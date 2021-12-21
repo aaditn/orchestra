@@ -223,30 +223,30 @@ const createPlayer = (instrument, pos, rot) => {
   player.r_wrist.bend = 0;
   // player.r_wrist.turn = -10;
   // player.r_fingers.bend = 90;
-  player.r_finger1.bend = 60;
-  player.r_finger2.bend = 60;
-  player.r_finger3.bend = 60;
-  player.r_finger4.bend = 60;
+  player.r_fingers[0].bend = 60;
+  player.r_fingers[1].bend = 60;
+  player.r_fingers[2].bend = 60;
+  player.r_fingers[3].bend = 60;
   
 
   player.l_arm.raise = 35;
   player.l_arm.straddle = 10;
   player.l_arm.turn = -10;
-  player.l_elbow.bend = 72;
+  player.l_elbow.bend = 75;
   player.l_elbow.turn = 0;
-  player.l_wrist.tilt = -40;
+  player.l_wrist.tilt = -50;
   player.l_wrist.bend = 0;
-  player.l_wrist.turn = 120;
+  player.l_wrist.turn = 155;
   // player.l_fingers.bend = 40;
   // player.l_fingers.turn = -80;
-  player.l_finger1.bend = 40;
-  player.l_finger1.turn = -80;
-  player.l_finger2.bend = 40;
-  player.l_finger2.turn = -80;
-  player.l_finger3.bend = 40;
-  player.l_finger3.turn = -80;
-  player.l_finger4.bend = 40;
-  player.l_finger4.turn = -80;
+  player.l_fingers[0].bend = 40;
+  player.l_fingers[0].turn = -80;
+  player.l_fingers[1].bend = 40;
+  player.l_fingers[1].turn = -80;
+  player.l_fingers[2].bend = 40;
+  player.l_fingers[2].turn = -80;
+  player.l_fingers[3].bend = 40;
+  player.l_fingers[3].turn = -80;
 
   return player
 }
@@ -258,10 +258,20 @@ const renderScene = () => {
   players.push(createPlayer("violin", {x: -21, y: -17, z: 0}, Math.PI))
 }
 
-const moveBow = (playerIdx, upbow, speed, note, strNum) => {
+const moveBow = (playerIdx, upbow, speed, note, strNum, fingerNum) => {
   let t = -30
   let msecs  = Math.floor(30 * speed)
   let player = players[playerIdx]
+  // Put the left finger down
+  for( let i = 1; i < 5; i++ ) { // finger numbers
+    if ( i == fingerNum ) {
+      player.l_fingers[i-1].bend = 60;
+      player.l_fingers[i-1].turn = -90;
+    } else {
+      player.l_fingers[i-1].bend = 40;
+      player.l_fingers[i-1].turn = -80;
+    }
+  }
   if (upbow) {
     // Execute up bow
     player.r_arm.straddle = 90 + strNum * 5 // play on default string
@@ -339,8 +349,8 @@ players[0].head.attach(new Violin(15, 20));
 players[1].head.attach(new Violin(15, 20));
 // players[0].r_fingers.attach(new Bow())
 // players[1].r_fingers.attach(new Bow())
-players[0].r_finger1.attach(new Bow())
-players[1].r_finger1.attach(new Bow())
+players[0].r_fingers[0].attach(new Bow())
+players[1].r_fingers[0].attach(new Bow())
 
 
 

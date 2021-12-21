@@ -1043,7 +1043,7 @@ class Finger extends Phalange {
 	constructor(parentJoint, zDelta) {
 		super(parentJoint, [1.2, 1.5, 1, 0, 45, 0.3, 0.4, 0.2]);
 		this.tips = new Phalange(this, [1.2, 1, 1, 45, 45, 0.3, 0.4, 0.2]);
-    this.position.z += zDelta
+    	this.position.z += zDelta
 		this.minRot = new THREE.Vector3(0, 0, -10);
 		this.maxRot = new THREE.Vector3(0, 0, 120);
 
@@ -1095,19 +1095,35 @@ class Mannequin extends THREE.Group
 		this.l_elbow = new Elbow(this.l_arm);
 		this.l_wrist = new Wrist(this.l_elbow);
 		// this.l_fingers = new Fingers(this.l_wrist);
+		this.l_fingers = [
+			new Finger(this.l_wrist, -0.75),
+			new Finger(this.l_wrist, -0.25),
+			new Finger(this.l_wrist, +0.25),
+			new Finger(this.l_wrist, +0.75)
+		]
+		/*
 		this.l_finger1 = new Finger(this.l_wrist, -0.75);
 		this.l_finger2 = new Finger(this.l_wrist, -0.25);
 		this.l_finger3 = new Finger(this.l_wrist, +0.25);
 		this.l_finger4 = new Finger(this.l_wrist, +0.75);
+		*/
 
 		this.r_arm = new Arm(this.torso, RIGHT);
 		this.r_elbow = new Elbow(this.r_arm);
 		this.r_wrist = new Wrist(this.r_elbow);
 		// this.r_fingers = new Fingers(this.r_wrist);
+		this.r_fingers = [
+			new Finger(this.r_wrist, -0.75),
+			new Finger(this.r_wrist, -0.25),
+			new Finger(this.r_wrist, +0.25),
+			new Finger(this.r_wrist, +0.75)
+		]
+		/*
 		this.r_finger1 = new Finger(this.r_wrist, -0.75);
 		this.r_finger2 = new Finger(this.r_wrist, -0.25);
 		this.r_finger3 = new Finger(this.r_wrist, +0.25);
 		this.r_finger4 = new Finger(this.r_wrist, +0.75);
+		*/
 
 		this.add(this.body);
 
@@ -1141,12 +1157,6 @@ class Mannequin extends THREE.Group
 
 		// this.l_fingers.bend = 10;
 		// this.r_fingers.bend = 10;
-    	/*
-		this.l_finger1.bend = 10;
-		this.r_finger1.bend = 10;
-    	this.l_finger2.bend = 10;
-		this.r_finger2.bend = 10;
-    	*/
 
 	} // Mannequin.constructor
 
@@ -1197,18 +1207,18 @@ class Mannequin extends THREE.Group
 			this.l_elbow.posture,
 			this.l_wrist.posture,
 			// this.l_fingers.posture,
-			this.l_finger1.posture,
-			this.l_finger2.posture,
-			this.l_finger3.posture,
-			this.l_finger4.posture,
+			this.l_fingers[0].posture,
+			this.l_fingers[1].posture,
+			this.l_fingers[2].posture,
+			this.l_fingers[3].posture,
 			this.r_arm.posture,
 			this.r_elbow.posture,
 			this.r_wrist.posture,
 			// this.r_fingers.posture
-			this.r_finger1.posture,
-			this.r_finger2.posture,
-			this.r_finger3.posture,
-			this.r_finger4.posture
+			this.r_fingers[0].posture,
+			this.r_fingers[1].posture,
+			this.r_fingers[2].posture,
+			this.r_fingers[3].posture,
 		];
 		return {
 			version: MANNEQUIN_POSTURE_VERSION,
@@ -1237,18 +1247,18 @@ class Mannequin extends THREE.Group
 		this.l_elbow.posture = posture.data[i++];
 		this.l_wrist.posture = posture.data[i++];
 		// this.l_fingers.posture = posture.data[i++];
-		this.l_finger1.posture = posture.data[i++];
-		this.l_finger2.posture = posture.data[i++];
-		this.l_finger3.posture = posture.data[i++];
-		this.l_finger4.posture = posture.data[i++];
+		this.l_fingers[0].posture = posture.data[i++];
+		this.l_fingers[1].posture = posture.data[i++];
+		this.l_fingers[2].posture = posture.data[i++];
+		this.l_fingers[3].posture = posture.data[i++];
 		this.r_arm.posture = posture.data[i++];
 		this.r_elbow.posture = posture.data[i++];
 		this.r_wrist.posture = posture.data[i++];
 		// this.r_fingers.posture = posture.data[i++];
-		this.r_finger1.posture = posture.data[i++];
-		this.r_finger2.posture = posture.data[i++];
-		this.r_finger3.posture = posture.data[i++];
-		this.r_finger4.posture = posture.data[i++];
+		this.r_fingers[0].posture = posture.data[i++];
+		this.r_fingers[1].posture = posture.data[i++];
+		this.r_fingers[2].posture = posture.data[i++];
+		this.r_fingers[3].posture = posture.data[i++];
 	} // Mannequin.posture
 
 	get postureString()

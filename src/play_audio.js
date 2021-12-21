@@ -48,6 +48,22 @@ const App = () => {
     }
   }
 
+  // return 0 (open), 1 (finger1), 2, 3, 4
+  const getViolinFingerFromNote = (note) => {
+    let fingerMap = {
+      'G3': 0, 'G#3': 1, 'Ab3': 1, 'A3': 1, 'A#3': 2, 'Bb3': 2, 'B3': 2, 'C4': 3, 
+      'C#4': 3, 'D4': 0, 'D#4': 1, 'Eb4': 1, 'E4': 1, 'F4': 2, 'F#4': 2, 'Gb4': 2,
+      'G4': 3, 'G#4': 3, 'Ab4': 3, 'A4': 0, 'A#4': 1, 'Bb4': 1, 'B4': 1, 'C5': 2, 
+      'C#5': 2, 'D5': 3, 'D#5': 3, 'Eb5': 3, 'E5': 0, 'F5': 1, 'F#5': 1, 'Gb5': 1,
+      'G5': 2, 'G#5': 2, 'Ab4': 2, 'A5': 3, 'A#5': 3, 'Bb5': 3, 'B5': 4
+    }
+    if (note in fingerMap) {
+      return fingerMap[note]
+    } else {
+      return 4 // 4th finger on E string for any note above B5 on E string
+    }
+  }
+
   const playNote = (synth, note, duration, when) => {
     synth.triggerAttackRelease(note, duration, when)
   }
@@ -69,7 +85,8 @@ const App = () => {
             if (j == 1) {
               // push only once for chords
               const strNum = getViolinStringFromNote(note)
-              times.push([voiceIdx, curr, duration, note, strNum])
+              const fingerNum = getViolinFingerFromNote(note)
+              times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
             }
           }
         }
@@ -87,8 +104,9 @@ const App = () => {
           const dur    = times[0][2] * 0.6
           const note   = times[0][3]
           const strNum = times[0][4]
+          const fingerNum = times[0][5]
           console.log(times[0][1], n, (n - times[0][1]), times.length, note, strNum )
-          moveBow(voiceIdx, bowdir, dur, note, strNum) // 0.75 leads to
+          moveBow(voiceIdx, bowdir, dur, note, strNum, fingerNum) // 0.75 leads to
           bowdir = !bowdir
         }
         times.shift()
