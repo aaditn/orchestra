@@ -1025,15 +1025,13 @@ class Fingers extends Phalange {
 		this.z = this.tips.z = angle;
 	}
 
-	get posture()
-	{
+	get posture() {
 		this.rotation.reorder('XYZ');
 		this.tips.rotation.reorder('XYZ');
 		return [grad(this.rotation.z), grad(this.tips.rotation.z)];
 	}
 	
-	set posture(pos)
-	{
+	set posture(pos) {
 		this.rotation.set(0, 0, rad(pos[0]), 'XYZ');
 		this.tips.rotation.set(0, 0, rad(pos[1]), 'XYZ');
 	}
@@ -1101,12 +1099,6 @@ class Mannequin extends THREE.Group
 			new Finger(this.l_wrist, +0.25),
 			new Finger(this.l_wrist, +0.75)
 		]
-		/*
-		this.l_finger1 = new Finger(this.l_wrist, -0.75);
-		this.l_finger2 = new Finger(this.l_wrist, -0.25);
-		this.l_finger3 = new Finger(this.l_wrist, +0.25);
-		this.l_finger4 = new Finger(this.l_wrist, +0.75);
-		*/
 
 		this.r_arm = new Arm(this.torso, RIGHT);
 		this.r_elbow = new Elbow(this.r_arm);
@@ -1118,12 +1110,6 @@ class Mannequin extends THREE.Group
 			new Finger(this.r_wrist, +0.25),
 			new Finger(this.r_wrist, +0.75)
 		]
-		/*
-		this.r_finger1 = new Finger(this.r_wrist, -0.75);
-		this.r_finger2 = new Finger(this.r_wrist, -0.25);
-		this.r_finger3 = new Finger(this.r_wrist, +0.25);
-		this.r_finger4 = new Finger(this.r_wrist, +0.75);
-		*/
 
 		this.add(this.body);
 
