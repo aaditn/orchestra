@@ -343,6 +343,15 @@ function animate(t) {
 }
 
 renderScene()
+const loader = new OBJLoader();
+  loader.load(
+    "/models/avahead.obj",
+    (object) => {
+      console.log("OBJECT: ", object)
+      object.scale.set(4, 4, 4)
+      scene.add(object)
+    }
+  )
 scene.add( new Chair(21, 180), new Chair(-21, 0));
 
 players[0].head.attach(new Violin(15, 20));
