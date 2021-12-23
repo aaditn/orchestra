@@ -1,4 +1,4 @@
-// const { Tone } = require("tone/build/esm/core/Tone")
+// import * as Tone from 'tone'
 
 const App = () => {
 
