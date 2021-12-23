@@ -73,6 +73,22 @@ const App = () => {
     let bowdir = true
     let curr = startTime
     const times = []
+
+    /*
+    const audio = document.querySelector('audio');
+    const actx  = Tone.context;
+    const dest  = actx.createMediaStreamDestination();
+    const recorder = new MediaRecorder(dest.stream);
+    synth.connect(dest);
+    const chunks = [];
+    recorder.start()
+    recorder.ondataavailable = evt => chunks.push(evt.data);
+    recorder.onstop = evt => {
+      let blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+      audio.src = URL.createObjectURL(blob);
+    };
+    */
+
     notes.forEach((noteArr, i) => {
       let duration = 0
       noteArr.forEach((el, j) => {
@@ -111,16 +127,20 @@ const App = () => {
         }
         times.shift()
         if (times.length <= 0) {
+          // recorder.stop();
           clearInterval(intvl)
         }
       }
     }, 20)
+
+
   }
   
   const handleClickPlay = () => {
     // const synth = new Tone.Synth().toDestination();
     // const synth = SampleLibrary.load({ instruments: "saxophone" }).toDestination();
     // playMidiFile(synth, "/midi/tchaik_serenade.mid")
+
 
     // Play a score with multiple parts
     let score   = []
@@ -132,7 +152,7 @@ const App = () => {
         const filter = new Tone.AutoFilter(4).start();
         const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
         synth.chain(panner3d, Tone.Destination)
-        // synth.toDestination();
+        synth.toDestination()
         score.push({synth: synth, voice: voice})
       }
     }
@@ -142,7 +162,9 @@ const App = () => {
       console.log("NOW = ", now)
       score.forEach((blob, blobIdx) => {
         if (! blob.voice.muted) {
-          playNotes( blob.synth, blob.voice.data, now, blob.voice.speed, updateNumNotes, blobIdx )
+          playNotes( 
+            blob.synth, blob.voice.data, now, blob.voice.speed, 
+            updateNumNotes, blobIdx )
         }
       })
     })
