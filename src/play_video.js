@@ -195,25 +195,24 @@ function createScene2() {
 }
 
 const createPlayer = (instrument, pos, rot) => {
-  const player = new Female();
+  const player = new Male();
   player.position.set(pos.x, pos.y, pos.z);
   player.rotation.y = rot
-  player.turn = 165;
+  player.turn = 180;
   player.bend = -40;
   player.torso.bend = 30;
   player.torso.turn = 0;
   player.torso.tilt = 0;
 
-  player.l_leg.straddle = -30;
-  player.l_leg.raise = 65;
+  player.l_leg.straddle = 10;
+  player.l_leg.raise = 70;
   player.l_knee.bend = 100;
-  player.l_ankle.bend = -10;
+  player.l_ankle.bend = 0;
 
-  player.r_leg.straddle = -25;
+  player.r_leg.straddle = 10;
+  player.r_leg.raise = 65;
   player.r_leg.turn = -25;
-  player.r_leg.raise = 75;
   player.r_knee.bend = 100;
-
 
   player.r_arm.straddle = 90;
   player.r_arm.raise = -67; // -70
@@ -254,8 +253,8 @@ const createPlayer = (instrument, pos, rot) => {
 const renderScene = () => {
   createScene2();
   players = []
-  players.push(createPlayer("violin", {x: 21, y: -17, z: 0}, 0))
-  players.push(createPlayer("violin", {x: -21, y: -17, z: 0}, Math.PI))
+  players.push(createPlayer("violin", {x: 25, y: -17, z: 0}, 0))
+  players.push(createPlayer("violin", {x: -25, y: -17, z: 0}, Math.PI))
 }
 
 const moveBow = (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -299,6 +298,25 @@ const moveBow = (playerIdx, upbow, speed, note, strNum, fingerNum) => {
   }
 }
 
+const loadFaceAndAttach = (loader, modelPath, attachPoint) => {
+  let texture = new THREE.TextureLoader().load( modelPath + "/model.png" )
+  let material = new THREE.MeshBasicMaterial({ map: texture})
+  loader.load(
+    modelPath + "/model.obj",
+    (object) => {
+      object.scale.set(40, 40, 40)
+      object.rotation.y = Math.PI/2
+      object.position.set(1, 4, 0)
+  
+      object.traverse( function ( child ) {
+        if ( child instanceof THREE.Mesh ) {
+          child.material = material
+        }
+      });
+      attachPoint.attach(object);
+    }
+  )
+}
 
 function animate(t) {
   controls.update();
@@ -346,54 +364,14 @@ function animate(t) {
 
 renderScene()
 
-scene.add( new Chair(21, 180), new Chair(-21, 0));
+scene.add( new Chair(25, 180), new Chair(-25, 0));
 
 players[0].torso.attach(new Violin(17, 7, 20));
 players[1].torso.attach(new Violin(17, 7, 20));
-// players[0].r_fingers.attach(new Bow())
-// players[1].r_fingers.attach(new Bow())
 players[0].r_fingers[0].attach(new Bow())
 players[1].r_fingers[0].attach(new Bow())
 
-face1_texture = new THREE.TextureLoader().load( "models/face1/model.png" );
-face1_material = new THREE.MeshBasicMaterial( { map: face1_texture} );
-brett_texture = new THREE.TextureLoader().load( "models/brett_face/model.png" );
-brett_material = new THREE.MeshBasicMaterial( { map: brett_texture} );
 const loader = new OBJLoader();
-loader.load(
-  "/models/face1/model.obj",
-  (object) => {
-    console.log("OBJECT: ", object)
-
-    object.scale.set(40, 40, 40)
-    object.rotation.y = Math.PI/2
-    object.position.set(1, 4, 0)
-
-    object.traverse( function ( child ) {
-      if ( child instanceof THREE.Mesh ) {
-        child.material = face1_material;
-      }
-    });
-    players[0].neck.attach(object);
-    // scene.add(clone1)
-  }
-)
-loader.load(
-  "/models/brett_face/model.obj",
-  (object) => {
-    object.scale.set(40, 40, 40)
-    object.rotation.y = Math.PI/2
-    object.position.set(1, 4, 0)
-
-    object.traverse( function ( child ) {
-      if ( child instanceof THREE.Mesh ) {
-        child.material = brett_material;
-      }
-    });
-    players[1].neck.attach(object);
-    // scene.add(clone1)
-  }
-)
-
-
+loadFaceAndAttach(loader, "/models/face1", players[0].neck)
+loadFaceAndAttach(loader, "/models/brett_face", players[1].neck)
 
