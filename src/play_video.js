@@ -353,14 +353,22 @@ players[1].head.attach(new Violin(15, 20));
 players[0].r_fingers[0].attach(new Bow())
 players[1].r_fingers[0].attach(new Bow())
 
+sanjay_texture = new THREE.TextureLoader().load( "models/sanjay_face/model.png" );
+sanjay_material = new THREE.MeshBasicMaterial( { map: sanjay_texture} );
 const loader = new OBJLoader();
 loader.load(
-  "/models/avahead.obj",
+  "/models/sanjay_face/model.obj",
   (object) => {
     console.log("OBJECT: ", object)
-    object.scale.set(4, 4, 4)
+    object.scale.set(40, 40, 40)
     object.rotation.y = Math.PI/2
-    object.position.set(2.5, -2, 0)
+    object.position.set(1, 2.5, 0)
+    // object.material.set(sanjay_material)
+    object.traverse( function ( child ) {
+      if ( child instanceof THREE.Mesh ) {
+        child.material = sanjay_material;
+      }
+    });
     players[0].head.attach(object);
     // scene.add(object)
   }
