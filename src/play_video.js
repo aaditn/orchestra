@@ -24,12 +24,12 @@ class Chair extends THREE.Group {
 }
 
 class Violin extends THREE.Group {
-  constructor(x, angle) {
+  constructor(x, y, angle) {
     super();
 
-    this.position.set(x, -14, -5);
+    this.position.set(x, y, -5);
     this.rotation.y = rad(angle);
-    this.rotation.z = rad(-20);
+    this.rotation.z = rad(-10);
 
     let head = new THREE.Mesh( new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
@@ -346,31 +346,50 @@ renderScene()
 
 scene.add( new Chair(21, 180), new Chair(-21, 0));
 
-players[0].head.attach(new Violin(15, 20));
-players[1].head.attach(new Violin(15, 20));
+players[0].torso.attach(new Violin(17, 7, 20));
+players[1].torso.attach(new Violin(17, 7, 20));
 // players[0].r_fingers.attach(new Bow())
 // players[1].r_fingers.attach(new Bow())
 players[0].r_fingers[0].attach(new Bow())
 players[1].r_fingers[0].attach(new Bow())
 
-sanjay_texture = new THREE.TextureLoader().load( "models/sanjay_face/model.png" );
-sanjay_material = new THREE.MeshBasicMaterial( { map: sanjay_texture} );
+face1_texture = new THREE.TextureLoader().load( "models/face1/model.png" );
+face1_material = new THREE.MeshBasicMaterial( { map: face1_texture} );
+brett_texture = new THREE.TextureLoader().load( "models/brett_face/model.png" );
+brett_material = new THREE.MeshBasicMaterial( { map: brett_texture} );
 const loader = new OBJLoader();
 loader.load(
-  "/models/sanjay_face/model.obj",
+  "/models/face1/model.obj",
   (object) => {
     console.log("OBJECT: ", object)
+
     object.scale.set(40, 40, 40)
     object.rotation.y = Math.PI/2
     object.position.set(1, 2.5, 0)
-    // object.material.set(sanjay_material)
+
     object.traverse( function ( child ) {
       if ( child instanceof THREE.Mesh ) {
-        child.material = sanjay_material;
+        child.material = face1_material;
       }
     });
     players[0].head.attach(object);
-    // scene.add(object)
+    // scene.add(clone1)
+  }
+)
+loader.load(
+  "/models/brett_face/model.obj",
+  (object) => {
+    object.scale.set(40, 40, 40)
+    object.rotation.y = Math.PI/2
+    object.position.set(1, 2.5, 0)
+
+    object.traverse( function ( child ) {
+      if ( child instanceof THREE.Mesh ) {
+        child.material = brett_material;
+      }
+    });
+    players[1].head.attach(object);
+    // scene.add(clone1)
   }
 )
 

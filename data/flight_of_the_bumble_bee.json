@@ -146,7 +146,7 @@
   },
   "voice2": {
       "instrument": "piano",
-      "muted": true,
+      "muted": false,
       "speed": 0.1,
       "data": [
 
