@@ -303,9 +303,11 @@ const moveBow = (playerIdx, upbow, speed, note, strNum, fingerNum) => {
 function animate(t) {
   controls.update();
 
+  /*
   var looking = 15 * sin(t),
     reading = 25 * cos(1.2 * t) * sin(0.7 * t),
     k = Math.min(1.5, Math.pow(sin(0.37 * t) * 0.5016 + 0.5, 300));
+  */
   if (t - prevt > 300) {
     // console.log("t =", t, " prevt =", prevt, " sin = ", sin(2 * 1.7 * t))
     // prevt = t
@@ -365,14 +367,14 @@ loader.load(
 
     object.scale.set(40, 40, 40)
     object.rotation.y = Math.PI/2
-    object.position.set(1, 2.5, 0)
+    object.position.set(1, 4, 0)
 
     object.traverse( function ( child ) {
       if ( child instanceof THREE.Mesh ) {
         child.material = face1_material;
       }
     });
-    players[0].head.attach(object);
+    players[0].neck.attach(object);
     // scene.add(clone1)
   }
 )
@@ -381,14 +383,14 @@ loader.load(
   (object) => {
     object.scale.set(40, 40, 40)
     object.rotation.y = Math.PI/2
-    object.position.set(1, 2.5, 0)
+    object.position.set(1, 4, 0)
 
     object.traverse( function ( child ) {
       if ( child instanceof THREE.Mesh ) {
         child.material = brett_material;
       }
     });
-    players[1].head.attach(object);
+    players[1].neck.attach(object);
     // scene.add(clone1)
   }
 )

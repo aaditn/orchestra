@@ -1079,7 +1079,7 @@ class Mannequin extends THREE.Group
 		this.pelvis = new Pelvis(this.body);
 		this.torso = new Torso(this.pelvis);
 		this.neck = new Neck(this.torso);
-		this.head = new Head(this.neck);
+		// this.head = new Head(this.neck);
 
 		this.l_leg = new Leg(this.pelvis, LEFT);
 		this.l_knee = new Knee(this.l_leg);
@@ -1114,7 +1114,7 @@ class Mannequin extends THREE.Group
 		this.add(this.body);
 
 		var s = 1.5 / (0.5 + height);
-		this.head.scale.set(s, s, s);
+		// this.head.scale.set(s, s, s);
 		this.castShadow = true;
 		this.receiveShadow = true;
 		scene.add(this);
@@ -1127,7 +1127,7 @@ class Mannequin extends THREE.Group
 
 		this.torso.bend = 2;
 
-		this.head.nod = -10;
+		// this.head.nod = -10;
 
 		this.l_arm.raise = -5;
 		this.r_arm.raise = -5;
@@ -1182,7 +1182,7 @@ class Mannequin extends THREE.Group
 			Number((this.body.position.y + this.position.y).toFixed(1)),
 			this.body.posture,
 			this.torso.posture,
-			this.head.posture,
+			// this.head.posture,
 			this.l_leg.posture,
 			this.l_knee.posture,
 			this.l_ankle.posture,
@@ -1222,7 +1222,7 @@ class Mannequin extends THREE.Group
 		this.body.position.y = posture.data[i++];
 		this.body.posture = posture.data[i++];
 		this.torso.posture = posture.data[i++];
-		this.head.posture = posture.data[i++];
+		// this.head.posture = posture.data[i++];
 		this.l_leg.posture = posture.data[i++];
 		this.l_knee.posture = posture.data[i++];
 		this.l_ankle.posture = posture.data[i++];
