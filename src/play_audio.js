@@ -109,11 +109,14 @@ const App = () => {
       })
       curr += duration
     })
+
+    let totCount = 0
+    let hitCount = 0
     let intvl = setInterval(() => {
+      totCount++
       const n = Tone.now()
       if (n > times[0][1]) { // next note time has arrived
         if (n - times[0][1] < 0.1) {
-          console.log(times[0][1], n, (n - times[0][1]), times.length,  )
           updateNumNotes(voiceIdx)
           // play video of next note
           // format: [voiceIdx, curr, duration, note, strNum]
@@ -121,9 +124,11 @@ const App = () => {
           const note   = times[0][3]
           const strNum = times[0][4]
           const fingerNum = times[0][5]
-          console.log(times[0][1], n, (n - times[0][1]), times.length, note, strNum )
-          moveBow(voiceIdx, bowdir, dur, note, strNum, fingerNum) // 0.75 leads to
+          console.log(times[0][1].toFixed(2), n.toFixed(2), (n - times[0][1]).toFixed(2), times.length, note, strNum )
+          moveBow(voiceIdx, bowdir, dur, note, strNum, fingerNum)
           bowdir = !bowdir
+          hitCount++
+          console.log("TOTALCOUNT, HITCOUNT = ", totCount, hitCount)
         }
         times.shift()
         if (times.length <= 0) {
@@ -131,8 +136,7 @@ const App = () => {
           clearInterval(intvl)
         }
       }
-    }, 20)
-
+    }, 40)
 
   }
   
@@ -178,7 +182,5 @@ const App = () => {
     handleClickPlay()
   });
 }
-
-
 
 App()
