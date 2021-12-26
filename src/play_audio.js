@@ -110,10 +110,7 @@ const App = () => {
       curr += duration
     })
 
-    let totCount = 0
-    let hitCount = 0
     let intvl = setInterval(() => {
-      totCount++
       const n = Tone.now()
       if (n > times[0][1]) { // next note time has arrived
         if (n - times[0][1] < 0.1) {
@@ -127,8 +124,6 @@ const App = () => {
           console.log(times[0][1].toFixed(2), n.toFixed(2), (n - times[0][1]).toFixed(2), times.length, note, strNum )
           moveBow(voiceIdx, bowdir, dur, note, strNum, fingerNum)
           bowdir = !bowdir
-          hitCount++
-          console.log("TOTALCOUNT, HITCOUNT = ", totCount, hitCount)
         }
         times.shift()
         if (times.length <= 0) {

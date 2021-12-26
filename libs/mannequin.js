@@ -37,7 +37,7 @@ class MannequinPostureVersionError extends Error
 	}
 }
 
-
+/*
 function createScene() {
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -85,14 +85,15 @@ function createScene() {
 
 	clock = new THREE.Clock();
 } // createScene
+*/
 
-
+/*
 function drawFrame()
 {
 	animate(100 * clock.getElapsedTime());
 	renderer.render(scene, camera);
 }
-
+*/
 
 // a placeholder function, should be overwritten by the user
 function animate()

@@ -89,7 +89,6 @@ class Bow extends THREE.Group {
   }
 }
 
-
 class Mask extends THREE.Group {
   constructor(zScale = 1, color = 'lightgray') {
     super();
@@ -142,7 +141,35 @@ class Smartphone extends THREE.Group {
   }
 }
 
-function createScene2() {
+class Event {
+  constructor(evtData) {
+    this.data  = evtData
+  }
+}
+
+const dispatchEvent = (evt) => {
+  const data = evt.data
+  switch(data.action) {
+    case "move":
+      moveObject(evt)
+      break;
+
+    default:
+
+  }
+}
+
+const moveObject = (evt) => {
+  const data = evt.data
+}
+
+function drawFrame() {
+	animate(100 * clock.getElapsedTime());
+	renderer.render(scene, camera);
+}
+
+// overridden from mannequin.js
+function createScene() {
   prevt = 0
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(1200, 750);
@@ -168,7 +195,6 @@ function createScene2() {
   function onWindowResize(event) {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     // renderer.setSize(window.innerWidth, window.innerHeight, true);
   }
   window.addEventListener('resize', onWindowResize, false);
@@ -251,10 +277,27 @@ const createPlayer = (instrument, pos, rot) => {
 }
 
 const renderScene = () => {
-  createScene2();
+  createScene();
   players = []
   players.push(createPlayer("violin", {x: 25, y: -17, z: 0}, 0))
   players.push(createPlayer("violin", {x: -25, y: -17, z: 0}, Math.PI))
+
+  scene.add( new Chair(25, 180), new Chair(-25, 0));
+
+  players[0].torso.attach(new Violin(17, 7, 20));
+  players[1].torso.attach(new Violin(17, 7, 20));
+  players[0].r_fingers[0].attach(new Bow())
+  players[1].r_fingers[0].attach(new Bow())
+
+  const loader = new OBJLoader();
+  loadFaceAndAttach(loader, "/models/face1", players[0].neck)
+  loadFaceAndAttach(loader, "/models/brett_face", players[1].neck)
+}
+
+const playScript = () => {
+  dispatchEvent( 
+    new Event({actor: players[0], action: "move", duration: 2, start: [0, 0, 0], end: [10, 0, 10], scheduled_ts: 2})
+  )
 }
 
 const moveBow = (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -319,8 +362,6 @@ const loadFaceAndAttach = (loader, modelPath, attachPoint) => {
 }
 
 function animate(t) {
-  controls.update();
-
   /*
   var looking = 15 * sin(t),
     reading = 25 * cos(1.2 * t) * sin(0.7 * t),
@@ -363,15 +404,4 @@ function animate(t) {
 }
 
 renderScene()
-
-scene.add( new Chair(25, 180), new Chair(-25, 0));
-
-players[0].torso.attach(new Violin(17, 7, 20));
-players[1].torso.attach(new Violin(17, 7, 20));
-players[0].r_fingers[0].attach(new Bow())
-players[1].r_fingers[0].attach(new Bow())
-
-const loader = new OBJLoader();
-loadFaceAndAttach(loader, "/models/face1", players[0].neck)
-loadFaceAndAttach(loader, "/models/brett_face", players[1].neck)
 
