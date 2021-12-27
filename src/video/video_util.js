@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { Mannequin, Male, Torso, LimbShape, HeadShape, rad, sin } from '../../libs/mannequin'
+import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 
 class Chair extends THREE.Group {
@@ -152,7 +152,7 @@ class Event {
     }
 }
 
-
+//-------- START VideoUtil --------//
 const VideoUtil = {
     scene: null,
     camera: null,
@@ -334,25 +334,25 @@ const VideoUtil = {
 			// Execute up bow
 			player.r_arm.straddle = 90 + strNum * 5 // play on default string
 			let intvl = setInterval(() => {
-			player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t));
-			player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * t));
-			if (t >= 30) {
-				clearInterval(intvl)
-			}
-			t += 1
+				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t));
+				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * t));
+				if (t >= 30) {
+					clearInterval(intvl)
+				}
+				t += 1
 			}, msecs)
 		} else {
 			// Execute down bow
 			player.r_arm.straddle = 90 + strNum * 5 // play on default string
 			let intvl = setInterval(() => {
-			const tdown = 0 - t
-			player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * tdown));
-			player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * tdown));
-			
-			if (t >= 30) {
-				clearInterval(intvl)
-			}
-			t += 1
+				const tdown = 0 - t
+				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * tdown));
+				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * tdown));
+				
+				if (t >= 30) {
+					clearInterval(intvl)
+				}
+				t += 1
 			}, msecs)
 		}
     },
