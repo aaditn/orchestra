@@ -5,70 +5,70 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
-	super();
+		super();
 
-	this.position.set(x, -25, 0);
-	this.rotation.y = rad(angle);
+		this.position.set(x, -25, 0);
+		this.rotation.y = rad(angle);
 
-	Mannequin.colors[4] = 'darksalmon';
+		Mannequin.colors[4] = 'darksalmon';
 
-	var seat = new LimbShape(false, [16, 10, 16, 0, 270, 1, 0.2, 0], 20, 20);
-	
-	var backrest = new LimbShape(false, [3, 30, 6, -90, 270, 1, 0.5, 0], 50, 10);
-	backrest.position.set(-9, 16, 0);
-	backrest.rotation.set(0, 0, rad(20));
+		var seat = new LimbShape(false, [16, 10, 16, 0, 270, 1, 0.2, 0], 20, 20);
+		
+		var backrest = new LimbShape(false, [3, 30, 6, -90, 270, 1, 0.5, 0], 50, 10);
+		backrest.position.set(-9, 16, 0);
+		backrest.rotation.set(0, 0, rad(20));
 
-	var cussion = new THREE.Mesh(
-	    new THREE.SphereBufferGeometry(6.8, 20, 10, 0, 2 * Math.PI, 0, Math.PI / 2),
-	    new THREE.MeshPhongMaterial({ color: 'black' }));
-	cussion.scale.set(1, 0.25, 1);
-	cussion.position.set(0, 4, 0);
-	
-	this.add(seat, cussion, backrest);
+		var cussion = new THREE.Mesh(
+			new THREE.SphereBufferGeometry(6.8, 20, 10, 0, 2 * Math.PI, 0, Math.PI / 2),
+			new THREE.MeshPhongMaterial({ color: 'black' }));
+		cussion.scale.set(1, 0.25, 1);
+		cussion.position.set(0, 4, 0);
+		
+		this.add(seat, cussion, backrest);
     }
 }
 
 class Violin extends THREE.Group {
     constructor(x, y, angle) {
-	super();
+		super();
 
-	this.position.set(x, y, -5);
-	this.rotation.y = rad(angle);
-	this.rotation.z = rad(-10);
+		this.position.set(x, y, -5);
+		this.rotation.y = rad(angle);
+		this.rotation.z = rad(-10);
 
-	let head = new THREE.Mesh( new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
-				   new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
-	head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(0, 4, 0);
-	head.castShadow = true;
+		let head = new THREE.Mesh( new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
+					new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
+		head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(0, 4, 0);
+		head.castShadow = true;
 
-	let fboard = new THREE.Mesh( new THREE.BoxGeometry(7, 1, 1),
-				     new THREE.MeshLambertMaterial({ color: 0x000000 }));
-	fboard.scale.set(1, 0.25, 1); fboard.position.set(-4, 4, 0);
-	fboard.castShadow = true;
+		let fboard = new THREE.Mesh( new THREE.BoxGeometry(7, 1, 1),
+						new THREE.MeshLambertMaterial({ color: 0x000000 }));
+		fboard.scale.set(1, 0.25, 1); fboard.position.set(-4, 4, 0);
+		fboard.castShadow = true;
 
-	let body1 = new THREE.Mesh( new THREE.CylinderGeometry(3, 3, 4, 32),
-				    new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
-	body1.scale.set(1, 0.25, 1); body1.position.set(-7, 3, 0);
-	body1.castShadow = true;
+		let body1 = new THREE.Mesh( new THREE.CylinderGeometry(3, 3, 4, 32),
+						new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
+		body1.scale.set(1, 0.25, 1); body1.position.set(-7, 3, 0);
+		body1.castShadow = true;
 
-	let body2 = new THREE.Mesh( new THREE.CylinderGeometry(4, 4, 4, 32),
-				    new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
-	body2.scale.set(1, 0.25, 1); body2.position.set(-12, 3, 0);
-	body2.castShadow = true;
+		let body2 = new THREE.Mesh( new THREE.CylinderGeometry(4, 4, 4, 32),
+						new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
+		body2.scale.set(1, 0.25, 1); body2.position.set(-12, 3, 0);
+		body2.castShadow = true;
 
-	let chinrest = new THREE.Mesh( new THREE.CylinderGeometry(1.25, 1.25, 1, 32),
-				       new THREE.MeshLambertMaterial({ color: 0x0f0f0f }));
-	chinrest.scale.set(1, 0.25, 1); chinrest.position.set(-15, 3.5, -1);
+		let chinrest = new THREE.Mesh( new THREE.CylinderGeometry(1.25, 1.25, 1, 32),
+						new THREE.MeshLambertMaterial({ color: 0x0f0f0f }));
+		chinrest.scale.set(1, 0.25, 1); chinrest.position.set(-15, 3.5, -1);
 
-	let string1 = new THREE.Mesh( new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
-				      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-	string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-8, 4.3, 0.2);
+		let string1 = new THREE.Mesh( new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
+						new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+		string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-8, 4.3, 0.2);
 
-	let string2 = new THREE.Mesh( new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
-				      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-	string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-8, 4.3, -0.2);
+		let string2 = new THREE.Mesh( new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
+						new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+		string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-8, 4.3, -0.2);
 
-	this.add(head, fboard, body1, body2, chinrest, string1, string2);
+		this.add(head, fboard, body1, body2, chinrest, string1, string2);
     }
 }
 
@@ -96,59 +96,59 @@ class Bow extends THREE.Group {
 
 class Mask extends THREE.Group {
     constructor(zScale = 1, color = 'lightgray') {
-	super();
+		super();
 
-	var geometry, material, mask, thread;
+		var geometry, material, mask, thread;
 
-	geometry = new THREE.CylinderBufferGeometry(3, 3, 2.4, 6, 1, true, rad(45), rad(90));
-	material = new THREE.MeshBasicMaterial({ color: color });
-	mask = new THREE.Mesh(geometry, material);
+		geometry = new THREE.CylinderBufferGeometry(3, 3, 2.4, 6, 1, true, rad(45), rad(90));
+		material = new THREE.MeshBasicMaterial({ color: color });
+		mask = new THREE.Mesh(geometry, material);
 
-	mask.scale.x = 1.25;
-	mask.scale.z = 0.85;
-	mask.position.x = -0.5;
-	mask.position.y = 2;
-	mask.rotation.z = rad(-25);
+		mask.scale.x = 1.25;
+		mask.scale.z = 0.85;
+		mask.position.x = -0.5;
+		mask.position.y = 2;
+		mask.rotation.z = rad(-25);
 
-	geometry = new THREE.CylinderBufferGeometry(3, 3, 0.1, 26, 1, true);
-	thread = new THREE.Mesh(geometry, material);
-	thread.scale.x = 0.65;
-	thread.scale.z = 1.1 * zScale;
-	thread.position.x = (3 - 3 * thread.scale.x) / 2;
-	thread.position.y = -1.2;
-	mask.add(thread);
+		geometry = new THREE.CylinderBufferGeometry(3, 3, 0.1, 26, 1, true);
+		thread = new THREE.Mesh(geometry, material);
+		thread.scale.x = 0.65;
+		thread.scale.z = 1.1 * zScale;
+		thread.position.x = (3 - 3 * thread.scale.x) / 2;
+		thread.position.y = -1.2;
+		mask.add(thread);
 
-	thread = new THREE.Mesh(geometry, material);
-	thread.scale.x = 0.9;
-	thread.scale.z = 1.2;
-	thread.position.x = (3 - 3 * thread.scale.x) / 2;
-	thread.position.y = 1.2;
-	mask.add(thread);
+		thread = new THREE.Mesh(geometry, material);
+		thread.scale.x = 0.9;
+		thread.scale.z = 1.2;
+		thread.position.x = (3 - 3 * thread.scale.x) / 2;
+		thread.position.y = 1.2;
+		mask.add(thread);
 
-	this.add(mask);
+		this.add(mask);
     }
 }
 
 class Smartphone extends THREE.Group {
     constructor() {
-	super();
+		super();
 
-	Mannequin.colors[4] = 'dimgray';
+		Mannequin.colors[4] = 'dimgray';
 
-	var body = new LimbShape(false, [1 / 2, 3.5, 6, -1, 1, 1, 0.2, 0.001], 8, 8);
+		var body = new LimbShape(false, [1 / 2, 3.5, 6, -1, 1, 1, 0.2, 0.001], 8, 8);
 
-	Mannequin.colors[4] = 'white';
+		Mannequin.colors[4] = 'white';
 
-	var screen = new LimbShape(false, [0.47, 3, 5.5, -1, 1, 1, 0.2, 0.001], 8, 8);
-	screen.position.x = -0.02;
+		var screen = new LimbShape(false, [0.47, 3, 5.5, -1, 1, 1, 0.2, 0.001], 8, 8);
+		screen.position.x = -0.02;
 
-	this.add(body, screen);
+		this.add(body, screen);
     }
 }
 
 class Event {
     constructor(evtData) {
-	this.data  = evtData
+		this.data  = evtData
     }
 }
 
