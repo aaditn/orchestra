@@ -123,9 +123,9 @@ const AudioUtil = {
 		// fetch the JSON audio data from fileUrl
 		const response = await fetch(fileUrl ,{
 			headers : { 
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-				}
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			}
 		})
 		const responseJson = await response.json()
 		console.log(responseJson);
@@ -145,14 +145,14 @@ const AudioUtil = {
 		let score   = []
 		if (Object.keys(AudioUtil.voices).length > 0) {
 			for(let vname in AudioUtil.voices) {
-			const voice = AudioUtil.voices[vname]
-			const synth = SampleLibrary.load({ instruments: voice.instrument });
-			const distortion = new Tone.Distortion(0.5);
-			const filter = new Tone.AutoFilter(4).start();
-			const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
-			synth.chain(panner3d, Tone.Destination)
-			synth.toDestination()
-			score.push({synth: synth, voice: voice})
+				const voice = AudioUtil.voices[vname]
+				const synth = SampleLibrary.load({ instruments: voice.instrument });
+				const distortion = new Tone.Distortion(0.5);
+				const filter = new Tone.AutoFilter(4).start();
+				const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
+				synth.chain(panner3d, Tone.Destination)
+				synth.toDestination()
+				score.push({synth: synth, voice: voice})
 			}
 		}
 		
