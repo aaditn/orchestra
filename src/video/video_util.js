@@ -124,9 +124,10 @@ class Mask extends THREE.Group {
 
 class Event {
     constructor(start, end, data) {
-		this.start = start
-		this.end   = end
-		this.data  = data
+		this.start  = start
+		this.end    = end
+		this.data   = data
+		this.status = 'ready'
     }
 }
 
@@ -202,18 +203,6 @@ const VideoUtil = {
 		VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
 		VideoUtil.clock = new THREE.Clock();
 
-		// Add events
-		VideoUtil.all_events.push(new Event(100, 300, {action: 'walk', actor: VideoUtil.players[2]}))
-		VideoUtil.all_events.push(
-			new Event(100, 600, {action: 'translate', actor: VideoUtil.players[2],
-				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0}}
-			)
-		)
-		VideoUtil.all_events.push(
-			new Event(600, 1000, {action: 'rotate', actor: VideoUtil.players[2],
-				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: -Math.PI, z: 0}, }
-			)
-		)
     },
 
 	// pos = {x: <xval>, y: <yval>, z: <zval>}
@@ -300,6 +289,19 @@ const VideoUtil = {
 		VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
 		VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
 
+
+		// Add events
+		VideoUtil.all_events.push(new Event(100, 300, {action: 'walk', actor: VideoUtil.players[2]}))
+		VideoUtil.all_events.push(
+			new Event(100, 600, {action: 'translate', actor: VideoUtil.players[2],
+				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0}}
+			)
+		)
+		VideoUtil.all_events.push(
+			new Event(600, 1000, {action: 'rotate', actor: VideoUtil.players[2],
+				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: -Math.PI, z: 0}, }
+			)
+		)
     },
 
     moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -363,26 +365,51 @@ const VideoUtil = {
 		)
     },
 
-    animate: (t) => {
+	processEvent: (t, evt) => {
+		const action = evt.data.action
+		const actor  = evt.data.actor
+		switch(action) {
+			case 'walk':
+				VideoActions.walk(t, evt)
+				break;
+			case 'translate':
+				VideoActions.translate(t, evt)
+				break;
+			case 'rotate':
+				VideoActions.rotate(t, evt)
+				break;
+			default:
+				// default here
+		}
+	},
 
+    animate: (t) => {
+		// cycle through events and process as needed
 		VideoUtil.all_events.forEach((evt) => {
 			const start  = evt.start
 			const end    = evt.end
-			const action = evt.data.action
-			if (t >= start && t <= end) {
-				switch(action) {
-					case 'walk':
-						VideoActions.walk( t, evt, VideoUtil.players[2])
-						break;
-					case 'translate':
-						VideoActions.translate( t, evt, VideoUtil.players[2])
-						break;
-					case 'rotate':
-						VideoActions.rotate( t, evt, VideoUtil.players[2])
-						break;
-					default:
-						// default here
-				}
+			switch(evt.status) {
+				case 'ready':
+					if (t >= start && t <= end) {
+						console.log("EVT going active: ", evt)
+						evt.status = 'active'
+						VideoUtil.processEvent(t, evt)
+					}
+					break;
+				case 'active':
+					if (t >= start && t <= end) {
+						VideoUtil.processEvent(t, evt)
+					} else {
+						console.log("EVT done: ", evt)
+						evt.status = 'done'
+						// post-process here if needed
+					}
+					break
+				case 'done':
+					// do nothing
+					break
+				default:
+					break
 			}
 		})
 

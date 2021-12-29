@@ -3,7 +3,8 @@ import { sin } from '../../libs/mannequin'
 //-------- START VideoActions --------//
 const VideoActions = {
 
-    walk: (t, evt, actor) => {
+    walk: (t, evt) => {
+        const actor = evt.data.actor
 		// walking motion
 		actor.l_leg.raise = 30 * sin(4 * t)
 		actor.r_leg.raise = -30 * sin(4 * t)
@@ -11,7 +12,8 @@ const VideoActions = {
 		actor.r_arm.raise = 30 * sin(4 * t)
 	},
 
-    translate: (t, evt, actor) => {
+    translate: (t, evt) => {
+        const actor    = evt.data.actor
 		const startPos = evt.data.startPos
 		const endPos   = evt.data.endPos
 		const deltaT   = t - evt.start
@@ -23,7 +25,8 @@ const VideoActions = {
 		actor.position.set(newPosX, newPosY, newPosZ)
 	},
 
-    rotate: (t, evt, actor) => {
+    rotate: (t, evt) => {
+        const actor    = evt.data.actor
 		const startRot = evt.data.startRot
 		const endRot   = evt.data.endRot
 		const deltaT   = t - evt.start
