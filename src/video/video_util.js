@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
@@ -20,7 +21,8 @@ class Chair extends THREE.Group {
 
 		var cussion = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(6.8, 20, 10, 0, 2 * Math.PI, 0, Math.PI / 2),
-			new THREE.MeshPhongMaterial({ color: 'black' }));
+			new THREE.MeshPhongMaterial({ color: 'black' })
+		);
 		cussion.scale.set(1, 0.25, 1);
 		cussion.position.set(0, 4, 0);
 		
@@ -74,23 +76,23 @@ class Violin extends THREE.Group {
 
 class Bow extends THREE.Group {
     constructor(x, angle) {
-	super();
+		super();
 
-	this.position.set(-1, 0, 0);
-	this.rotation.z = rad(-90);
+		this.position.set(-1, 0, 0);
+		this.rotation.z = rad(-90);
 
-	let bowwood = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
-				      new THREE.MeshLambertMaterial({ color: 0xfa0a0a }));
-	bowwood.scale.set(1, 1, 1); bowwood.position.set(0, 0.5, 15);
-	bowwood.castShadow = true;
-	
-	let bowhair = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
-				      new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
-	bowhair.scale.set(1, 1, 1); bowhair.position.set(0, 0, 15);
+		let bowwood = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
+						new THREE.MeshLambertMaterial({ color: 0xfa0a0a }));
+		bowwood.scale.set(1, 1, 1); bowwood.position.set(0, 0.5, 15);
+		bowwood.castShadow = true;
+		
+		let bowhair = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
+						new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
+		bowhair.scale.set(1, 1, 1); bowhair.position.set(0, 0, 15);
 
-	bowwood.castShadow = true;
+		bowwood.castShadow = true;
 
-	this.add(bowwood, bowhair);
+		this.add(bowwood, bowhair);
     }
 }
 
@@ -132,16 +134,11 @@ class Mask extends THREE.Group {
 class Smartphone extends THREE.Group {
     constructor() {
 		super();
-
 		Mannequin.colors[4] = 'dimgray';
-
 		var body = new LimbShape(false, [1 / 2, 3.5, 6, -1, 1, 1, 0.2, 0.001], 8, 8);
-
 		Mannequin.colors[4] = 'white';
-
 		var screen = new LimbShape(false, [0.47, 3, 5.5, -1, 1, 1, 0.2, 0.001], 8, 8);
 		screen.position.x = -0.02;
-
 		this.add(body, screen);
     }
 }
@@ -219,8 +216,7 @@ const VideoUtil = {
 		const texture = new THREE.TextureLoader().load( "/textures/wood_floor.jpg" );
 		var ground = new THREE.Mesh(
 			new THREE.PlaneBufferGeometry(1000, 1000),
-			new THREE.MeshPhongMaterial(
-			{
+			new THREE.MeshPhongMaterial({
 				color: 'antiquewhite',
 				shininess: 1,
 				map: texture
@@ -308,6 +304,7 @@ const VideoUtil = {
 		const loader = new OBJLoader();
 		VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
 		VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
+
     },
 
     playScript: () => {

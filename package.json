@@ -13,7 +13,7 @@
   "devDependencies": {
     "css-loader": "^6.5.1",
     "style-loader": "^3.3.1",
-    "three": "^0.122.0",
+    "three": "^0.136.0",
     "tone": "^14.7.77",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"

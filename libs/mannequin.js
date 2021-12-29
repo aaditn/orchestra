@@ -21,11 +21,12 @@ import {
     Group,
     Mesh,
     MeshPhongMaterial,
-    ParametricBufferGeometry,
+    // ParametricBufferGeometry,
     SphereBufferGeometry,
     TextureLoader,
     Vector3,
 } from 'three'
+import { ParametricGeometry } from 'three/examples/jsm/geometries/ParametricGeometry'
 import { VideoUtil } from '../src/video/video_util'
 
 const MANNEQUIN_VERSION = 4.41;
@@ -69,8 +70,8 @@ class ParametricShape extends Group {
     constructor(tex, col, func, nU = 3, nV = 3) {
 	super();
 	var obj = new Mesh(
-	    new ParametricBufferGeometry(func, nU, nV),
-	    // new BufferGeometry(func, nU, nV),
+	    // new ParametricBufferGeometry(func, nU, nV),
+	    new ParametricGeometry(func, nU, nV),
 	    new MeshPhongMaterial({
 		color: col,
 		shininess: 1,
