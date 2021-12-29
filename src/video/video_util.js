@@ -391,7 +391,7 @@ const VideoUtil = {
 			switch(evt.status) {
 				case 'ready':
 					if (t >= start && t <= end) {
-						console.log("EVT going active: ", evt)
+						console.log("EVT active: ", evt)
 						evt.status = 'active'
 						VideoUtil.processEvent(t, evt)
 					}

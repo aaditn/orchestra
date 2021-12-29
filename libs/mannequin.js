@@ -306,106 +306,105 @@ class Joint extends Group {
     } // Joint.x
 
     get y() {
-	this.rotation.reorder('ZXY');
-	return this.rotation.y * 180 / Math.PI;
+		this.rotation.reorder('ZXY');
+		return this.rotation.y * 180 / Math.PI;
     }
     
     set y(angle) {
-	this.rotation.reorder('ZXY');
-	this.rotation.y = angle * Math.PI / 180;
+		this.rotation.reorder('ZXY');
+		this.rotation.y = angle * Math.PI / 180;
     } // Joint.y
 
     reset() {
-	this.rotation.set(0, 0, 0);
+		this.rotation.set(0, 0, 0);
     }
 
     get posture() {
-	this.rotation.reorder('XYZ');
-	return [grad(this.rotation.x), grad(this.rotation.y), grad(this.rotation.z)];
+		this.rotation.reorder('XYZ');
+		return [grad(this.rotation.x), grad(this.rotation.y), grad(this.rotation.z)];
     }
     
     set posture(pos) {
-	this.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
+		this.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
     } // Joint.posture
 
     getBumper(x, y, z) {
-	var bumper = new Vector3(x, y, z);
-	this.image.localToWorld(bumper);
-	this.parentJoint.image.worldToLocal(bumper);
-	return bumper;
+		var bumper = new Vector3(x, y, z);
+		this.image.localToWorld(bumper);
+		this.parentJoint.image.worldToLocal(bumper);
+		return bumper;
     }
 
     hide() {
-	this.image.visible = false;
+		this.image.visible = false;
     } // Joint.hide
 
     show() {
-	this.image.visible = true;
+		this.image.visible = true;
     } // Joint.show
     
     // attach Object3D instance to the joint
     attach(image) {
-	this.imageWrapper.add(image);
+		this.imageWrapper.add(image);
     } // Joint.attach
 
     detach(image) {
-	if (this.imageWrapper.children.includes(
-	    this.imageWrapper.getObjectById(image.id)) ) {
-	    this.imageWrapper.remove(
-		this.imageWrapper.getObjectById(image.id)
-	    );
-	}
+		if (this.imageWrapper.children.includes(
+			this.imageWrapper.getObjectById(image.id)) ) {
+				this.imageWrapper.remove(
+				this.imageWrapper.getObjectById(image.id)
+			);
+		}
     } // Joint.detach
     
     // calculate global coordinates of point with coordinates relative to the joint
     point(x, y, z) {
-	return VideoUtil.scene.worldToLocal(this.localToWorld(new Vector3(x, y, z)));
+		return VideoUtil.scene.worldToLocal(this.localToWorld(new Vector3(x, y, z)));
     } // Joint.point
 
     // change the colour of the joint
     recolor(color, secondaryColor = color) {
-	var joint = this.image;
+		var joint = this.image;
 
-	if (typeof color === 'string')
-	    color = new Color(color);
+		if (typeof color === 'string')
+			color = new Color(color);
 
-	if (typeof secondaryColor === 'string')
-	    secondaryColor = new Color(secondaryColor);
+		if (typeof secondaryColor === 'string')
+			secondaryColor = new Color(secondaryColor);
 
-	joint.children[0].material.color = color;
+		joint.children[0].material.color = color;
 
-	if (joint.children.length > 1) {
-	    joint.children[1].material.color = secondaryColor;
-	}
+		if (joint.children.length > 1) {
+			joint.children[1].material.color = secondaryColor;
+		}
     } // Joint.recolor
 
     select(state) {
-	this.traverse(function (o) {
-	    if (o.material && o.material.emissive) o.material.emissive.setRGB(0, state ? -1 : 0, state ? -0.4 : 0);
-	});
+		this.traverse(function (o) {
+			if (o.material && o.material.emissive) o.material.emissive.setRGB(0, state ? -1 : 0, state ? -0.4 : 0);
+		});
     } // Joint.select
 } // Joint
 
 
 class Pelvis extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, null, [3, 4, parentJoint.feminine ? 5.5 : 5], PelvisShape);
+		super(parentJoint, null, [3, 4, parentJoint.feminine ? 5.5 : 5], PelvisShape);
 
-	this.minRot = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-	this.maxRot = new Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-
+		this.minRot = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+		this.maxRot = new Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     } // Pelvis.constructor
 } // Pelvis
 
 
 class Body extends Joint {
     constructor(feminine) {
-	super(null, null, [1, 1, 1], Group);
+		super(null, null, [1, 1, 1], Group);
 
-	this.feminine = feminine;
+		this.feminine = feminine;
 
-	this.minRot = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-	this.maxRot = new Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+		this.minRot = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+		this.maxRot = new Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     } // Body.constructor
 
     get bend() { return -this.z; }
@@ -419,10 +418,10 @@ class Body extends Joint {
 
 class Torso extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, [-2, 4, 0], [5, 17, 10, parentJoint.feminine ? 10 : 80, parentJoint.feminine ? 520 : 380, parentJoint.feminine ? 0.8 : 0.9, parentJoint.feminine ? 0.25 : 0.2], TorsoShape);
+		super(parentJoint, [-2, 4, 0], [5, 17, 10, parentJoint.feminine ? 10 : 80, parentJoint.feminine ? 520 : 380, parentJoint.feminine ? 0.8 : 0.9, parentJoint.feminine ? 0.25 : 0.2], TorsoShape);
 
-	this.minRot = new Vector3(-25, -50, -60);
-	this.maxRot = new Vector3(25, 50, 25);
+		this.minRot = new Vector3(-25, -50, -60);
+		this.maxRot = new Vector3(25, 50, 25);
     } // Torso.constructor
 
     get bend() { return -this.z; }
@@ -437,45 +436,44 @@ class Torso extends Joint {
 
 class Neck extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, [0, 15, 0], [2, parentJoint.feminine ? 5 : 4, 2, 45, 60, 1, 0.2, 0], LimbShape);
+		super(parentJoint, [0, 15, 0], [2, parentJoint.feminine ? 5 : 4, 2, 45, 60, 1, 0.2, 0], LimbShape);
 
-	this.minRot = new Vector3(-45 / 2, -90 / 2, -60);
-	this.maxRot = new Vector3(45 / 2, 90 / 2, 50 / 2);
-
+		this.minRot = new Vector3(-45 / 2, -90 / 2, -60);
+		this.maxRot = new Vector3(45 / 2, 90 / 2, 50 / 2);
     } // Neck.constructor
 } // Neck
 
 
 class Head extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, [1, 3, 0], [3, 4, 2.5], HeadShape);
+		super(parentJoint, [1, 3, 0], [3, 4, 2.5], HeadShape);
 
-	this.minRot = new Vector3(-45 / 2, -90 / 2, -60 / 2);
-	this.maxRot = new Vector3(45 / 2, 90 / 2, 50 / 2);
+		this.minRot = new Vector3(-45 / 2, -90 / 2, -60 / 2);
+		this.maxRot = new Vector3(45 / 2, 90 / 2, 50 / 2);
     } // Head.constructor
 
     get nod() { return -2 * this.z; }
     set nod(angle) {
-	this.z = -angle / 2;
-	this.parentJoint.z = -angle / 2;
+		this.z = -angle / 2;
+		this.parentJoint.z = -angle / 2;
     }
     get tilt() { return -2 * this.x; }
     set tilt(angle) {
-	this.x = -angle / 2;
-	this.parentJoint.x = -angle / 2;
+		this.x = -angle / 2;
+		this.parentJoint.x = -angle / 2;
     }
     get turn() { return 2 * this.y; }
     set turn(angle) {
-	this.y = angle / 2;
-	this.parentJoint.y = angle / 2;
+		this.y = angle / 2;
+		this.parentJoint.y = angle / 2;
     }
     get posture() {
-	this.rotation.reorder('XYZ');
-	return [grad(this.rotation.x), grad(this.rotation.y), grad(this.rotation.z)];
+		this.rotation.reorder('XYZ');
+		return [grad(this.rotation.x), grad(this.rotation.y), grad(this.rotation.z)];
     }
     set posture(pos) {
-	this.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
-	this.parentJoint.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
+		this.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
+		this.parentJoint.rotation.set(rad(pos[0]), rad(pos[1]), rad(pos[2]), 'XYZ');
     } // Head.posture
 
 } // Head
@@ -483,31 +481,28 @@ class Head extends Joint {
 
 class Leg extends Joint {
     constructor(parentJoint, leftOrRight) {
-	super(parentJoint, [-1, -3, 4 * leftOrRight], [4, 15, 4, -70, 220, 1, 0.4, 2], LimbShape);
-	this.leftOrRight = leftOrRight;
+		super(parentJoint, [-1, -3, 4 * leftOrRight], [4, 15, 4, -70, 220, 1, 0.4, 2], LimbShape);
+		this.leftOrRight = leftOrRight;
 
-	this.imageWrapper.rotation.set(Math.PI, 0, 0);
-
-	//		this.image.addSphere(0.4, 0,5,0);
+		this.imageWrapper.rotation.set(Math.PI, 0, 0);
+		//		this.image.addSphere(0.4, 0,5,0);
     } // Leg.constructor
 
     biologicallyImpossibleLevel() {
-	// return 0 if the rotation is possible
-	// return >0 if it is not possible, the higher the result, the more impossible it is
+		// return 0 if the rotation is possible
+		// return >0 if it is not possible, the higher the result, the more impossible it is
+		var result = 0;
+		this.image.updateWorldMatrix(true);
 
-	var result = 0;
+		var p = this.getBumper(5, 0, 0);
+		if (p.x < 0) result += -p.x;
 
-	this.image.updateWorldMatrix(true);
+		this.rotation.reorder('ZXY');
+		var y = this.y;
+		if (y > +60) result += y - 60;
+		if (y < -60) result += -60 - y;
 
-	var p = this.getBumper(5, 0, 0);
-	if (p.x < 0) result += -p.x;
-
-	this.rotation.reorder('ZXY');
-	var y = this.y;
-	if (y > +60) result += y - 60;
-	if (y < -60) result += -60 - y;
-
-	return result;
+		return result;
     } // Leg.biologicallyImpossibleLevel
 
     get raise() { return this.z; }
@@ -522,17 +517,17 @@ class Leg extends Joint {
 
 class Knee extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, null, [4, 14, 4, -40, 290, 0.65, 0.25, 1.5], LimbShape);
+		super(parentJoint, null, [4, 14, 4, -40, 290, 0.65, 0.25, 1.5], LimbShape);
 
-	this.minRot = new Vector3(0, 0, 0);
-	this.maxRot = new Vector3(0, 0, 150);
+		this.minRot = new Vector3(0, 0, 0);
+		this.maxRot = new Vector3(0, 0, 150);
     } // Knee.constructor
 
     get bend() { return this.z; }
     set bend(angle) { this.z = angle; }
     get posture() {
-	this.rotation.reorder('XYZ');
-	return [grad(this.rotation.z)];
+		this.rotation.reorder('XYZ');
+		return [grad(this.rotation.z)];
     }
     set posture(pos) { this.rotation.set(0, 0, rad(pos[0]), 'XYZ'); }
 
@@ -541,12 +536,11 @@ class Knee extends Joint {
 
 class Ankle extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, null, [1, 4, 2], ShoeShape);
-	this.leftOrRight = parentJoint.parentJoint.leftOrRight; // i.e. leg
+		super(parentJoint, null, [1, 4, 2], ShoeShape);
+		this.leftOrRight = parentJoint.parentJoint.leftOrRight; // i.e. leg
 
-	this.minRot = new Vector3(-25, -30, -70);
-	this.maxRot = new Vector3(25, 30, 80);
-
+		this.minRot = new Vector3(-25, -30, -70);
+		this.maxRot = new Vector3(25, 30, 80);
     } // Ankle.constructor
 
     get bend() { return -this.z; }
@@ -561,34 +555,34 @@ class Ankle extends Joint {
 
 class Arm extends Joint {
     constructor(parentJoint, leftOrRight) {
-	super(parentJoint, [0, 14, leftOrRight * (parentJoint.feminine ? 5 : 6)], [3.5, 11, 2.5, -90, 360, 0.9, 0.2, 1.5], LimbShape);
-	this.leftOrRight = leftOrRight;
-	this.imageWrapper.rotation.set(Math.PI, Math.PI, 0);
+		super(parentJoint, [0, 14, leftOrRight * (parentJoint.feminine ? 5 : 6)], [3.5, 11, 2.5, -90, 360, 0.9, 0.2, 1.5], LimbShape);
+		this.leftOrRight = leftOrRight;
+		this.imageWrapper.rotation.set(Math.PI, Math.PI, 0);
 
-	//this.image.addSphere(2,15,0,0);
+		//this.image.addSphere(2,15,0,0);
     } // Arm.constructor
 
     biologicallyImpossibleLevel() {
-	var result = 0;
+		var result = 0;
 
-	this.image.updateWorldMatrix(true);
+		this.image.updateWorldMatrix(true);
 
-	var p = this.getBumper(0, 15, -0 * 5 * this.leftOrRight);
+		var p = this.getBumper(0, 15, -0 * 5 * this.leftOrRight);
 
-	if (p.z * this.leftOrRight < -3) result += -3 - p.z * this.leftOrRight;
+		if (p.z * this.leftOrRight < -3) result += -3 - p.z * this.leftOrRight;
 
-	if (p.x < -7 && p.y > 0) result = p.y;
+		if (p.x < -7 && p.y > 0) result = p.y;
 
-	this.rotation.reorder('ZXY');
-	var r = this.rotation.y * 180 / Math.PI;
-	var min = -90;
-	var max = 90;
-	//document.getElementById("name").innerHTML = (this.rotation.x*180/Math.PI).toFixed(0)+' '+(this.rotation.y*180/Math.PI).toFixed(0)+' '+(this.rotation.z*180/Math.PI).toFixed(0);
-	//document.getElementById("name").innerHTML += '<br>'+(p.x).toFixed(1)+' '+(p.y).toFixed(1)+' '+(p.z).toFixed(1);
+		this.rotation.reorder('ZXY');
+		var r = this.rotation.y * 180 / Math.PI;
+		var min = -90;
+		var max = 90;
+		//document.getElementById("name").innerHTML = (this.rotation.x*180/Math.PI).toFixed(0)+' '+(this.rotation.y*180/Math.PI).toFixed(0)+' '+(this.rotation.z*180/Math.PI).toFixed(0);
+		//document.getElementById("name").innerHTML += '<br>'+(p.x).toFixed(1)+' '+(p.y).toFixed(1)+' '+(p.z).toFixed(1);
 
-	if (r > max) result += r - max;
-	if (r < min) result += min - r;
-	return result;
+		if (r > max) result += r - max;
+		if (r < min) result += min - r;
+		return result;
     }
 
     get raise() { return this.z; }
@@ -603,18 +597,18 @@ class Arm extends Joint {
 
 class Elbow extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, null, [2.5, 11, 2, -40, 150, 0.5, 0.45, 1.1], LimbShape);
+		super(parentJoint, null, [2.5, 11, 2, -40, 150, 0.5, 0.45, 1.1], LimbShape);
 
-	this.minRot = new Vector3(0, 0, 0);
-	this.maxRot = new Vector3(0, 0, 150);
+		this.minRot = new Vector3(0, 0, 0);
+		this.maxRot = new Vector3(0, 0, 150);
 
     } // Elbow.constructor
 
     get bend() { return this.z; }
     set bend(angle) { this.z = angle; }
     get posture() {
-	this.rotation.reorder('XYZ');
-	return [grad(this.rotation.z)];
+		this.rotation.reorder('XYZ');
+		return [grad(this.rotation.z)];
     }
     set posture(pos) { this.rotation.set(0, 0, rad(pos[0]), 'XYZ'); }
 
@@ -623,45 +617,44 @@ class Elbow extends Joint {
 
 class Wrist extends Joint {
     constructor(parentJoint) {
-	super(parentJoint, null, [1.2, 2, 3.5, -90, 45, 0.5, 0.3, 1 / 2], LimbShape);
-	this.leftOrRight = parentJoint.parentJoint.leftOrRight;
+		super(parentJoint, null, [1.2, 2, 3.5, -90, 45, 0.5, 0.3, 1 / 2], LimbShape);
+		this.leftOrRight = parentJoint.parentJoint.leftOrRight;
 
-	this.imageWrapper.rotation.set(0, -this.leftOrRight * Math.PI / 2, 0);
+		this.imageWrapper.rotation.set(0, -this.leftOrRight * Math.PI / 2, 0);
 
-	if (this.leftOrRight == -1) {
-	    this.minRot = new Vector3(-20, -90, -90);
-	    this.maxRot = new Vector3(35, 90, 90);
-	} else {
-	    this.minRot = new Vector3(-35, -90, -90);
-	    this.maxRot = new Vector3(20, 90, 90);
-	}
+		if (this.leftOrRight == -1) {
+			this.minRot = new Vector3(-20, -90, -90);
+			this.maxRot = new Vector3(35, 90, 90);
+		} else {
+			this.minRot = new Vector3(-35, -90, -90);
+			this.maxRot = new Vector3(20, 90, 90);
+		}
 
-	//this.image.addSphere( 1, 0,5,0 );
+		//this.image.addSphere( 1, 0,5,0 );
     } // Wrist.constructor
 
     biologicallyImpossibleLevel() {
 	// return 0 if the rotation is possible
 	// return >0 if it is not possible, the higher the result, the more impossible it is
+		var result = 0;
 
-	var result = 0;
+		var wristX = new Vector3(),
+			wristY = new Vector3(),
+			wristZ = new Vector3();
+		this.matrixWorld.extractBasis(wristX, wristY, wristZ);
 
-	var wristX = new Vector3(),
-	    wristY = new Vector3(),
-	    wristZ = new Vector3();
-	this.matrixWorld.extractBasis(wristX, wristY, wristZ);
+		var elbowX = new Vector3(),
+			elbowY = new Vector3(),
+			elbowZ = new Vector3();
+		this.parentJoint.matrixWorld.extractBasis(elbowX, elbowY, elbowZ);
 
-	var elbowX = new Vector3(),
-	    elbowY = new Vector3(),
-	    elbowZ = new Vector3();
-	this.parentJoint.matrixWorld.extractBasis(elbowX, elbowY, elbowZ);
+		var dot1 = wristY.dot(elbowY);
+		if (dot1 < 0) result += -dot1;
 
-	var dot1 = wristY.dot(elbowY);
-	if (dot1 < 0) result += -dot1;
+		var dot2 = wristZ.dot(elbowZ);
+		if (dot2 < 0) result += -dot2;
 
-	var dot2 = wristZ.dot(elbowZ);
-	if (dot2 < 0) result += -dot2;
-
-	return result;
+		return result;
     } // Wrist.biologicallyImpossibleLevel
 
     get bend() { return -this.leftOrRight * this.x; }
@@ -674,161 +667,141 @@ class Wrist extends Joint {
 } // Wrist
 
 
-class Phalange extends Joint
-{
-    constructor(parentJoint, params)
-    {
-	super(parentJoint, null, params, LimbShape);
-
-	this.minRot = new Vector3(0, 0, -10);
-	this.maxRot = new Vector3(0, 0, 100);
-
+class Phalange extends Joint {
+    constructor(parentJoint, params) {
+		super(parentJoint, null, params, LimbShape);
+		this.minRot = new Vector3(0, 0, -10);
+		this.maxRot = new Vector3(0, 0, 100);
     } // Phalange.constructor
 
-    get bend()
-    {
-	return this.z;
-    }
-    
-    set bend(angle)
-    {
-	this.z = angle;
-    }
+    get bend() { return this.z; }
+    set bend(angle) { this.z = angle; }
 } // Phalange
 
 
 class Fingers extends Phalange {
     constructor(parentJoint) {
-	super(parentJoint, [1.2, 1.5, 3.5, 0, 45, 0.3, 0.4, 0.2]);
+		super(parentJoint, [1.2, 1.5, 3.5, 0, 45, 0.3, 0.4, 0.2]);
 
-	this.tips = new Phalange(this, [1.2, 1, 3.5, 45, 45, 0.3, 0.4, 0.2]);
+		this.tips = new Phalange(this, [1.2, 1, 3.5, 45, 45, 0.3, 0.4, 0.2]);
 
-	this.minRot = new Vector3(0, 0, -10);
-	this.maxRot = new Vector3(0, 0, 120);
-
+		this.minRot = new Vector3(0, 0, -10);
+		this.maxRot = new Vector3(0, 0, 120);
     } // Fingers.constructor
 
-    get bend() {
-	return this.z;
-    }
-    
-    set bend(angle) {
-	this.z = this.tips.z = angle;
-    }
-
+    get bend() { return this.z; }
+    set bend(angle) { this.z = this.tips.z = angle; }
     get posture() {
-	this.rotation.reorder('XYZ');
-	this.tips.rotation.reorder('XYZ');
-	return [grad(this.rotation.z), grad(this.tips.rotation.z)];
+		this.rotation.reorder('XYZ');
+		this.tips.rotation.reorder('XYZ');
+		return [grad(this.rotation.z), grad(this.tips.rotation.z)];
     }
-    
     set posture(pos) {
-	this.rotation.set(0, 0, rad(pos[0]), 'XYZ');
-	this.tips.rotation.set(0, 0, rad(pos[1]), 'XYZ');
+		this.rotation.set(0, 0, rad(pos[0]), 'XYZ');
+		this.tips.rotation.set(0, 0, rad(pos[1]), 'XYZ');
     }
 } // Fingers
 
 class Finger extends Phalange {
     constructor(parentJoint, zDelta) {
-	super(parentJoint, [1.2, 1.5, 1, 0, 45, 0.3, 0.4, 0.2]);
-	this.tips = new Phalange(this, [1.2, 1, 1, 45, 45, 0.3, 0.4, 0.2]);
-    	this.position.z += zDelta
-	this.minRot = new Vector3(0, 0, -10);
-	this.maxRot = new Vector3(0, 0, 120);
-
+		super(parentJoint, [1.2, 1.5, 1, 0, 45, 0.3, 0.4, 0.2]);
+		this.tips = new Phalange(this, [1.2, 1, 1, 45, 45, 0.3, 0.4, 0.2]);
+			this.position.z += zDelta
+		this.minRot = new Vector3(0, 0, -10);
+		this.maxRot = new Vector3(0, 0, 120);
     } // Finger.constructor
 
     get bend() { return this.z;	}
     set bend(angle) { this.z = this.tips.z = angle; }
     get posture() {
-	this.rotation.reorder('XYZ');
-	this.tips.rotation.reorder('XYZ');
-	return [grad(this.rotation.z), grad(this.tips.rotation.z)];
+		this.rotation.reorder('XYZ');
+		this.tips.rotation.reorder('XYZ');
+		return [grad(this.rotation.z), grad(this.tips.rotation.z)];
     }
     set posture(pos) {
-	this.rotation.set(0, 0, rad(pos[0]), 'XYZ');
-	this.tips.rotation.set(0, 0, rad(pos[1]), 'XYZ');
+		this.rotation.set(0, 0, rad(pos[0]), 'XYZ');
+		this.tips.rotation.set(0, 0, rad(pos[1]), 'XYZ');
     }
 } // Finger
 
 
 export class Mannequin extends Group {
     constructor(feminine, height = 1) {
-	super();
+		super();
 
-	const LEFT = -1;
-	const RIGHT = 1;
+		const LEFT = -1;
+		const RIGHT = 1;
 
-	this.scale.set(height, height, height);
-	this.feminine = feminine;
+		this.scale.set(height, height, height);
+		this.feminine = feminine;
 
-	this.body = new Body(feminine);
-	this.pelvis = new Pelvis(this.body);
-	this.torso = new Torso(this.pelvis);
-	this.neck = new Neck(this.torso);
-	this.head = new Head(this.neck);
+		this.body = new Body(feminine);
+		this.pelvis = new Pelvis(this.body);
+		this.torso = new Torso(this.pelvis);
+		this.neck = new Neck(this.torso);
+		this.head = new Head(this.neck);
 
-	this.l_leg = new Leg(this.pelvis, LEFT);
-	this.l_knee = new Knee(this.l_leg);
-	this.l_ankle = new Ankle(this.l_knee);
+		this.l_leg = new Leg(this.pelvis, LEFT);
+		this.l_knee = new Knee(this.l_leg);
+		this.l_ankle = new Ankle(this.l_knee);
 
-	this.r_leg = new Leg(this.pelvis, RIGHT);
-	this.r_knee = new Knee(this.r_leg);
-	this.r_ankle = new Ankle(this.r_knee);
+		this.r_leg = new Leg(this.pelvis, RIGHT);
+		this.r_knee = new Knee(this.r_leg);
+		this.r_ankle = new Ankle(this.r_knee);
 
-	this.l_arm = new Arm(this.torso, LEFT);
-	this.l_elbow = new Elbow(this.l_arm);
-	this.l_wrist = new Wrist(this.l_elbow);
-	// this.l_fingers = new Fingers(this.l_wrist);
-	this.l_fingers = [
-	    new Finger(this.l_wrist, -0.75),
-	    new Finger(this.l_wrist, -0.25),
-	    new Finger(this.l_wrist, +0.25),
-	    new Finger(this.l_wrist, +0.75)
-	]
+		this.l_arm = new Arm(this.torso, LEFT);
+		this.l_elbow = new Elbow(this.l_arm);
+		this.l_wrist = new Wrist(this.l_elbow);
+		// this.l_fingers = new Fingers(this.l_wrist);
+		this.l_fingers = [
+			new Finger(this.l_wrist, -0.75),
+			new Finger(this.l_wrist, -0.25),
+			new Finger(this.l_wrist, +0.25),
+			new Finger(this.l_wrist, +0.75)
+		]
 
-	this.r_arm = new Arm(this.torso, RIGHT);
-	this.r_elbow = new Elbow(this.r_arm);
-	this.r_wrist = new Wrist(this.r_elbow);
-	// this.r_fingers = new Fingers(this.r_wrist);
-	this.r_fingers = [
-	    new Finger(this.r_wrist, -0.75),
-	    new Finger(this.r_wrist, -0.25),
-	    new Finger(this.r_wrist, +0.25),
-	    new Finger(this.r_wrist, +0.75)
-	]
-	this.add(this.body);
+		this.r_arm = new Arm(this.torso, RIGHT);
+		this.r_elbow = new Elbow(this.r_arm);
+		this.r_wrist = new Wrist(this.r_elbow);
+		// this.r_fingers = new Fingers(this.r_wrist);
+		this.r_fingers = [
+			new Finger(this.r_wrist, -0.75),
+			new Finger(this.r_wrist, -0.25),
+			new Finger(this.r_wrist, +0.25),
+			new Finger(this.r_wrist, +0.75)
+		]
+		this.add(this.body);
 
-	var s = 1.5 / (0.5 + height);
-	this.head.scale.set(s, s, s);
-	this.castShadow = true;
-	this.receiveShadow = true;
-	VideoUtil.scene.add(this);
+		var s = 1.5 / (0.5 + height);
+		this.head.scale.set(s, s, s);
+		this.castShadow = true;
+		this.receiveShadow = true;
+		VideoUtil.scene.add(this);
 
-	this.updateMatrix();
-	this.updateWorldMatrix();
+		this.updateMatrix();
+		this.updateWorldMatrix();
 
-	// default general posture
-	this.body.turn = -90;
+		// default general posture
+		this.body.turn = -90;
 
-	this.torso.bend = 2;
+		this.torso.bend = 2;
 
-	this.head.nod = -10;
+		this.head.nod = -10;
 
-	this.l_arm.raise = -5;
-	this.r_arm.raise = -5;
+		this.l_arm.raise = -5;
+		this.r_arm.raise = -5;
 
-	this.l_arm.straddle = 7;
-	this.r_arm.straddle = 7;
+		this.l_arm.straddle = 7;
+		this.r_arm.straddle = 7;
 
-	this.l_elbow.bend = 15;
-	this.r_elbow.bend = 15;
+		this.l_elbow.bend = 15;
+		this.r_elbow.bend = 15;
 
-	this.l_wrist.bend = -15;
-	this.r_wrist.bend = -15;
+		this.l_wrist.bend = -15;
+		this.r_wrist.bend = -15;
 
-	// this.l_fingers.bend = 10;
-	// this.r_fingers.bend = 10;
+		// this.l_fingers.bend = 10;
+		// this.r_fingers.bend = 10;
 
     } // Mannequin.constructor
 
@@ -839,72 +812,72 @@ export class Mannequin extends Group {
     get turn() { return this.body.y; }
     set turn(angle) { this.body.y = angle; }
     get posture() {
-	var posture = [
-	    Number((this.body.position.y + this.position.y).toFixed(1)),
-	    this.body.posture,
-	    this.torso.posture,
-	    this.head.posture,
-	    this.l_leg.posture,
-	    this.l_knee.posture,
-	    this.l_ankle.posture,
-	    this.r_leg.posture,
-	    this.r_knee.posture,
-	    this.r_ankle.posture,
-	    this.l_arm.posture,
-	    this.l_elbow.posture,
-	    this.l_wrist.posture,
-	    // this.l_fingers.posture,
-	    this.l_fingers[0].posture,
-	    this.l_fingers[1].posture,
-	    this.l_fingers[2].posture,
-	    this.l_fingers[3].posture,
-	    this.r_arm.posture,
-	    this.r_elbow.posture,
-	    this.r_wrist.posture,
-	    // this.r_fingers.posture
-	    this.r_fingers[0].posture,
-	    this.r_fingers[1].posture,
-	    this.r_fingers[2].posture,
-	    this.r_fingers[3].posture,
-	];
-	return {
-	    version: MANNEQUIN_POSTURE_VERSION,
-	    data: posture,
-	};
+		var posture = [
+			Number((this.body.position.y + this.position.y).toFixed(1)),
+			this.body.posture,
+			this.torso.posture,
+			this.head.posture,
+			this.l_leg.posture,
+			this.l_knee.posture,
+			this.l_ankle.posture,
+			this.r_leg.posture,
+			this.r_knee.posture,
+			this.r_ankle.posture,
+			this.l_arm.posture,
+			this.l_elbow.posture,
+			this.l_wrist.posture,
+			// this.l_fingers.posture,
+			this.l_fingers[0].posture,
+			this.l_fingers[1].posture,
+			this.l_fingers[2].posture,
+			this.l_fingers[3].posture,
+			this.r_arm.posture,
+			this.r_elbow.posture,
+			this.r_wrist.posture,
+			// this.r_fingers.posture
+			this.r_fingers[0].posture,
+			this.r_fingers[1].posture,
+			this.r_fingers[2].posture,
+			this.r_fingers[3].posture,
+		];
+		return {
+			version: MANNEQUIN_POSTURE_VERSION,
+			data: posture,
+		};
     } // Mannequin.posture
 
     set posture(posture) {
-	if (posture.version != MANNEQUIN_POSTURE_VERSION)
-	    throw new MannequinPostureVersionError(posture.version);
+		if (posture.version != MANNEQUIN_POSTURE_VERSION)
+			throw new MannequinPostureVersionError(posture.version);
 
-	var i = 0;
+		var i = 0;
 
-	this.body.position.y = posture.data[i++];
-	this.body.posture = posture.data[i++];
-	this.torso.posture = posture.data[i++];
-	this.head.posture = posture.data[i++];
-	this.l_leg.posture = posture.data[i++];
-	this.l_knee.posture = posture.data[i++];
-	this.l_ankle.posture = posture.data[i++];
-	this.r_leg.posture = posture.data[i++];
-	this.r_knee.posture = posture.data[i++];
-	this.r_ankle.posture = posture.data[i++];
-	this.l_arm.posture = posture.data[i++];
-	this.l_elbow.posture = posture.data[i++];
-	this.l_wrist.posture = posture.data[i++];
-	// this.l_fingers.posture = posture.data[i++];
-	this.l_fingers[0].posture = posture.data[i++];
-	this.l_fingers[1].posture = posture.data[i++];
-	this.l_fingers[2].posture = posture.data[i++];
-	this.l_fingers[3].posture = posture.data[i++];
-	this.r_arm.posture = posture.data[i++];
-	this.r_elbow.posture = posture.data[i++];
-	this.r_wrist.posture = posture.data[i++];
-	// this.r_fingers.posture = posture.data[i++];
-	this.r_fingers[0].posture = posture.data[i++];
-	this.r_fingers[1].posture = posture.data[i++];
-	this.r_fingers[2].posture = posture.data[i++];
-	this.r_fingers[3].posture = posture.data[i++];
+		this.body.position.y = posture.data[i++];
+		this.body.posture = posture.data[i++];
+		this.torso.posture = posture.data[i++];
+		this.head.posture = posture.data[i++];
+		this.l_leg.posture = posture.data[i++];
+		this.l_knee.posture = posture.data[i++];
+		this.l_ankle.posture = posture.data[i++];
+		this.r_leg.posture = posture.data[i++];
+		this.r_knee.posture = posture.data[i++];
+		this.r_ankle.posture = posture.data[i++];
+		this.l_arm.posture = posture.data[i++];
+		this.l_elbow.posture = posture.data[i++];
+		this.l_wrist.posture = posture.data[i++];
+		// this.l_fingers.posture = posture.data[i++];
+		this.l_fingers[0].posture = posture.data[i++];
+		this.l_fingers[1].posture = posture.data[i++];
+		this.l_fingers[2].posture = posture.data[i++];
+		this.l_fingers[3].posture = posture.data[i++];
+		this.r_arm.posture = posture.data[i++];
+		this.r_elbow.posture = posture.data[i++];
+		this.r_wrist.posture = posture.data[i++];
+		// this.r_fingers.posture = posture.data[i++];
+		this.r_fingers[0].posture = posture.data[i++];
+		this.r_fingers[1].posture = posture.data[i++];
+		this.r_fingers[2].posture = posture.data[i++];
+		this.r_fingers[3].posture = posture.data[i++];
     } // Mannequin.posture
 
     get postureString() { return JSON.stringify(this.posture); }
@@ -927,28 +900,28 @@ export class Female extends Mannequin {
 
 export class Male extends Mannequin {
     constructor(height = 1) {
-	super(false, height);
-	this.position.y = 3.8;
+		super(false, height);
+		this.position.y = 3.8;
 
-	this.l_leg.straddle += 6;
-	this.r_leg.straddle += 6;
+		this.l_leg.straddle += 6;
+		this.r_leg.straddle += 6;
 
-	this.l_ankle.turn += 6;
-	this.r_ankle.turn += 6;
+		this.l_ankle.turn += 6;
+		this.r_ankle.turn += 6;
 
-	this.l_ankle.tilt += 6;
-	this.r_ankle.tilt += 6;
+		this.l_ankle.tilt += 6;
+		this.r_ankle.tilt += 6;
     } // Male.constructor
 } // Male
 
 
 class Child extends Mannequin {
     constructor(height = 0.65) {
-	super(false, height);
-	this.position.y = -7.7;
+		super(false, height);
+		this.position.y = -7.7;
 
-	this.l_arm.straddle -= 2;
-	this.r_arm.straddle -= 2;
+		this.l_arm.straddle -= 2;
+		this.r_arm.straddle -= 2;
     } // Child.constructor
 } // Child
 
@@ -1003,21 +976,21 @@ Mannequin.cossers = function (u, v, params) {
 
 Mannequin.blend = function (posture0, posture1, k) {
     if (posture0.version != posture1.version)
-	throw 'Incompatibe posture blending.';
+		throw 'Incompatibe posture blending.';
 
     function lerp(data0, data1, k) {
-	if (data0 instanceof Array) {
-	    var result = [];
-	    for (var i in data0)
-		result.push(lerp(data0[i], data1[i], k));
-	    return result;
-	} else {
-	    return data0 * (1 - k) + k * data1;
-	}
+		if (data0 instanceof Array) {
+			var result = [];
+			for (var i in data0)
+			result.push(lerp(data0[i], data1[i], k));
+			return result;
+		} else {
+			return data0 * (1 - k) + k * data1;
+		}
     }
 
     return {
-	version: posture1.version,
-	data: lerp(posture0.data, posture1.data, k)
+		version: posture1.version,
+		data: lerp(posture0.data, posture1.data, k)
     };
 } // Mannequin.blend
