@@ -1,31 +1,27 @@
 import * as THREE from 'three'
+import * as Tone from 'tone'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
 		super();
-
 		this.position.set(x, -25, 0);
 		this.rotation.y = rad(angle);
-
 		Mannequin.colors[4] = 'darksalmon';
-
-		var seat = new LimbShape(false, [16, 10, 16, 0, 270, 1, 0.2, 0], 20, 20);
-		
-		var backrest = new LimbShape(false, [3, 30, 6, -90, 270, 1, 0.5, 0], 50, 10);
+		let seat = new LimbShape(false, [16, 10, 16, 0, 270, 1, 0.2, 0], 20, 20);
+		let backrest = new LimbShape(false, [3, 30, 6, -90, 270, 1, 0.5, 0], 50, 10);
 		backrest.position.set(-9, 16, 0);
 		backrest.rotation.set(0, 0, rad(20));
 
-		var cussion = new THREE.Mesh(
+		let cussion = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(6.8, 20, 10, 0, 2 * Math.PI, 0, Math.PI / 2),
 			new THREE.MeshPhongMaterial({ color: 'black' })
 		);
 		cussion.scale.set(1, 0.25, 1);
 		cussion.position.set(0, 4, 0);
-		
 		this.add(seat, cussion, backrest);
     }
 }
@@ -33,16 +29,15 @@ class Chair extends THREE.Group {
 class Violin extends THREE.Group {
     constructor(x, y, angle) {
 		super();
-
 		this.position.set(x, y, -5);
 		this.rotation.y = rad(angle);
 		this.rotation.z = rad(-10);
-
+		
 		let head = new THREE.Mesh( new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
 					new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
 		head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(0, 4, 0);
 		head.castShadow = true;
-
+		
 		let fboard = new THREE.Mesh( new THREE.BoxGeometry(7, 1, 1),
 						new THREE.MeshLambertMaterial({ color: 0x000000 }));
 		fboard.scale.set(1, 0.25, 1); fboard.position.set(-4, 4, 0);
@@ -77,21 +72,16 @@ class Violin extends THREE.Group {
 class Bow extends THREE.Group {
     constructor(x, angle) {
 		super();
-
 		this.position.set(-1, 0, 0);
 		this.rotation.z = rad(-90);
-
 		let bowwood = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
 						new THREE.MeshLambertMaterial({ color: 0xfa0a0a }));
 		bowwood.scale.set(1, 1, 1); bowwood.position.set(0, 0.5, 15);
 		bowwood.castShadow = true;
-		
 		let bowhair = new THREE.Mesh( new THREE.BoxGeometry(0.2, 0.2, 30),
 						new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
 		bowhair.scale.set(1, 1, 1); bowhair.position.set(0, 0, 15);
-
 		bowwood.castShadow = true;
-
 		this.add(bowwood, bowhair);
     }
 }
@@ -131,21 +121,11 @@ class Mask extends THREE.Group {
     }
 }
 
-class Smartphone extends THREE.Group {
-    constructor() {
-		super();
-		Mannequin.colors[4] = 'dimgray';
-		var body = new LimbShape(false, [1 / 2, 3.5, 6, -1, 1, 1, 0.2, 0.001], 8, 8);
-		Mannequin.colors[4] = 'white';
-		var screen = new LimbShape(false, [0.47, 3, 5.5, -1, 1, 1, 0.2, 0.001], 8, 8);
-		screen.position.x = -0.02;
-		this.add(body, screen);
-    }
-}
-
 class Event {
-    constructor(evtData) {
-		this.data  = evtData
+    constructor(start, end, data) {
+		this.start = start
+		this.end   = end
+		this.data  = data
     }
 }
 
@@ -158,18 +138,8 @@ const VideoUtil = {
     light: null,
     controls: null,
     players: [],
-    
-    dispatchEvent: (evt) => {
-		const data = evt.data
-		switch(data.action) {
-		case "move":
-			VideoUtil.moveObject(evt)
-			break;
-			
-		default:
-
-		}
-    },
+	all_events: [],
+	active_events: [],
 
     moveObject: (evt) => {
 		const data = evt.data
@@ -230,6 +200,29 @@ const VideoUtil = {
 		VideoUtil.scene.rotation.x = rad(20)
 		VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
 		VideoUtil.clock = new THREE.Clock();
+
+		// Add events
+		VideoUtil.all_events.push(
+			new Event(100, 600, {actor: VideoUtil.players[2],
+				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0},
+				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: Math.PI/4, z: 0}, }
+			)
+		)
+		VideoUtil.all_events.push(
+			new Event(600, 700, {actor: VideoUtil.players[2],
+				startPos: {x: 0, y: 0, z: 0}, endPos: {x: 0, y: 0, z: 0},
+				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: -Math.PI, z: 0}, }
+			)
+		)
+    },
+
+	// pos = {x: <xval>, y: <yval>, z: <zval>}
+	// rot = {x: <xval>, y: <yval>, z: <zval>}
+	createActor: (pos, rot) => {
+		const actor = new Male();
+		actor.position.set(pos.x, pos.y, pos.z);
+		actor.rotation.set = (rot.x, rot.y, rot.z)
+		return actor
     },
 
     createPlayer: (instrument, pos, rot) => {
@@ -294,6 +287,8 @@ const VideoUtil = {
 		VideoUtil.players.push(VideoUtil.createPlayer("violin", {x: 25, y: -17, z: 0}, 0))
 		VideoUtil.players.push(VideoUtil.createPlayer("violin", {x: -25, y: -17, z: 0}, Math.PI))
 
+		VideoUtil.players.push(VideoUtil.createActor({x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 0}))
+
 		VideoUtil.scene.add( new Chair(25, 180), new Chair(-25, 0));
 
 		VideoUtil.players[0].torso.attach(new Violin(17, 7, 20));
@@ -305,12 +300,6 @@ const VideoUtil = {
 		VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
 		VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
 
-    },
-
-    playScript: () => {
-		VideoUtil.dispatchEvent( 
-			new Event({actor: players[0], action: "move", duration: 2, start: [0, 0, 0], end: [10, 0, 10], scheduled_ts: 2})
-		)
     },
 
     moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -374,46 +363,41 @@ const VideoUtil = {
 		)
     },
 
+	walkAction: (t, evt, actor) => {
+		const startPos = evt.data.startPos
+		const endPos   = evt.data.endPos
+		const startRot = evt.data.startRot
+		const endRot   = evt.data.endRot
+		const deltaT   = t - evt.start
+		const totalT   = evt.end - evt.start
+		// place at parametrized (t) position
+		const newPosX = startPos.x + (endPos.x - startPos.x) * deltaT / totalT
+		const newPosY = startPos.y + (endPos.y - startPos.y) * deltaT / totalT
+		const newPosZ = startPos.z + (endPos.z - startPos.z) * deltaT / totalT
+		const newRotX = startRot.x + (endRot.x - startRot.x) * deltaT / totalT
+		const newRotY = startRot.y + (endRot.y - startRot.y) * deltaT / totalT
+		const newRotZ = startRot.z + (endRot.z - startRot.z) * deltaT / totalT
+		actor.position.set(newPosX, newPosY, newPosZ)
+		actor.rotation.x = newRotX
+		actor.rotation.y = newRotY
+		actor.rotation.z = newRotZ
+		// walking motion
+		actor.l_leg.raise = 30 * sin(4 * t)
+		actor.r_leg.raise = -30 * sin(4 * t)
+		actor.l_arm.raise = -30 * sin(4 * t)
+		actor.r_arm.raise = 30 * sin(4 * t)
+	},
+
     animate: (t) => {
-		/*
-		var looking = 15 * sin(t),
-		reading = 25 * cos(1.2 * t) * sin(0.7 * t),
-		k = Math.min(1.5, Math.pow(sin(0.37 * t) * 0.5016 + 0.5, 300));
-		*/
-		// if (t - prevt > 300) {
-			// console.log("t =", t, " prevt =", prevt, " sin = ", sin(2 * 1.7 * t))
-			// prevt = t
-			// moveBow(bowdir, 1)
-			// bowdir = !bowdir // reverse bowdir for next note
-		// }
 
-		/*
-		man.head.turn = reading * (1 - k);
-		man.head.nod = 15 * (1 - k) - k * looking;
+		VideoUtil.all_events.forEach((evt) => {
+			const start = evt.start
+			const end   = evt.end
+			if (t >= start && t <= end) {
+				VideoUtil.walkAction( t, evt, VideoUtil.players[2])
+			}
+		})
 
-		man.l_ankle.bend = -5 + 10 * Math.pow(sin(t), 34);
-		man.r_ankle.bend = -5 + 10 * Math.pow(sin(t + 90), 34);
-		*/
-
-		/*
-		k = Math.min(1.5, Math.pow(sin(0.37 * t + 10) * 0.5016 + 0.5, 100));
-		players[0].r_leg.raise = 85 + 0.5 * sin(3.4 * t);
-		players[0].r_knee.bend = (80 + 5 * sin(2 * 1.7 * t)) * (1 - k) + k * 45;
-		players[0].r_ankle.bend = -20 - 10 * sin(2 * 1.7 * t);
-		*/
-
-		// play violin
-		/*
-		players[0].r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t));
-		players[0].r_wrist.tilt = (-30 * sin(2 * 1.7 * t)); 
-		*/
-		
-		/*
-		players[0].head.turn = 25 * cos(0.7 * t);
-		players[0].head.nod = 35 + 5 * cos(0.8 * t);
-		*/
-
-		// scene.rotation.x = t / 1000;
     },
 
 }
