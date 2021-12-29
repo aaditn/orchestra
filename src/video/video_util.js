@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { VideoActions } from './video_actions'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
@@ -202,15 +203,14 @@ const VideoUtil = {
 		VideoUtil.clock = new THREE.Clock();
 
 		// Add events
+		VideoUtil.all_events.push(new Event(100, 300, {action: 'walk', actor: VideoUtil.players[2]}))
 		VideoUtil.all_events.push(
-			new Event(100, 600, {actor: VideoUtil.players[2],
-				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0},
-				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: Math.PI/4, z: 0}, }
+			new Event(100, 600, {action: 'translate', actor: VideoUtil.players[2],
+				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0}}
 			)
 		)
 		VideoUtil.all_events.push(
-			new Event(600, 700, {actor: VideoUtil.players[2],
-				startPos: {x: 0, y: 0, z: 0}, endPos: {x: 0, y: 0, z: 0},
+			new Event(600, 1000, {action: 'rotate', actor: VideoUtil.players[2],
 				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: -Math.PI, z: 0}, }
 			)
 		)
@@ -349,52 +349,40 @@ const VideoUtil = {
 		loader.load(
 			modelPath + "/model.obj",
 			(object) => {
-			object.scale.set(40, 40, 40)
-			object.rotation.y = Math.PI/2
-			object.position.set(1, 4, 0)
-			
-			object.traverse( function ( child ) {
-				if ( child instanceof THREE.Mesh ) {
-				child.material = material
-				}
-			});
-			attachPoint.attach(object);
+				object.scale.set(40, 40, 40)
+				object.rotation.y = Math.PI/2
+				object.position.set(1, 4, 0)
+				
+				object.traverse( function ( child ) {
+					if ( child instanceof THREE.Mesh ) {
+						child.material = material
+					}
+				});
+				attachPoint.attach(object);
 			}
 		)
     },
 
-	walkAction: (t, evt, actor) => {
-		const startPos = evt.data.startPos
-		const endPos   = evt.data.endPos
-		const startRot = evt.data.startRot
-		const endRot   = evt.data.endRot
-		const deltaT   = t - evt.start
-		const totalT   = evt.end - evt.start
-		// place at parametrized (t) position
-		const newPosX = startPos.x + (endPos.x - startPos.x) * deltaT / totalT
-		const newPosY = startPos.y + (endPos.y - startPos.y) * deltaT / totalT
-		const newPosZ = startPos.z + (endPos.z - startPos.z) * deltaT / totalT
-		const newRotX = startRot.x + (endRot.x - startRot.x) * deltaT / totalT
-		const newRotY = startRot.y + (endRot.y - startRot.y) * deltaT / totalT
-		const newRotZ = startRot.z + (endRot.z - startRot.z) * deltaT / totalT
-		actor.position.set(newPosX, newPosY, newPosZ)
-		actor.rotation.x = newRotX
-		actor.rotation.y = newRotY
-		actor.rotation.z = newRotZ
-		// walking motion
-		actor.l_leg.raise = 30 * sin(4 * t)
-		actor.r_leg.raise = -30 * sin(4 * t)
-		actor.l_arm.raise = -30 * sin(4 * t)
-		actor.r_arm.raise = 30 * sin(4 * t)
-	},
-
     animate: (t) => {
 
 		VideoUtil.all_events.forEach((evt) => {
-			const start = evt.start
-			const end   = evt.end
+			const start  = evt.start
+			const end    = evt.end
+			const action = evt.data.action
 			if (t >= start && t <= end) {
-				VideoUtil.walkAction( t, evt, VideoUtil.players[2])
+				switch(action) {
+					case 'walk':
+						VideoActions.walk( t, evt, VideoUtil.players[2])
+						break;
+					case 'translate':
+						VideoActions.translate( t, evt, VideoUtil.players[2])
+						break;
+					case 'rotate':
+						VideoActions.rotate( t, evt, VideoUtil.players[2])
+						break;
+					default:
+						// default here
+				}
 			}
 		})
 
