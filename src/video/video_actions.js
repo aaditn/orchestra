@@ -4,7 +4,7 @@ import { sin, cos } from '../../libs/mannequin'
 const VideoActions = {
 
     walk: (t, evt, reset) => {
-        const actor = evt.data.actor
+        const actor = evt.actor
 		const t0    = evt.data.t0 || 0 // start from a 0 position (t-t0)
 		// walking motion
 		if (! reset) {
@@ -22,7 +22,7 @@ const VideoActions = {
 	},
 
 	bow: (t, evt, reset) => {
-        const actor = evt.data.actor
+        const actor = evt.actor
 		const paramt   = (t - evt.start) / (evt.end - evt.start)
 		// walking motion
 		if (! reset) {
@@ -38,13 +38,13 @@ const VideoActions = {
 
 	// move instantly, no transition
 	move: (t, evt) => {
-        const actor    = evt.data.actor
+        const actor    = evt.actor
 		const endPos   = evt.data.endPos
 		actor.position.set(endPos.x, endPos.y, endPos.z)
 	},
 
     translate: (t, evt) => {
-        const actor    = evt.data.actor
+        const actor    = evt.actor
 		const startPos = evt.data.startPos
 		const endPos   = evt.data.endPos
 		const paramt   = (t - evt.start) / (evt.end - evt.start)
@@ -56,7 +56,7 @@ const VideoActions = {
 	},
 
     rotate: (t, evt) => {
-        const actor    = evt.data.actor
+        const actor    = evt.actor
 		const startRot = evt.data.startRot
 		const endRot   = evt.data.endRot
 		const paramt   = (t - evt.start) / (evt.end - evt.start)
@@ -67,7 +67,7 @@ const VideoActions = {
     },
 
 	sit: (t, evt) => {
-        const actor  = evt.data.actor
+        const actor  = evt.actor
 		const paramt = (t - evt.start) / (evt.end - evt.start)
 
 		actor['bend'] = -40 * paramt

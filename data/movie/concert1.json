@@ -1,8 +1,29 @@
 {
     "actors": [
       {
-        "id": 0, 
-        "position": {"x": -55, "y": -17, "z": 0},
+        "ID": 0,
+        "position": {"x": -25, "y": -17, "z": 0},
+        "rotation": {"x": 0, "y": 3.14159, "z": 0},
+        "posture": [
+          {"turn": 180},
+          {"bend": -40},
+          {"torso": {"bend": 30}},
+          {"l_leg": {"raise": 70}},
+          {"l_knee": {"bend": 100}},
+          {"r_leg": {"raise": 65, "turn": -25}},
+          {"r_knee": {"bend": 100}},
+          {"r_arm": {"straddle": 90, "raise": -67, "tilt": 0}},
+		      {"r_elbow": {"bend": 0}},
+		      {"r_wrist": {"tilt": -10, "bend": 0}},
+
+          {"l_arm": {"raise": 35, "straddle": 10, "turn": -10}},
+          {"l_elbow": {"bend": 75, "turn": 0}},
+          {"l_wrist": {"tilt": -50, "bend": 0, "turn": 155}}
+        ]
+      },
+      {
+        "ID": 1,
+        "position": {"x": 25, "y": -17, "z": 0},
         "rotation": {"x": 0, "y": 0, "z": 0},
         "posture": [
           {"turn": 180},
@@ -20,9 +41,47 @@
           {"l_elbow": {"bend": 75, "turn": 0}},
           {"l_wrist": {"tilt": -50, "bend": 0, "turn": 155}}
         ]
+      },
+      {
+        "ID": 2,
+        "position": {"x": 0, "y": 0, "z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "posture": []
       }
     ],
-    "events": {
 
-    }
+
+    "events": [
+      {"ID": 0, "start": 0, "end": 0, "actor_id": 2,
+        "data": {
+          "action": "move",
+          "startPos": {"x": 0, "y": 0, "z": 0},
+          "endPos": {"x": -150, "y": 0, "z": -150}
+        }
+      },
+      {"ID": 1, "start": 0, "end": 50, "actor_id": 2,
+        "data": {
+          "action": "rotate",
+          "startRot": {"x": 0, "y": 0, "z": 0},
+          "endRot": {"x": 0, "y": 0.785398, "z": 0}
+        }
+      },
+      {"ID": 2, "start": 100, "end": 600, "actor_id": 2, "data": { "action": "walk" }},
+      {"ID": 3, "start": 100, "end": 600, "actor_id": 2,
+        "data": { 
+          "action": "translate",
+          "startPos": {"x": -150, "y": 0, "z": -150},
+          "endPos": {"x": 0, "y": 0, "z": 0}
+        }
+      },
+      {"ID": 4, "start": 600, "end": 700, "actor_id": 2,
+        "data": { 
+          "action": "rotate",
+          "startRot": {"x": 0, "y":  0.785398, "z": 0},
+          "endRot": {"x": 0, "y": 0, "z": 0}
+        }
+      },
+      {"ID": 5, "start": 700, "end": 900, "actor_id": 2, "data": { "action": "bow" }},
+      {"ID": 6, "start": 900, "end": 950, "actor_id": 2, "data": { "action": "sit" }}
+    ]
 }
