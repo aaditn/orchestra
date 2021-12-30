@@ -962,11 +962,11 @@ Mannequin.sphereTemplate.receiveShadow = true;
 // params is array of [ [u-min, u-max, v-min, v-max, 1/height], ...]
 Mannequin.cossers = function (u, v, params) {
     function cosser(t, min, max) {
-	if (t < min) t++;
-	if (t > max) t--;
-	if (min <= t && t <= max)
-	    return 0.5 + 0.5 * Math.cos((t - min) / (max - min) * 2 * Math.PI - Math.PI);
-	return 0;
+		if (t < min) t++;
+		if (t > max) t--;
+		if (min <= t && t <= max)
+			return 0.5 + 0.5 * Math.cos((t - min) / (max - min) * 2 * Math.PI - Math.PI);
+		return 0;
     }
     for (var i = 0, r = 1; i < params.length; i++)
 	r += cosser(u, params[i][0], params[i][1]) * cosser(v, params[i][2], params[i][3]) / params[i][4];

@@ -5,6 +5,7 @@ import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { VideoActions } from './video_actions'
+import { TickSignal } from 'tone/build/esm/core/clock/TickSignal'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
@@ -30,7 +31,7 @@ class Chair extends THREE.Group {
 class Violin extends THREE.Group {
     constructor(x, y, angle) {
 		super();
-		this.position.set(x, y, -5);
+		this.position.set(x, y, -5)
 		this.rotation.y = rad(angle);
 		this.rotation.z = rad(-10);
 		
@@ -122,12 +123,16 @@ class Mask extends THREE.Group {
     }
 }
 
+// if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
+// for events with duration, event transition from ready -> active -> done
 class Event {
     constructor(start, end, data) {
-		this.start  = start
-		this.end    = end
-		this.data   = data
-		this.status = 'ready'
+		this.start   = start   // duration start
+		this.end     = end     // duration end
+		this.data    = data
+		this.status  = 'ready'
+		this.t0      = null
+		this.prevVal = null // used in some cases
     }
 }
 
@@ -168,7 +173,7 @@ const VideoUtil = {
 		// VideoUtil.scene.fog = new THREE.Fog('gainsboro', 100, 600);
 
 		VideoUtil.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
-		VideoUtil.camera.position.set(0, 0, 150);
+		VideoUtil.camera.position.set(0, 0, 250);
 
 		VideoUtil.light = new THREE.PointLight('white', 0.7);
 		VideoUtil.light.position.set(0, 100, 50);
@@ -291,17 +296,28 @@ const VideoUtil = {
 
 
 		// Add events
-		VideoUtil.all_events.push(new Event(100, 300, {action: 'walk', actor: VideoUtil.players[2]}))
+		VideoUtil.all_events.push(
+			new Event(0, 0, {action: 'move', actor: VideoUtil.players[2],
+				startPos: {x: 0, y: 0, z: 0}, endPos: {x: -100, y: 0, z: 0}, }
+			)
+		)
+		VideoUtil.all_events.push(
+			new Event(0, 100, {action: 'rotate', actor: VideoUtil.players[2],
+				startRot: {x: 0, y: 0, z: 0}, endRot: {x: 0, y: Math.PI/2, z: 0}, }
+			)
+		)
+		VideoUtil.all_events.push(new Event(100, 600, {action: 'walk', actor: VideoUtil.players[2]}))
 		VideoUtil.all_events.push(
 			new Event(100, 600, {action: 'translate', actor: VideoUtil.players[2],
-				startPos: {x: -250, y: 0, z: -200}, endPos: {x: 0, y: 0, z: 0}}
+				startPos: {x: -100, y: 0, z: 0}, endPos: {x: 0, y: 0, z: 0}, }
 			)
 		)
 		VideoUtil.all_events.push(
-			new Event(600, 1000, {action: 'rotate', actor: VideoUtil.players[2],
-				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: -Math.PI, z: 0}, }
+			new Event(600, 800, {action: 'rotate', actor: VideoUtil.players[2],
+				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: 0, z: 0}, }
 			)
 		)
+		VideoUtil.all_events.push(new Event(800, 1200, {action: 'bow', actor: VideoUtil.players[2]}))
     },
 
     moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -311,11 +327,11 @@ const VideoUtil = {
 		// Put the left finger down
 		for( let i = 1; i < 5; i++ ) { // finger numbers
 			if ( i == fingerNum ) {
-			player.l_fingers[i-1].bend = 60;
-			player.l_fingers[i-1].turn = -90;
+				player.l_fingers[i-1].bend = 60;
+				player.l_fingers[i-1].turn = -90;
 			} else {
-			player.l_fingers[i-1].bend = 40;
-			player.l_fingers[i-1].turn = -80;
+				player.l_fingers[i-1].bend = 40;
+				player.l_fingers[i-1].turn = -80;
 			}
 		}
 		if (upbow) {
@@ -365,44 +381,60 @@ const VideoUtil = {
 		)
     },
 
-	processEvent: (t, evt) => {
+	processEvent: (t, evt, reset) => {
 		const action = evt.data.action
 		const actor  = evt.data.actor
 		switch(action) {
 			case 'walk':
-				VideoActions.walk(t, evt)
-				break;
+				VideoActions.walk(t, evt, reset)
+				break
+			case 'bow':
+				VideoActions.bow(t, evt, reset)
+				break
+			case 'move': // move right away
+				VideoActions.move(t, evt)
+				break
 			case 'translate':
 				VideoActions.translate(t, evt)
-				break;
+				break
 			case 'rotate':
 				VideoActions.rotate(t, evt)
-				break;
+				break
 			default:
+				break
 				// default here
 		}
 	},
 
+	// animate loop (runs ~50ms right now)
     animate: (t) => {
 		// cycle through events and process as needed
 		VideoUtil.all_events.forEach((evt) => {
-			const start  = evt.start
-			const end    = evt.end
+			const start   = evt.start
+			const end     = evt.end
+			const instant = start >= end
 			switch(evt.status) {
 				case 'ready':
-					if (t >= start && t <= end) {
+					if (instant) { // no duration event, only start time needed
+						if (t >= start) {
+							evt.status = 'done' // bypass active for instant
+							VideoUtil.processEvent(t, evt) // instant
+						}
+					} else if (t >= start && t <= end) { // default event has duration
 						console.log("EVT active: ", evt)
 						evt.status = 'active'
-						VideoUtil.processEvent(t, evt)
+						evt.t0     = t
+						VideoUtil.processEvent(t, evt) // first time
 					}
 					break;
 				case 'active':
 					if (t >= start && t <= end) {
-						VideoUtil.processEvent(t, evt)
+						VideoUtil.processEvent(t, evt, false) // 0 < t < T
 					} else {
+						evt.status = 'done' // t >= T
 						console.log("EVT done: ", evt)
-						evt.status = 'done'
 						// post-process here if needed
+						VideoUtil.processEvent(t, evt, true) // reset if appropriate
 					}
 					break
 				case 'done':
