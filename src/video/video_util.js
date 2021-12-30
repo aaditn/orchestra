@@ -1,12 +1,9 @@
 import * as THREE from 'three'
-import * as Tone from 'tone'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { VideoActions } from './video_actions'
-import { TickSignal } from 'tone/build/esm/core/clock/TickSignal'
-import { AbstractParam } from 'tone/build/esm/core/context/AbstractParam'
 
 class Chair extends THREE.Group {
     constructor(x, angle) {
@@ -234,7 +231,6 @@ const VideoUtil = {
 				}
 			}
 		}
-		console.log("ACTOR_ID = ", actor.ID)
 		return actor
 	},
 
@@ -366,30 +362,11 @@ const VideoUtil = {
     },
 
 	processEvent: (t, evt, reset) => {
-		const action = evt.data.action
-		const actor  = evt.data.actor
-		switch(action) {
-			case 'walk':
-				VideoActions.walk(t, evt, reset)
-				break
-			case 'bow':
-				VideoActions.bow(t, evt, reset)
-				break
-			case 'sit':
-				VideoActions.sit(t, evt)
-				break
-			case 'move': // move right away
-				VideoActions.move(t, evt)
-				break
-			case 'translate':
-				VideoActions.translate(t, evt)
-				break
-			case 'rotate':
-				VideoActions.rotate(t, evt)
-				break
-			default:
-				break
-				// default here
+		const action = evt.data.action // actions are "walk", "sit", "rotate" etc.
+		if (action in VideoActions) {
+			VideoActions[action](t, evt, reset)
+		} else {
+			// action not found, default
 		}
 	},
 
