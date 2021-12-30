@@ -1,11 +1,11 @@
-import { sin } from '../../libs/mannequin'
+import { sin, cos } from '../../libs/mannequin'
 
 //-------- START VideoActions --------//
 const VideoActions = {
 
     walk: (t, evt, reset) => {
         const actor = evt.data.actor
-		const t0    = evt.t0 || 0 // start from a 0 position (t-t0)
+		const t0    = evt.data.t0 || 0 // start from a 0 position (t-t0)
 		// walking motion
 		if (! reset) {
 			const sint = sin(4 * (t-t0))
@@ -23,10 +23,14 @@ const VideoActions = {
 
 	bow: (t, evt, reset) => {
         const actor = evt.data.actor
-		const t0    = evt.t0 || 0
+		const paramt   = (t - evt.start) / (evt.end - evt.start)
 		// walking motion
 		if (! reset) {
-			actor.torso.bend = 45 + 45 * sin(2 * (t-t0))
+			if (paramt <= 0.5) {
+				actor.torso.bend = 180 * paramt
+			} else {
+				actor.torso.bend = 180 * (1 - paramt)
+			}
 		} else {
 			actor.torso.bend = 0
 		}
@@ -61,6 +65,24 @@ const VideoActions = {
 		actor.rotation.y = startRot.y + (endRot.y - startRot.y) * paramt
 		actor.rotation.z = startRot.z + (endRot.z - startRot.z) * paramt
     },
+
+	sit: (t, evt) => {
+        const actor  = evt.data.actor
+		const paramt = (t - evt.start) / (evt.end - evt.start)
+
+		actor['bend'] = -40 * paramt
+		actor.torso.bend = 30 * paramt
+		actor.l_leg.raise = 70 * paramt
+		actor.l_knee.bend = 100 * paramt
+
+		actor.r_leg.raise = 65 * paramt
+		actor.r_leg.turn = -25 * paramt
+		actor.r_knee.bend = 100 * paramt
+
+		// Lower entire mannequin
+		actor.position.y = -17 * paramt
+
+	},
 }
 
 export { VideoActions }

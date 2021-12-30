@@ -131,8 +131,7 @@ class Event {
 		this.end     = end     // duration end
 		this.data    = data
 		this.status  = 'ready'
-		this.t0      = null
-		this.prevVal = null // used in some cases
+		this.data.t0 = null
     }
 }
 
@@ -144,13 +143,9 @@ const VideoUtil = {
     clock: null,
     light: null,
     controls: null,
+	movie: {},
     players: [],
 	all_events: [],
-	active_events: [],
-
-    moveObject: (evt) => {
-		const data = evt.data
-    },
 
     // refresh rate is every 50ms
     drawFrame: () => {
@@ -173,7 +168,7 @@ const VideoUtil = {
 		// VideoUtil.scene.fog = new THREE.Fog('gainsboro', 100, 600);
 
 		VideoUtil.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
-		VideoUtil.camera.position.set(0, 0, 250);
+		VideoUtil.camera.position.set(0, 0, 300);
 
 		VideoUtil.light = new THREE.PointLight('white', 0.7);
 		VideoUtil.light.position.set(0, 100, 50);
@@ -204,7 +199,7 @@ const VideoUtil = {
 		ground.rotation.x = -Math.PI / 2;
 		VideoUtil.scene.add(ground);
 
-		VideoUtil.scene.rotation.x = rad(20)
+		VideoUtil.scene.rotation.x = rad(10)
 		VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
 		VideoUtil.clock = new THREE.Clock();
 
@@ -219,12 +214,42 @@ const VideoUtil = {
 		return actor
     },
 
-    createPlayer: (instrument, pos, rot) => {
-		const player = new Male();
-		player.position.set(pos.x, pos.y, pos.z);
+	createActorFromData: (actorData) => {
+		const actor = new Male()
+		const pos = actorData.position
+		const rot = actorData.rotation
+		const posture = actorData.posture
+		if (pos) {
+			actor.position.set(pos.x, pos.y, pos.z)
+		}
+		if (rot) {
+			actor.rotation.x = rot.x
+			actor.rotation.y = rot.y
+			actor.rotation.z = rot.z
+		}
+		// posture needs to be an array, order of transformations matters
+		for (let i in posture) {
+			const postureElem = posture[i]
+			for (let postureKey in postureElem) {
+				if (typeof postureElem[postureKey] == "object") {
+					console.log("Type of ", postureElem[postureKey], " is ", typeof postureElem[postureKey])
+					for (let subkey in postureElem[postureKey]) {
+						actor[postureKey][subkey] = postureElem[postureKey][subkey]
+					}
+				} else {
+					actor[postureKey] = postureElem[postureKey]
+				}
+			}
+		}
+		return actor
+	},
+
+	createPlayer: (instrument, pos, rot) => {
+		const player = new Male()
+		player.position.set(pos.x, pos.y, pos.z)
 		player.rotation.y = rot
-		player.turn = 180;
-		player.bend = -40;
+		player['turn'] = 180;
+		player['bend'] = -40;
 		player.torso.bend = 30;
 		player.torso.turn = 0;
 		player.torso.tilt = 0;
@@ -245,8 +270,7 @@ const VideoUtil = {
 		player.r_elbow.bend = 0;
 		player.r_wrist.tilt = -10;
 		player.r_wrist.bend = 0;
-		// player.r_wrist.turn = -10;
-		// player.r_fingers.bend = 90;
+
 		player.r_fingers[0].bend = 60;
 		player.r_fingers[1].bend = 60;
 		player.r_fingers[2].bend = 60;
@@ -261,8 +285,6 @@ const VideoUtil = {
 		player.l_wrist.tilt = -50;
 		player.l_wrist.bend = 0;
 		player.l_wrist.turn = 155;
-		// player.l_fingers.bend = 40;
-		// player.l_fingers.turn = -80;
 		player.l_fingers[0].bend = 40;
 		player.l_fingers[0].turn = -80;
 		player.l_fingers[1].bend = 40;
@@ -275,15 +297,37 @@ const VideoUtil = {
 		return player
     },
 
-    renderScene: () => {
+	loadMovieScript: async function(fileUrl) {
+		const response = await fetch(fileUrl ,{
+			headers : { 
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			}
+		})
+		VideoUtil.movie = await response.json()
+	},
+
+	renderScene: () => {
 		VideoUtil.createScene();
 		VideoUtil.players = []
+
+		// Load movie script
+		VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
+			console.log("AFTER LOAD: ", VideoUtil.movie)
+			const actorsData = VideoUtil.movie.actors
+			actorsData.forEach((actorData) => {
+				const actor = VideoUtil.createActorFromData(actorData)
+				console.log("ACTOR: ", actor)
+			})
+		})
+
+
+
 		VideoUtil.players.push(VideoUtil.createPlayer("violin", {x: 25, y: -17, z: 0}, 0))
 		VideoUtil.players.push(VideoUtil.createPlayer("violin", {x: -25, y: -17, z: 0}, Math.PI))
 
 		VideoUtil.players.push(VideoUtil.createActor({x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 0}))
-
-		VideoUtil.scene.add( new Chair(25, 180), new Chair(-25, 0));
+		VideoUtil.scene.add( new Chair(25, 180), new Chair(-25, 0))
 
 		VideoUtil.players[0].torso.attach(new Violin(17, 7, 20));
 		VideoUtil.players[1].torso.attach(new Violin(17, 7, 20));
@@ -298,26 +342,27 @@ const VideoUtil = {
 		// Add events
 		VideoUtil.all_events.push(
 			new Event(0, 0, {action: 'move', actor: VideoUtil.players[2],
-				startPos: {x: 0, y: 0, z: 0}, endPos: {x: -100, y: 0, z: 0}, }
+				startPos: {x: 0, y: 0, z: 0}, endPos: {x: -150, y: 0, z: -150}, }
 			)
 		)
 		VideoUtil.all_events.push(
-			new Event(0, 100, {action: 'rotate', actor: VideoUtil.players[2],
-				startRot: {x: 0, y: 0, z: 0}, endRot: {x: 0, y: Math.PI/2, z: 0}, }
+			new Event(0, 50, {action: 'rotate', actor: VideoUtil.players[2],
+				startRot: {x: 0, y: 0, z: 0}, endRot: {x: 0, y: Math.PI/4, z: 0}, }
 			)
 		)
 		VideoUtil.all_events.push(new Event(100, 600, {action: 'walk', actor: VideoUtil.players[2]}))
 		VideoUtil.all_events.push(
 			new Event(100, 600, {action: 'translate', actor: VideoUtil.players[2],
-				startPos: {x: -100, y: 0, z: 0}, endPos: {x: 0, y: 0, z: 0}, }
+				startPos: {x: -150, y: 0, z: -150}, endPos: {x: 0, y: 0, z: 0}, }
 			)
 		)
 		VideoUtil.all_events.push(
-			new Event(600, 800, {action: 'rotate', actor: VideoUtil.players[2],
+			new Event(600, 700, {action: 'rotate', actor: VideoUtil.players[2],
 				startRot: {x: 0, y: Math.PI/4, z: 0}, endRot: {x: 0, y: 0, z: 0}, }
 			)
 		)
-		VideoUtil.all_events.push(new Event(800, 1200, {action: 'bow', actor: VideoUtil.players[2]}))
+		VideoUtil.all_events.push(new Event(700, 900, {action: 'bow', actor: VideoUtil.players[2]}))
+		VideoUtil.all_events.push(new Event(900, 950, {action: 'sit', actor: VideoUtil.players[2]}))
     },
 
     moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
@@ -391,6 +436,9 @@ const VideoUtil = {
 			case 'bow':
 				VideoActions.bow(t, evt, reset)
 				break
+			case 'sit':
+				VideoActions.sit(t, evt)
+				break
 			case 'move': // move right away
 				VideoActions.move(t, evt)
 				break
@@ -423,7 +471,7 @@ const VideoUtil = {
 					} else if (t >= start && t <= end) { // default event has duration
 						console.log("EVT active: ", evt)
 						evt.status = 'active'
-						evt.t0     = t
+						evt.data.t0     = t
 						VideoUtil.processEvent(t, evt) // first time
 					}
 					break;

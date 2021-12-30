@@ -1,0 +1,28 @@
+{
+    "actors": [
+      {
+        "id": 0, 
+        "position": {"x": -55, "y": -17, "z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "posture": [
+          {"turn": 180},
+          {"bend": -40},
+          {"torso": {"bend": 30}},
+          {"l_leg": {"raise": 70}},
+          {"l_knee": {"bend": 100}},
+          {"r_leg": {"raise": 65, "turn": -25}},
+          {"r_knee": {"bend": 100}},
+          {"r_arm": {"straddle": 90, "raise": -67, "tilt": 0}},
+		      {"r_elbow": {"bend": 0}},
+		      {"r_wrist": {"tilt": -10, "bend": 0}},
+
+          {"l_arm": {"raise": 35, "straddle": 10, "turn": -10}},
+          {"l_elbow": {"bend": 75, "turn": 0}},
+          {"l_wrist": {"tilt": -50, "bend": 0, "turn": 155}}
+        ]
+      }
+    ],
+    "events": {
+
+    }
+}
