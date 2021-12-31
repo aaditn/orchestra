@@ -169,13 +169,6 @@ const VideoUtil = {
 		VideoUtil.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
 		VideoUtil.camera.position.set(0, 0, 300);
 
-		VideoUtil.light = new THREE.PointLight('white', 0.7);
-		VideoUtil.light.position.set(0, 100, 50);
-		VideoUtil.light.shadow.mapSize.width = 1024;
-		VideoUtil.light.shadow.mapSize.height = 1024;
-		VideoUtil.light.castShadow = true;
-		VideoUtil.scene.add(VideoUtil.light, new THREE.AmbientLight('white', 0.5));
-
 		const onWindowResize = (event) => {
 			VideoUtil.camera.aspect = window.innerWidth / window.innerHeight;
 			VideoUtil.camera.updateProjectionMatrix();
@@ -204,7 +197,7 @@ const VideoUtil = {
 
     },
 
-	createActorFromData: (actorData) => {
+	processActorData: (actorData) => {
 		const actor   = new Male()
 		const pos     = actorData.position
 		const rot     = actorData.rotation
@@ -232,6 +225,41 @@ const VideoUtil = {
 			}
 		}
 		return actor
+	},
+
+
+	processLightData: (ldata) => {
+		let light
+		switch(ldata.type) {
+			case "PointLight":
+				light = new THREE.PointLight(ldata.color, ldata.intensity)
+				if (ldata.position) {
+					light.position.set(ldata.position.x, ldata.position.y, ldata.position.z)
+				}
+				if ("mapSize.width" in ldata) {
+					light.shadow.mapSize.width = ldata["mapSize.width"]
+				}
+				if ("mapSize.height" in ldata) {
+					light.shadow.mapSize.height = ldata["mapSize.height"]
+				}
+				if (ldata.castShadow) {
+					light.castShadow = ldata.castShadow
+				}
+				break
+			case "AmbientLight":
+				light = new THREE.AmbientLight(ldata.color, ldata.intensity)
+				break
+		}
+		return light
+	},
+
+	processEvent: (t, evt, reset) => {
+		const action = evt.data.action // actions are "walk", "sit", "rotate" etc.
+		if (action in VideoActions) {
+			VideoActions[action](t, evt, reset)
+		} else {
+			// action not found, default
+		}
 	},
 
 	// have to figure how to posture fingers in movie file
@@ -275,7 +303,7 @@ const VideoUtil = {
 			// handle actor data
 			const actorsData = VideoUtil.movie.actors
 			actorsData.forEach((actorData) => {
-				const actor = VideoUtil.createActorFromData(actorData)
+				const actor = VideoUtil.processActorData(actorData)
 				VideoUtil.players.push(actor)
 			})
 			for( let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
@@ -288,6 +316,15 @@ const VideoUtil = {
 			VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
 
 			VideoUtil.scene.add( new Chair(25, 180), new Chair(-25, 0))
+
+			// handle lights
+			const lights = VideoUtil.movie.lights
+			lights.forEach((l) => {
+				let light = VideoUtil.processLightData(l)
+				if (light) {
+					VideoUtil.scene.add(light)
+				}
+			})
 
 			// handle event data
 			const eventsData  = VideoUtil.movie.events
@@ -360,15 +397,6 @@ const VideoUtil = {
 			}
 		)
     },
-
-	processEvent: (t, evt, reset) => {
-		const action = evt.data.action // actions are "walk", "sit", "rotate" etc.
-		if (action in VideoActions) {
-			VideoActions[action](t, evt, reset)
-		} else {
-			// action not found, default
-		}
-	},
 
 	// animate loop (runs ~50ms right now)
     animate: (t) => {
