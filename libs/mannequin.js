@@ -42,8 +42,8 @@ const AXIS = {
 
 class MannequinPostureVersionError extends Error {
     constructor(version) {
-	super('Posture data version ' + version + ' is incompatible with the currently supported version ' + MANNEQUIN_POSTURE_VERSION + '.');
-	this.name = "IncompatibleMannequinError";
+		super('Posture data version ' + version + ' is incompatible with the currently supported version ' + MANNEQUIN_POSTURE_VERSION + '.');
+		this.name = "IncompatibleMannequinError";
     }
 }
 
@@ -68,33 +68,32 @@ export function cos(x) {
 // create parametric surface
 class ParametricShape extends Group {
     constructor(tex, col, func, nU = 3, nV = 3) {
-	super();
-	var obj = new Mesh(
-	    // new ParametricBufferGeometry(func, nU, nV),
-	    new ParametricGeometry(func, nU, nV),
-	    new MeshPhongMaterial({
-		color: col,
-		shininess: 1,
-		map: tex
-	    })
-	);
-	obj.receiveShadow = true;
-	obj.castShadow = true;
-	this.add(obj);
-
+		super();
+		var obj = new Mesh(
+			// new ParametricBufferGeometry(func, nU, nV),
+			new ParametricGeometry(func, nU, nV),
+			new MeshPhongMaterial({
+			color: col,
+			shininess: 1,
+			map: tex
+			})
+		);
+		obj.receiveShadow = true;
+		obj.castShadow = true;
+		this.add(obj);
     } // ParametricShape.constructor
 
     addSphere(r, y, x = 0, z = 0) {
-	var s = Mannequin.sphereTemplate.clone();
-	s.material = new MeshPhongMaterial(
-	    {
-		color: Mannequin.colors[3],
-		shininess: 1
-	    });
-	s.scale.set(r, r, r);
-	s.position.set(x, y, z);
-	this.add(s);
-	return s;
+		var s = Mannequin.sphereTemplate.clone();
+		s.material = new MeshPhongMaterial(
+			{
+			color: Mannequin.colors[3],
+			shininess: 1
+			});
+		s.scale.set(r, r, r);
+		s.position.set(x, y, z);
+		this.add(s);
+		return s;
     } // ParametricShape.addSphere
 } // ParametricShape
 
@@ -102,28 +101,28 @@ class ParametricShape extends Group {
 // head shape as parametric surface
 class HeadShape extends ParametricShape {
     constructor(feminine, params) {
-	super(Mannequin.texHead, Mannequin.colors[0], function (u, v, target) {
-	    var r = Mannequin.cossers(u, v, [
-		[0.4, 0.9, 0, 1, -3],
-		[0, 1, 0, 0.1, 3],
-		[0, 1, 0.9, 1, 3],
-		[1.00, 1.05, 0.55, 0.85, -3],
-		[1.00, 1.05, 0.15, 0.45, -3],
-		[0.93, 1.08, 0.40, 0.60, 8],
-		[0.0, 0.7, 0.05, 0.95, 3],
-		[-0.2, 0.2, -0.15, 1.15, -6],
-		[-0.07, 0.07, 0.45, 0.55, 20], // nose
-		[-0.07, 0.01, 0.35, 0.55, 10], // nostril
-		[-0.07, 0.01, 0.45, 0.65, 10], // nostril
-	    ]);
-	    u = 360 * u;
-	    v = 180 * v - 90;
-	    var k = (1 + (feminine ? 1 : 2) * sin(u) * cos(v)) / 4;
-	    target.set(
-		r * params[0] * cos(u) * cos(v),
-		r * params[1] * sin(u) * cos(v),
-		(r + k) * params[2] * sin(v));
-	}, 32, 32);
+		super(Mannequin.texHead, Mannequin.colors[0], function (u, v, target) {
+			var r = Mannequin.cossers(u, v, [
+			[0.4, 0.9, 0, 1, -3],
+			[0, 1, 0, 0.1, 3],
+			[0, 1, 0.9, 1, 3],
+			[1.00, 1.05, 0.55, 0.85, -3],
+			[1.00, 1.05, 0.15, 0.45, -3],
+			[0.93, 1.08, 0.40, 0.60, 8],
+			[0.0, 0.7, 0.05, 0.95, 3],
+			[-0.2, 0.2, -0.15, 1.15, -6],
+			[-0.07, 0.07, 0.45, 0.55, 20], // nose
+			[-0.07, 0.01, 0.35, 0.55, 10], // nostril
+			[-0.07, 0.01, 0.45, 0.65, 10], // nostril
+			]);
+			u = 360 * u;
+			v = 180 * v - 90;
+			var k = (1 + (feminine ? 1 : 2) * sin(u) * cos(v)) / 4;
+			target.set(
+			r * params[0] * cos(u) * cos(v),
+			r * params[1] * sin(u) * cos(v),
+			(r + k) * params[2] * sin(v));
+		}, 32, 32);
     } // HeadShape.constructor
 } // HeadShape
 
@@ -171,19 +170,19 @@ class ShoeShape extends Group {
 // pelvis shape as parametric surface
 class PelvisShape extends ParametricShape {
     constructor(feminine, params) {
-	super(Mannequin.texLimb, Mannequin.colors[2], function (u, v, target) {
-	    var r = Mannequin.cossers(u, v, [
-		[0.6, 0.95, 0, 1, 4],
-		[0.7, 1.0, 0.475, 0.525, -13],
-		[-0.2, 0.3, 0, 0.3, -4],
-		[-0.2, 0.3, -0.3, 0, -4]
-	    ]);
-	    u = 360 * u - 90;
-	    v = 180 * v - 90;
-	    target.set(-1.5 + r * params[0] * cos(u) * Math.pow(cos(v), 0.6),
-		       r * params[1] * sin(u) * Math.pow(cos(v), 0.6),
-		       r * params[2] * sin(v));
-	}, 20, 10);
+		super(Mannequin.texLimb, Mannequin.colors[2], function (u, v, target) {
+			var r = Mannequin.cossers(u, v, [
+			[0.6, 0.95, 0, 1, 4],
+			[0.7, 1.0, 0.475, 0.525, -13],
+			[-0.2, 0.3, 0, 0.3, -4],
+			[-0.2, 0.3, -0.3, 0, -4]
+			]);
+			u = 360 * u - 90;
+			v = 180 * v - 90;
+			target.set(-1.5 + r * params[0] * cos(u) * Math.pow(cos(v), 0.6),
+				r * params[1] * sin(u) * Math.pow(cos(v), 0.6),
+				r * params[2] * sin(v));
+		}, 20, 10);
     } // PelvisShape.constructor
 } // PelvisShape
 
@@ -191,26 +190,26 @@ class PelvisShape extends ParametricShape {
 // limb shape as parametric surface
 export class LimbShape extends ParametricShape {
     constructor(feminine, params, nU = 24, nV = 12) {
-	var x = params[0],
-	    y = params[1],
-	    z = params[2],
-	    alpha = params[3],
-	    dAlpha = params[4],
-	    offset = params[5],
-	    scale = params[6],
-	    rad = params[7];
-	super(Mannequin.texLimb, Mannequin.colors[4], function (u, v, target) {
-	    v = 360 * v;
-	    var r = offset + scale * cos(alpha + dAlpha * u);
-	    target.set(x * r * cos(v) / 2, y * u, z * r * sin(v) / 2);
-	    var w = new Vector3(x * cos(v) * cos(170 * u - 85) / 2,
-				y * (1 / 2 + sin(180 * u - 90) / 2),
-				z * sin(v) * cos(180 * u - 90) / 2);
-	    target = target.lerp(w, Math.pow(Math.abs(2 * u - 1), 16));
-	}, nU, nV);
-	this.children[0].position.set(0, -y / 2, 0);
+		var x = params[0],
+			y = params[1],
+			z = params[2],
+			alpha = params[3],
+			dAlpha = params[4],
+			offset = params[5],
+			scale = params[6],
+			rad = params[7];
+		super(Mannequin.texLimb, Mannequin.colors[4], function (u, v, target) {
+			v = 360 * v;
+			var r = offset + scale * cos(alpha + dAlpha * u);
+			target.set(x * r * cos(v) / 2, y * u, z * r * sin(v) / 2);
+			var w = new Vector3(x * cos(v) * cos(170 * u - 85) / 2,
+					y * (1 / 2 + sin(180 * u - 90) / 2),
+					z * sin(v) * cos(180 * u - 90) / 2);
+			target = target.lerp(w, Math.pow(Math.abs(2 * u - 1), 16));
+		}, nU, nV);
+		this.children[0].position.set(0, -y / 2, 0);
 
-	if (rad) this.addSphere(rad ? rad : z / 2, -y / 2);
+		if (rad) this.addSphere(rad ? rad : z / 2, -y / 2);
     } // LimbShape.constructor
 } // LimbShape
 
@@ -218,35 +217,35 @@ export class LimbShape extends ParametricShape {
 // torso shape as parametric surface
 class TorsoShape extends ParametricShape {
     constructor(feminine, params) {
-	var x = params[0],
-	    y = params[1],
-	    z = params[2],
-	    alpha = params[3],
-	    dAlpha = params[4],
-	    offset = params[5],
-	    scale = params[6];
-	super(Mannequin.texLimb, Mannequin.colors[5], function (u, v, target) {
-	    var r = offset + scale * cos(alpha + dAlpha * u);
-	    if (feminine) r += Mannequin.cossers(u, v, [
-		[0.35, 0.85, 0.7, 0.95, 2],
-		[0.35, 0.85, 0.55, 0.8, 2]
-	    ]) - 1;
-	    v = 360 * v + 90;
-	    var x1 = x * (0.3 + r) * cos(v) / 2,
-		y1 = y * u,
-		z1 = z * r * sin(v) / 2;
-	    var x2 = x * cos(v) * cos(180 * u - 90) / 2,
-		y2 = y * (1 / 2 + sin(180 * u - 90) / 2),
-		z2 = z * sin(v) * cos(180 * u - 90) / 2;
-	    var k = Math.pow(Math.abs(2 * u - 1), 16),
-		kx = Math.pow(Math.abs(2 * u - 1), 2);
-	    if (x2 < 0) kx = k;
-	    target.set(x1 * (1 - kx) + kx * x2, y1 * (1 - k) + k * y2, z1 * (1 - k) + k * z2);
-	}, 30, 20);
+		var x = params[0],
+			y = params[1],
+			z = params[2],
+			alpha = params[3],
+			dAlpha = params[4],
+			offset = params[5],
+			scale = params[6];
+		super(Mannequin.texLimb, Mannequin.colors[5], function (u, v, target) {
+			var r = offset + scale * cos(alpha + dAlpha * u);
+			if (feminine) r += Mannequin.cossers(u, v, [
+			[0.35, 0.85, 0.7, 0.95, 2],
+			[0.35, 0.85, 0.55, 0.8, 2]
+			]) - 1;
+			v = 360 * v + 90;
+			var x1 = x * (0.3 + r) * cos(v) / 2,
+			y1 = y * u,
+			z1 = z * r * sin(v) / 2;
+			var x2 = x * cos(v) * cos(180 * u - 90) / 2,
+			y2 = y * (1 / 2 + sin(180 * u - 90) / 2),
+			z2 = z * sin(v) * cos(180 * u - 90) / 2;
+			var k = Math.pow(Math.abs(2 * u - 1), 16),
+			kx = Math.pow(Math.abs(2 * u - 1), 2);
+			if (x2 < 0) kx = k;
+			target.set(x1 * (1 - kx) + kx * x2, y1 * (1 - k) + k * y2, z1 * (1 - k) + k * z2);
+		}, 30, 20);
 
-	this.children[0].position.set(0, -y / 2, 0);
+		this.children[0].position.set(0, -y / 2, 0);
 
-	this.addSphere(2, -y / 2);
+		this.addSphere(2, -y / 2);
     } // TorsoShape.constructor
 } // TorsoShape
 
@@ -254,55 +253,55 @@ class TorsoShape extends ParametricShape {
 // flexible joint
 class Joint extends Group {
     constructor(parentJoint, pos, params, shape) {
-	super();
-	var yVal = params[1];
+		super();
+		var yVal = params[1];
 
-	this.image = new shape(parentJoint ? parentJoint.feminine : false, params);
-	this.image.castShadow = true;
-	if (shape != PelvisShape && shape != ShoeShape) this.image.position.set(0, yVal / 2, 0);
+		this.image = new shape(parentJoint ? parentJoint.feminine : false, params);
+		this.image.castShadow = true;
+		if (shape != PelvisShape && shape != ShoeShape) this.image.position.set(0, yVal / 2, 0);
 
-	this.imageWrapper = new Group();
-	this.imageWrapper.add(this.image);
-	this.imageWrapper.castShadow = true;
+		this.imageWrapper = new Group();
+		this.imageWrapper.add(this.image);
+		this.imageWrapper.castShadow = true;
 
-	this.add(this.imageWrapper);
+		this.add(this.imageWrapper);
 
-	this.castShadow = true;
-	this.yVal = yVal;
-	this.parentJoint = parentJoint;
+		this.castShadow = true;
+		this.yVal = yVal;
+		this.parentJoint = parentJoint;
 
-	if (parentJoint) { // attaching to parent joint
-	    this.position.set(0, parentJoint.yVal, 0);
-	    parentJoint.imageWrapper.add(this);
-	    this.feminine = parentJoint.feminine;
-	}
+		if (parentJoint) { // attaching to parent joint
+			this.position.set(0, parentJoint.yVal, 0);
+			parentJoint.imageWrapper.add(this);
+			this.feminine = parentJoint.feminine;
+		}
 
-	if (pos) { // initial joint position
-	    this.position.set(pos[0], pos[1], pos[2]);
-	}
+		if (pos) { // initial joint position
+			this.position.set(pos[0], pos[1], pos[2]);
+		}
 
-	this.minRot = new Vector3();
-	this.maxRot = new Vector3();
+		this.minRot = new Vector3();
+		this.maxRot = new Vector3();
     } // Joint.constructor
 
     get z() {
-	this.rotation.reorder('YXZ');
-	return this.rotation.z * 180 / Math.PI;
+		this.rotation.reorder('YXZ');
+		return this.rotation.z * 180 / Math.PI;
     }
     
     set z(angle) {
-	this.rotation.reorder('YXZ');
-	this.rotation.z = angle * Math.PI / 180;
+		this.rotation.reorder('YXZ');
+		this.rotation.z = angle * Math.PI / 180;
     } // Joint.z
 
     get x() {
-	this.rotation.reorder('YZX');
-	return this.rotation.x * 180 / Math.PI;
+		this.rotation.reorder('YZX');
+		return this.rotation.x * 180 / Math.PI;
     }
 
     set x(angle) {
-	this.rotation.reorder('YZX');
-	this.rotation.x = angle * Math.PI / 180;
+		this.rotation.reorder('YZX');
+		this.rotation.x = angle * Math.PI / 180;
     } // Joint.x
 
     get y() {
@@ -982,7 +981,7 @@ Mannequin.blend = function (posture0, posture1, k) {
 		if (data0 instanceof Array) {
 			var result = [];
 			for (var i in data0)
-			result.push(lerp(data0[i], data1[i], k));
+				result.push(lerp(data0[i], data1[i], k));
 			return result;
 		} else {
 			return data0 * (1 - k) + k * data1;

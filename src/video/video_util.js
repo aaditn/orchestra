@@ -27,11 +27,12 @@ class Chair extends THREE.Group {
 }
 
 class Violin extends THREE.Group {
-    constructor(x, y, angle) {
+    constructor(pos, rot) {
 		super();
-		this.position.set(x, y, -5)
-		this.rotation.y = rad(angle);
-		this.rotation.z = rad(-10);
+		this.position.set(pos.x, pos.y, pos.z)
+		this.rotation.x = rad(rot.x);
+		this.rotation.y = rad(rot.y);
+		this.rotation.z = rad(rot.z);
 		
 		let head = new THREE.Mesh( new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
 					new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
@@ -139,8 +140,8 @@ const VideoUtil = {
     scene: null,
     camera: null,
     renderer: null,
+	lights: [],
     clock: null,
-    light: null,
     controls: null,
 	movie: {},
     players: [],
@@ -227,12 +228,12 @@ const VideoUtil = {
 		return actor
 	},
 
-
 	processLightData: (ldata) => {
 		let light
 		switch(ldata.type) {
 			case "PointLight":
 				light = new THREE.PointLight(ldata.color, ldata.intensity)
+				light.ID = ldata.ID
 				if (ldata.position) {
 					light.position.set(ldata.position.x, ldata.position.y, ldata.position.z)
 				}
@@ -246,8 +247,33 @@ const VideoUtil = {
 					light.castShadow = ldata.castShadow
 				}
 				break
+			case "SpotLight":
+				light = new THREE.SpotLight(ldata.color, ldata.intensity)
+				light.ID = ldata.ID
+				if (ldata.position) {
+					light.position.set(ldata.position.x, ldata.position.y, ldata.position.z)
+				}
+				if ("mapSize.width" in ldata) {
+					light.shadow.mapSize.width = ldata["mapSize.width"]
+				}
+				if ("mapSize.height" in ldata) {
+					light.shadow.mapSize.height = ldata["mapSize.height"]
+				}
+				if (ldata.castShadow) light.castShadow = ldata.castShadow
+				if (ldata.angle) light.angle = ldata.angle
+				if (ldata.target) { // connect light to target if specified
+					if (ldata.target.actor == "player") {
+						light.target = VideoUtil.players[ldata.target.actor_id]
+					}
+				}
+				break
+			case "DirectionalLight":
+				light = new THREE.DirectionalLight(ldata.color, ldata.intensity)
+				light.ID = ldata.ID
+				break
 			case "AmbientLight":
 				light = new THREE.AmbientLight(ldata.color, ldata.intensity)
+				light.ID = ldata.ID
 				break
 		}
 		return light
@@ -308,7 +334,8 @@ const VideoUtil = {
 			})
 			for( let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
 				const actor = VideoUtil.players[i]
-				actor.torso.attach(new Violin(17, 7, 20))
+				// actor.torso.attach(new Violin(17, 7, 20))
+				actor.neck.attach(new Violin({x: 17, y: -5, z: -5}, {x: 0, y: 20, z: -10}))
 				actor.r_fingers[0].attach(new Bow())
 			}
 			const loader = new OBJLoader();
@@ -321,18 +348,27 @@ const VideoUtil = {
 			const lights = VideoUtil.movie.lights
 			lights.forEach((l) => {
 				let light = VideoUtil.processLightData(l)
-				if (light) {
+				if (light) { 
 					VideoUtil.scene.add(light)
+					VideoUtil.lights.push(light)
 				}
 			})
 
 			// handle event data
 			const eventsData  = VideoUtil.movie.events
+			let actor
 			eventsData.forEach((e) => {
-				const actor = VideoUtil.players[e.actor_id]
-				VideoUtil.all_events.push( 
-					new Event(e.start, e.end, actor, e.data)
-				)
+				switch(e.actor_type) {
+					case "player":
+						actor = VideoUtil.players[e.actor_id]
+						break
+					case "light":
+						actor = VideoUtil.lights[e.actor_id]
+						break
+				}
+				if (actor) {
+					VideoUtil.all_events.push(new Event(e.start, e.end, actor, e.data))
+				}
 			})
 		})
     },
