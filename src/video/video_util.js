@@ -195,7 +195,6 @@ const VideoUtil = {
 		VideoUtil.scene.rotation.x = rad(10)
 		VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
 		VideoUtil.clock = new THREE.Clock();
-
     },
 
 	processActorData: (actorData) => {

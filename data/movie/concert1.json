@@ -85,54 +85,55 @@
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },
-    {"ID": 0, "start": 100, "end": 600, "actor_id": 1, "actor_type": "player",
+    {"ID": 4, "start": 100, "end": 600, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 150, "y": 0, "z": 0},
         "endPos": {"x": 25, "y": 0, "z": 0}
       }
     },
-    {"ID": 6, "start": 700, "end": 900, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 7, "start": 900, "end": 950, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
+    {"ID": 5, "start": 700, "end": 900, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
+    {"ID": 6, "start": 900, "end": 950, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
 
 
-    {"ID": 0, "start": 0, "end": 0, "actor_id": 2, "actor_type": "player",
+    {"ID": 7, "start": 0, "end": 0, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": -150, "y": 0, "z": -150}
       }
     },
-    {"ID": 1, "start": 0, "end": 50, "actor_id": 2, "actor_type": "player",
+    {"ID": 8, "start": 0, "end": 50, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
         "endRot": {"x": 0, "y": 0.785398, "z": 0}
       }
     },
-    {"ID": 2, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
-    {"ID": 3, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player",
+    {"ID": 9, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
+    {"ID": 10, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player",
       "data": { 
         "action": "translate",
         "startPos": {"x": -150, "y": 0, "z": -150},
         "endPos": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 3, "start": 100, "end": 600, "actor_id": 1, "actor_type": "light",
-      "data": { 
+    {"ID": 11, "start": 100, "end": 600, "actor_id": 1, "actor_type": "light",
+      "data":
+       { 
         "action": "translate",
         "startPos": {"x": -150, "y": 50, "z": -150},
         "endPos": {"x": 0, "y": 50, "z": 0}
       }
     },
-    {"ID": 5, "start": 600, "end": 700, "actor_id": 2, "actor_type": "player",
+    {"ID": 12, "start": 600, "end": 700, "actor_id": 2, "actor_type": "player",
       "data": { 
         "action": "rotate",
         "startRot": {"x": 0, "y":  0.785398, "z": 0},
         "endRot": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 6, "start": 700, "end": 900, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 7, "start": 900, "end": 950, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }}
+    {"ID": 13, "start": 700, "end": 900, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
+    {"ID": 14, "start": 900, "end": 950, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }}
   ]
 }

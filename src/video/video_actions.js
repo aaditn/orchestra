@@ -8,7 +8,7 @@ const VideoActions = {
 		const t0    = evt.data.t0 || 0 // start from a 0 position (t-t0)
 		// walking motion
 		if (! reset) {
-			const sint = sin(4 * (t-t0))
+			const sint =  sin(4 * (t-t0))
 			actor.l_leg.raise = 30 * sint
 			actor.r_leg.raise = -30 * sint
 			actor.l_arm.raise = -30 * sint

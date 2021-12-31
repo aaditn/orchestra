@@ -80,13 +80,13 @@ const AudioUtil = {
 			} else {
 				const note = el
 				if (note != "R") { // "R" is a rest
-				AudioUtil.playNote(synth, note, duration, curr)
-				if (j == 1) {
-					// push only once for chords
-					const strNum = AudioUtil.getViolinStringFromNote(note)
-					const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-					times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
-				}
+					AudioUtil.playNote(synth, note, duration, curr)
+					if (j == 1) {
+						// push only once for chords
+						const strNum = AudioUtil.getViolinStringFromNote(note)
+						const fingerNum = AudioUtil.getViolinFingerFromNote(note)
+						times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
+					}
 				}
 			}
 			})
@@ -134,12 +134,10 @@ const AudioUtil = {
 		const num = []
 		for (let vname in responseJson) num.push(responseJson[vname].data.length)
 		AudioUtil.setNumNotes(num)
-
 		
 		// const synth = new Tone.Synth().toDestination();
 		// const synth = SampleLibrary.load({ instruments: "saxophone" }).toDestination();
 		// playMidiFile(synth, "/midi/tchaik_serenade.mid")
-
 
 		// Play a score with multiple parts
 		let score   = []
@@ -155,16 +153,17 @@ const AudioUtil = {
 				score.push({synth: synth, voice: voice})
 			}
 		}
-		
+
 		Tone.loaded().then(() => {
 			const now = Tone.now()
 			console.log("NOW = ", now)
 			score.forEach((blob, blobIdx) => {
-			if (! blob.voice.muted) {
-				AudioUtil.playNotes( 
-				blob.synth, blob.voice.data, now, blob.voice.speed, 
-				AudioUtil.updateNumNotes, blobIdx )
-			}
+				if (! blob.voice.muted) {
+					AudioUtil.playNotes( 
+						blob.synth, blob.voice.data, now, blob.voice.speed, 
+						AudioUtil.updateNumNotes, blobIdx
+					)
+				}
 			})
 		})
     },
