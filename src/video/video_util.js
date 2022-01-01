@@ -2,7 +2,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, LimbShape, rad, sin } from '../../libs/mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { VideoActions } from './video_actions'
 
 class Chair extends THREE.Group {
@@ -146,14 +148,12 @@ const VideoUtil = {
 	movie: {},
     players: [],
 	all_events: [],
+	bows: [],
 
-    // refresh rate is every 50ms
-    drawFrame: () => {
-		VideoUtil.animate( 50 * VideoUtil.clock.getElapsedTime() );
-		VideoUtil.renderer.render(VideoUtil.scene, VideoUtil.camera);
-    },
+	mixer: null,
+	prevt: 0,
 
-    // overridden from mannequin.js
+	// overridden from mannequin.js
     createScene: () => {
 		// prevt = 0
 		VideoUtil.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -319,7 +319,7 @@ const VideoUtil = {
 		VideoUtil.movie = await response.json()
 	},
 
-	renderScene: () => {
+	initScene: () => {
 		VideoUtil.createScene();
 		VideoUtil.players = []
 
@@ -335,7 +335,9 @@ const VideoUtil = {
 				const actor = VideoUtil.players[i]
 				// actor.torso.attach(new Violin(17, 7, 20))
 				actor.neck.attach(new Violin({x: 17, y: -5, z: -5}, {x: 0, y: 20, z: -10}))
-				actor.r_fingers[0].attach(new Bow())
+				const bow = new Bow()
+				actor.r_fingers[0].attach(bow)
+				VideoUtil.bows.push(bow)
 			}
 			const loader = new OBJLoader();
 			VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
@@ -370,7 +372,28 @@ const VideoUtil = {
 				}
 			})
 		})
-    },
+
+		// Load facecap model
+		const ktx2Loader = 
+			new KTX2Loader()
+                .setTranscoderPath( '../node_modules/three/examples/js/libs/basis/' )
+                .detectSupport( VideoUtil.renderer );
+		new GLTFLoader()
+			.setKTX2Loader( ktx2Loader )
+			.setMeshoptDecoder( MeshoptDecoder )
+			.load( '/models/facecap.glb', ( gltf ) => {
+				const mesh = gltf.scene.children[ 0 ]
+				mesh.position.set(0, 0, 15)
+				mesh.scale.set(30, 30, 30)
+				console.log("GLTF: ", gltf, " MESH: ", mesh)
+				VideoUtil.scene.add( mesh );
+				VideoUtil.mixer = new THREE.AnimationMixer( mesh );
+				VideoUtil.mixer.clipAction( gltf.animations[ 0 ] ).play();
+				// GUI                                                                  
+				const head = mesh.getObjectByName( 'mesh_2' );
+				const influences = head.morphTargetInfluences;
+			})
+	},
 
     moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
 		let t = -30
@@ -379,19 +402,19 @@ const VideoUtil = {
 		// Put the left finger down
 		for( let i = 1; i < 5; i++ ) { // finger numbers
 			if ( i == fingerNum ) {
-				player.l_fingers[i-1].bend = 60;
-				player.l_fingers[i-1].turn = -90;
+				player.l_fingers[i-1].bend = 60
+				player.l_fingers[i-1].turn = -90
 			} else {
-				player.l_fingers[i-1].bend = 40;
-				player.l_fingers[i-1].turn = -80;
+				player.l_fingers[i-1].bend = 40
+				player.l_fingers[i-1].turn = -80
 			}
 		}
 		if (upbow) {
 			// Execute up bow
 			player.r_arm.straddle = 90 + strNum * 5 // play on default string
 			let intvl = setInterval(() => {
-				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t));
-				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * t));
+				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t))
+				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * t))
 				if (t >= 30) {
 					clearInterval(intvl)
 				}
@@ -402,9 +425,8 @@ const VideoUtil = {
 			player.r_arm.straddle = 90 + strNum * 5 // play on default string
 			let intvl = setInterval(() => {
 				const tdown = 0 - t
-				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * tdown));
-				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * tdown));
-				
+				player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * tdown))
+				player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * tdown))
 				if (t >= 30) {
 					clearInterval(intvl)
 				}
@@ -433,8 +455,21 @@ const VideoUtil = {
 		)
     },
 
+	// refresh rate is every 50ms
+	drawFrame: () => {
+		VideoUtil.animate( 50 * VideoUtil.clock.getElapsedTime() );
+		VideoUtil.renderer.render(VideoUtil.scene, VideoUtil.camera);
+	},
+
 	// animate loop (runs ~50ms right now)
     animate: (t) => {
+		// test animation for model from face cap
+		const delta = t - VideoUtil.prevt
+        if ( VideoUtil.mixer ) {
+            VideoUtil.mixer.update( delta * 0.02 );
+        }
+		VideoUtil.prevt = t
+
 		// cycle through events and process as needed
 		VideoUtil.all_events.forEach((evt) => {
 			const start   = evt.start
@@ -448,7 +483,7 @@ const VideoUtil = {
 							VideoUtil.processEvent(t, evt) // instant
 						}
 					} else if (t >= start && t <= end) { // default event has duration
-						console.log("EVT active: ", evt)
+						// console.log("EVT active: ", evt)
 						evt.status = 'active'
 						evt.data.t0     = t
 						VideoUtil.processEvent(t, evt) // first time
@@ -459,7 +494,7 @@ const VideoUtil = {
 						VideoUtil.processEvent(t, evt, false) // 0 < t < T
 					} else {
 						evt.status = 'done' // t >= T
-						console.log("EVT done: ", evt)
+						// console.log("EVT done: ", evt)
 						// post-process here if needed
 						VideoUtil.processEvent(t, evt, true) // reset if appropriate
 					}

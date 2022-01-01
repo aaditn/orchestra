@@ -38,27 +38,27 @@
 
   "lights": [
     {
-      "ID": 0, "type": "PointLight", "color": "white", "intensity": 0.4,
+      "ID": 0, "type": "PointLight", "color": "white", "intensity": 0.7,
       "position": {"x": 0, "y": 100, "z": 50},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "castShadow": true
     },
     {
-      "ID": 1, "type": "SpotLight", "color": "white", "intensity": 0.6,
+      "ID": 1, "type": "SpotLight", "color": "white", "intensity": 0.01,
       "position": {"x": 0, "y": 50, "z": 0},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "angle": 0.35, "castShadow": true,
       "target": {"actor": "player", "actor_id": 2}
     },
     {
-      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.6,
+      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.01,
       "position": {"x": 150, "y": 50, "z": 0},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "angle": 0.35, "castShadow": true,
       "target": {"actor": "player", "actor_id": 1}
     },
     {
-      "ID": 3, "type": "AmbientLight", "color": "white", "intensity": 0.3
+      "ID": 3, "type": "AmbientLight", "color": "white", "intensity": 0.4
     }
   ],
 

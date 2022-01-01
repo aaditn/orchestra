@@ -17,4 +17,4 @@ document.querySelector("button").addEventListener("click", () => {
     handleClickPlay()
 });
 
-VideoUtil.renderScene()
+VideoUtil.initScene()
