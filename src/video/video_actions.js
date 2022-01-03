@@ -81,7 +81,21 @@ const VideoActions = {
 
 		// Lower entire mannequin
 		actor.position.y = -17 * paramt
+	},
 
+	animateInfluence: (t, evt) => {
+		// influences = [{id: <influence_id>, startParam: <val>, endParam: <val>}, ...]
+		const infs   = evt.data.influences
+		const paramt = (t - evt.start) / (evt.end - evt.start) // 0 <= paramt <= 1
+		const head   = evt.actor
+		const targetInfs = head.morphTargetInfluences
+		infs.forEach((infObj) => {
+			const id       = infObj.id
+			const start    = infObj.startParam
+			const end      = infObj.endParam
+			const infVal   = (end - start) * paramt
+			targetInfs[id] = infVal
+		})
 	},
 }
 

@@ -275,7 +275,7 @@ const VideoUtil = {
         actor.r_fingers[0].attach(bow)
         VideoUtil.bows.push(bow)
       }
-      const loader = new OBJLoader();
+      const loader = new OBJLoader()
       VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
       VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
       VideoUtil.loadAnimatableFace(VideoUtil.players[2])
@@ -302,6 +302,9 @@ const VideoUtil = {
             break
           case "light":
             actor = VideoUtil.lights[e.actor_id]
+            break
+          case "influence":
+            actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
             break
         }
         if (actor) {
@@ -370,10 +373,11 @@ const VideoUtil = {
       // console.log("HEAD: ", head, " INFLUENCES: ", influences)
       // VideoUtil.mixer.update(0.015)
       const tval = (VideoUtil.testcount % 200) * 0.01
+      const infs = [24, 28]
       if (tval <= 1) {
-        for (let i = 0; i < 50; i++) influences[i] = tval
+        for (let i in infs) influences[infs[i]] = tval
       } else {
-        for (let i = 0; i < 50; i++) influences[i] = 2 - tval
+        for (let i in infs) influences[infs[i]] = 2 - tval
       }
     }
 
@@ -419,3 +423,58 @@ const VideoUtil = {
 }
 
 export { VideoUtil }
+
+/*
+  browInnerUp: 0
+  browDown_L: 1
+  browDown_R: 2
+  browOuterUp_L: 3
+  browOuterUp_R: 4
+  eyeLookUp_L: 5
+  eyeLookUp_R: 6
+  eyeLookDown_L: 7
+  eyeLookDown_R: 8
+  eyeLookIn_L: 9
+  eyeLookIn_R: 10
+  eyeLookOut_L: 11
+  eyeLookOut_R: 12
+  eyeBlink_L: 13
+  eyeBlink_R: 14
+  eyeSquint_L: 15
+  eyeSquint_R: 16
+  eyeWide_L: 17
+  eyeWide_R: 18
+  cheekPuff: 19
+  cheekSquint_L: 20
+  cheekSquint_R: 21
+  noseSneer_L: 22
+  noseSneer_R: 23
+  jawOpen: 24
+  jawForward: 25
+  jawLeft: 26
+  jawRight: 27
+  mouthFunnel: 28
+  mouthPucker: 29
+  mouthLeft: 30
+  mouthRight: 31
+  mouthRollUpper: 32
+  mouthRollLower: 33
+  mouthShrugUpper: 34
+  mouthShrugLower: 35
+  mouthClose: 36
+  mouthSmile_L: 37
+  mouthSmile_R: 38
+  mouthFrown_L: 39
+  mouthFrown_R: 40
+  mouthDimple_L: 41
+  mouthDimple_R: 42
+  mouthUpperUp_L: 43
+  mouthUpperUp_R: 44
+  mouthLowerDown_L: 45
+  mouthLowerDown_R: 46
+  mouthPress_L: 47
+  mouthPress_R: 48
+  mouthStretch_L: 49
+  mouthStretch_R: 50
+  tongueOut: 51
+*/

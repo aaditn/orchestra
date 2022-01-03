@@ -77,23 +77,23 @@
         "endRot": {"x": 0, "y": -1.570796, "z": 0}
       }
     },
-    {"ID": 2, "start": 100, "end": 600, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
-    {"ID": 3, "start": 100, "end": 600, "actor_id": 2, "actor_type": "light",
+    {"ID": 2, "start": 100, "end": 300, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
+    {"ID": 3, "start": 100, "end": 300, "actor_id": 2, "actor_type": "light",
       "data": { 
         "action": "translate",
         "startPos": {"x": 150, "y": 50, "z": 0},
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },
-    {"ID": 4, "start": 100, "end": 600, "actor_id": 1, "actor_type": "player",
+    {"ID": 4, "start": 100, "end": 300, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 150, "y": 0, "z": 0},
         "endPos": {"x": 25, "y": 0, "z": 0}
       }
     },
-    {"ID": 5, "start": 700, "end": 900, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 6, "start": 900, "end": 950, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
+    {"ID": 5, "start": 350, "end": 400, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
+    {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
 
 
     {"ID": 7, "start": 0, "end": 0, "actor_id": 2, "actor_type": "player",
@@ -110,15 +110,15 @@
         "endRot": {"x": 0, "y": 0.785398, "z": 0}
       }
     },
-    {"ID": 9, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
-    {"ID": 10, "start": 100, "end": 600, "actor_id": 2, "actor_type": "player",
+    {"ID": 9, "start": 100, "end": 300, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
+    {"ID": 10, "start": 100, "end": 300, "actor_id": 2, "actor_type": "player",
       "data": { 
         "action": "translate",
         "startPos": {"x": -150, "y": 0, "z": -150},
         "endPos": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 11, "start": 100, "end": 600, "actor_id": 1, "actor_type": "light",
+    {"ID": 11, "start": 100, "end": 300, "actor_id": 1, "actor_type": "light",
       "data":
        { 
         "action": "translate",
@@ -126,14 +126,24 @@
         "endPos": {"x": 0, "y": 50, "z": 0}
       }
     },
-    {"ID": 12, "start": 600, "end": 700, "actor_id": 2, "actor_type": "player",
+    {"ID": 12, "start": 300, "end": 350, "actor_id": 2, "actor_type": "player",
       "data": { 
         "action": "rotate",
         "startRot": {"x": 0, "y":  0.785398, "z": 0},
         "endRot": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 13, "start": 700, "end": 900, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 14, "start": 900, "end": 950, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }}
+    {"ID": 13, "start": 350, "end": 450, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
+    {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }},
+
+    {"ID": 15, "start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
+      "data": {
+        "action": "animateInfluence",
+        "influences": [
+          {"id": 24, "startParam": 0.0, "endParam": 1.0},
+          {"id": 51, "startParam": 0.0, "endParam": 0.5}
+        ]
+      }
+    }
   ]
 }
