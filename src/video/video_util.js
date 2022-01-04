@@ -163,11 +163,34 @@ const VideoUtil = {
     return light
   },
 
+  processEventData: (evtsData) => {
+    // Handle (movie) event data after assets have been loaded
+    const eventsData = VideoUtil.movie.events
+    let actor
+    evtsData.forEach((e) => {
+      switch (e.actor_type) {
+        case "player":
+          actor = VideoUtil.players[e.actor_id]
+          break
+        case "light":
+          actor = VideoUtil.lights[e.actor_id]
+          break
+        case "influence":
+          actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
+          break
+      }
+      if (actor) {
+        VideoUtil.all_events.push(new Event(e.start, e.end, actor, e.data))
+      }
+    })
+  },
+
   processEvent: (t, evt, reset) => {
     const action = evt.data.action // actions are "walk", "sit", "rotate" etc.
     if (action in VideoActions) {
       VideoActions[action](t, evt, reset)
     } else {
+      console.log("ACTION not found: ", action)
       // action not found, default
     }
   },
@@ -204,55 +227,69 @@ const VideoUtil = {
     VideoUtil.movie = await response.json()
   },
 
-  // Load face with influences
-  // from head.morphTargetDIctionary + head.morephTargetInfluences
-  loadAnimatableFace: (actor) => {
-    // Load facecap model
-    let head = null
+  loadAssets: () => {
+
+    // load faces with textures (cannot animate)
+    const modelPaths   = ["/models/face1", "/models/brett_face"]
+    const attachPoints = [VideoUtil.players[0].neck, VideoUtil.players[1].neck]
+    const textures = []
+    const promises = []
+    const loader   = new OBJLoader()
+    modelPaths.forEach((modelPath, i) => {
+      textures.push(new THREE.TextureLoader().load(modelPath + "/model.png")) // sync
+      promises.push(loader.loadAsync(modelPath + "/model.obj")) // push promise for each model
+    })
+
+    // Load animatable face
     const ktx2Loader =
       new KTX2Loader()
         .setTranscoderPath('../node_modules/three/examples/js/libs/basis/')
         .detectSupport(VideoUtil.renderer);
-    return new GLTFLoader()
-      .setKTX2Loader(ktx2Loader)
-      .setMeshoptDecoder(MeshoptDecoder)
-      .load('/models/facecap.glb', (gltf) => {
-        VideoUtil.facecap_mesh = gltf.scene.children[0]
-        VideoUtil.facecap_mesh.position.set(2, 2, 0)
-        VideoUtil.facecap_mesh.rotation.y = Math.PI / 2
-        VideoUtil.facecap_mesh.scale.set(37, 37, 37)
+    promises.push(new GLTFLoader().setKTX2Loader(ktx2Loader)
+                      .setMeshoptDecoder(MeshoptDecoder)
+                      .loadAsync('/models/facecap.glb'))
+    Promise.all(promises).then((allObjects) => {
 
-        VideoUtil.scene.add(VideoUtil.facecap_mesh);
-        VideoUtil.mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
-        // console.log("ANIMATIONS: ", gltf.animations)
-        // VideoUtil.facecap_action = VideoUtil.mixer.clipAction(gltf.animations[0])
-        head = VideoUtil.facecap_mesh.getObjectByName('mesh_2');
-        const dict = head.morphTargetDictionary
-        console.log("HEAD: ", head, " DICT: ", dict)
-        // VideoUtil.facecap_action.setLoop(THREE.LoopRepeat, 2)
-        // VideoUtil.facecap_action.play()
-        actor.head.attach(VideoUtil.facecap_mesh)
-      })
-  },
+      allObjects.forEach((object, i) => {
 
-  loadFaceAndAttach: (loader, modelPath, attachPoint) => {
-    let texture = new THREE.TextureLoader().load(modelPath + "/model.png")
-    let material = new THREE.MeshBasicMaterial({ map: texture })
-    loader.load(
-      modelPath + "/model.obj",
-      (object) => {
-        object.scale.set(40, 40, 40)
-        object.rotation.y = Math.PI / 2
-        object.position.set(1, 4, 0)
+        if (i == 0 || i == 1) {
 
-        object.traverse(function (child) {
-          if (child instanceof THREE.Mesh) {
-            child.material = material
-          }
-        });
-        attachPoint.attach(object);
-      }
-    )
+          let material = new THREE.MeshBasicMaterial({ map: textures[i] })
+          object.scale.set(40, 40, 40)
+          object.rotation.y = Math.PI / 2
+          object.position.set(1, 4, 0)
+          object.traverse(function (child) {
+            if (child instanceof THREE.Mesh) {
+              child.material = material
+            }
+          });
+          attachPoints[i].attach(object)
+
+        } else if (i == 2) { // animatable face
+          // Load face with influences
+          // from head.morphTargetDIctionary + head.morephTargetInfluences
+          VideoUtil.facecap_mesh = object.scene.children[0]
+          VideoUtil.facecap_mesh.position.set(2, 2, 0)
+          VideoUtil.facecap_mesh.rotation.y = Math.PI / 2
+          VideoUtil.facecap_mesh.scale.set(37, 37, 37)
+
+          VideoUtil.scene.add(VideoUtil.facecap_mesh);
+          VideoUtil.mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
+          // console.log("ANIMATIONS: ", gltf.animations)
+          // VideoUtil.facecap_action = VideoUtil.mixer.clipAction(gltf.animations[0])
+          let head = VideoUtil.facecap_mesh.getObjectByName('mesh_2');
+          const dict = head.morphTargetDictionary
+          console.log("HEAD: ", head, " DICT: ", dict)
+          // VideoUtil.facecap_action.setLoop(THREE.LoopRepeat, 2)
+          // VideoUtil.facecap_action.play()
+          VideoUtil.players[2].head.attach(VideoUtil.facecap_mesh)
+
+        }
+      }) // close allObjects.forEach
+      // Process event data after assets are loaded
+      VideoUtil.processEventData(VideoUtil.movie.events)
+
+    }) // end of Promise.all
   },
 
   initScene: () => {
@@ -261,6 +298,7 @@ const VideoUtil = {
 
     // Load movie script
     VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
+
       // handle actor data
       const actorsData = VideoUtil.movie.actors
       actorsData.forEach((actorData) => {
@@ -275,10 +313,7 @@ const VideoUtil = {
         actor.r_fingers[0].attach(bow)
         VideoUtil.bows.push(bow)
       }
-      const loader = new OBJLoader()
-      VideoUtil.loadFaceAndAttach(loader, "/models/face1", VideoUtil.players[0].neck)
-      VideoUtil.loadFaceAndAttach(loader, "/models/brett_face", VideoUtil.players[1].neck)
-      VideoUtil.loadAnimatableFace(VideoUtil.players[2])
+      VideoUtil.loadAssets()
 
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
 
@@ -292,25 +327,6 @@ const VideoUtil = {
         }
       })
 
-      // handle event data
-      const eventsData = VideoUtil.movie.events
-      let actor
-      eventsData.forEach((e) => {
-        switch (e.actor_type) {
-          case "player":
-            actor = VideoUtil.players[e.actor_id]
-            break
-          case "light":
-            actor = VideoUtil.lights[e.actor_id]
-            break
-          case "influence":
-            actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
-            break
-        }
-        if (actor) {
-          VideoUtil.all_events.push(new Event(e.start, e.end, actor, e.data))
-        }
-      })
     })
 
   },
@@ -364,13 +380,13 @@ const VideoUtil = {
   // animate loop (runs ~50ms right now)
   animate: (t) => {
     // test animation for model from face cap
+
     VideoUtil.testcount++
     if (VideoUtil.testcount >= 100000) VideoUtil.testcount = 0
+    /*
     if (VideoUtil.facecap_mesh) {
       const head = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
       const influences = head.morphTargetInfluences
-      // const dict       = head.morphTargetDictionary
-      // console.log("HEAD: ", head, " INFLUENCES: ", influences)
       // VideoUtil.mixer.update(0.015)
       const tval = (VideoUtil.testcount % 200) * 0.01
       const infs = [24, 28]
@@ -380,6 +396,7 @@ const VideoUtil = {
         for (let i in infs) influences[infs[i]] = 2 - tval
       }
     }
+    */
 
     // cycle through events and process as needed
     VideoUtil.all_events.forEach((evt) => {

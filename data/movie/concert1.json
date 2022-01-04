@@ -4,7 +4,7 @@
     {
       "ID": 0,
       "position": {"x": -25, "y": -17, "z": 0},
-      "rotation": {"x": 0, "y": 3.14159, "z": 0},
+      "rotation": {"x": 0, "y": -3.14159, "z": 0},
       "posture": [
         {"turn": 180},
         {"bend": -40},
@@ -63,14 +63,14 @@
   ],
 
   "events": [
-    {"ID": 0, "start": 0, "end": 0, "actor_id": 1, "actor_type": "player",
+    {"ID": 0, "start": 50, "end": 50, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": 150, "y": 0, "z": 0}
       }
     },
-    {"ID": 1, "start": 0, "end": 50, "actor_id": 1, "actor_type": "player",
+    {"ID": 1, "start": 50, "end": 75, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
@@ -96,14 +96,14 @@
     {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
 
 
-    {"ID": 7, "start": 0, "end": 0, "actor_id": 2, "actor_type": "player",
+    {"ID": 7, "start": 50, "end": 50, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": -150, "y": 0, "z": -150}
       }
     },
-    {"ID": 8, "start": 0, "end": 50, "actor_id": 2, "actor_type": "player",
+    {"ID": 8, "start": 50, "end": 75, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
@@ -136,12 +136,12 @@
     {"ID": 13, "start": 350, "end": 450, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
     {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }},
 
-    {"ID": 15, "start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
+    {"ID": 15, "start": 500, "end": 1000, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",
         "influences": [
           {"id": 24, "startParam": 0.0, "endParam": 1.0},
-          {"id": 51, "startParam": 0.0, "endParam": 0.5}
+          {"id": 51, "startParam": 0.0, "endParam": 0.75}
         ]
       }
     }
