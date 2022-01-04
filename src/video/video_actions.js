@@ -93,7 +93,7 @@ const VideoActions = {
 			const id       = infObj.id
 			const start    = infObj.startParam
 			const end      = infObj.endParam
-			const infVal   = (end - start) * paramt
+			const infVal   = start + (end - start) * paramt
 			targetInfs[id] = infVal
 		})
 	},
