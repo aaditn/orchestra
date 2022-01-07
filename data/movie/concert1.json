@@ -70,7 +70,7 @@
         "endPos": {"x": 150, "y": 0, "z": 0}
       }
     },
-    {"ID": 1, "start": 50, "end": 75, "actor_id": 1, "actor_type": "player",
+    {"ID": 1, "start": 50, "end": 100, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
@@ -85,15 +85,42 @@
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },
-    {"ID": 4, "start": 100, "end": 300, "actor_id": 1, "actor_type": "player",
+    {"ID": 4, "start": 100, "end": 200, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
-        "startPos": {"x": 150, "y": 0, "z": 0},
+        "startPos": {"x": 100, "y": 0, "z": 0},
+        "endPos": {"x": 50, "y": 0, "z": 0}
+      }
+    },
+    {"ID": 4, "start": 200, "end": 250, "actor_id": 1, "actor_type": "player",
+      "data": {
+        "action": "translate",
+        "startPos": {"x": 50, "y": 0, "z": 0},
+        "endPos": {"x": 25, "y": 0, "z": 25}
+      }
+    },
+    {"ID": 4, "start": 250, "end": 300, "actor_id": 1, "actor_type": "player",
+      "data": {
+        "action": "translate",
+        "startPos": {"x": 25, "y": 0, "z": 25},
         "endPos": {"x": 25, "y": 0, "z": 0}
       }
     },
     {"ID": 5, "start": 350, "end": 400, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player", "data": { "action": "sit" }},
+    {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player",
+      "data": {
+        "action": "posture",
+        "posture": [
+          {"bend": -40},
+          {"torso": [{"bend": 30}]},
+          {"l_leg": [{"raise": 70}]},
+          {"l_knee": [{"bend": 100}]},
+          {"r_leg": [{"raise": 65}, {"turn": -25}]},
+          {"r_knee": [{"bend": 100}]},
+          {"position": {"x": null, "y": -17, "z": null}}
+        ]
+      }
+    },
 
 
     {"ID": 7, "start": 50, "end": 50, "actor_id": 2, "actor_type": "player",
@@ -134,8 +161,20 @@
       }
     },
     {"ID": 13, "start": 350, "end": 450, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
-    {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player", "data": { "action": "sit" }},
-
+    {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player",
+      "data": {
+        "action": "posture",
+        "posture": [
+          {"bend": -40},
+          {"torso": [{"bend": 30}]},
+          {"l_leg": [{"raise": 70}]},
+          {"l_knee": [{"bend": 100}]},
+          {"r_leg": [{"raise": 65}, {"turn": -25}]},
+          {"r_knee": [{"bend": 100}]},
+          {"position": {"x": null, "y": -17, "z": null}}
+        ]
+      }
+    },
     {"ID": 15, "start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",

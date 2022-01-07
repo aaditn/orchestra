@@ -83,6 +83,43 @@ const VideoActions = {
 		actor.position.y = -17 * paramt
 	},
 
+	posture: (t, evt) => {
+        const actor  = evt.actor
+		const paramt = (t - evt.start) / (evt.end - evt.start)
+
+		// posture = [{position: {}}, {t_leg: [{raise: 20}, {turn: 20}]}, ...]
+		const bodyParts = [
+			'pelvis', 'torso', 'neck', 'head',
+			'l_arm', 'l_elbow', 'l_wrist', 'r_arm', 'r_elbow', 'r_wrist',
+			'l_leg', 'l_knee', 'l_ankle', 'r_leg', 'r_knee', 'r_ankle'
+		]
+		const posture = evt.data.posture
+		posture.forEach((pos) => {
+			if ('position' in pos) {
+				if (pos.position.x) actor.position.x = pos.position.x * paramt
+				if (pos.position.y) actor.position.y = pos.position.y * paramt
+				if (pos.position.z) actor.position.z = pos.position.z * paramt
+			} else if ('rotation' in pos) {
+				if (pos.rotation.x) actor.rotation.x = pos.rotation.x * paramt
+				if (pos.rotation.y) actor.rotation.y = pos.rotation.y * paramt
+				if (pos.rotation.z) actor.rotation.z = pos.rotation.z * paramt
+			} else if ('bend' in pos) {
+				actor.bend = pos.bend * paramt
+			} else {
+				for (let key in pos) { // should be one key only
+					if (bodyParts.includes(key)) {
+						const changes = pos[key]
+						changes.forEach((change) => {
+							for (let subk in change) {
+								actor[key][subk] = change[subk] * paramt
+							}
+						})
+					}
+				}
+			}
+		})
+	},
+
 	animateInfluence: (t, evt) => {
 		// influences = [{id: <influence_id>, startParam: <val>, endParam: <val>}, ...]
 		const infs   = evt.data.influences
