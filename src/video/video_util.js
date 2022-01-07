@@ -308,7 +308,7 @@ const VideoUtil = {
       for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
         const actor = VideoUtil.players[i]
         // actor.torso.attach(new Violin(17, 7, 20))
-        actor.neck.attach(new Violin({ x: 17, y: -5, z: -5 }, { x: 0, y: 20, z: -10 }))
+        actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
         const bow = new Bow()
         actor.r_fingers[0].attach(bow)
         VideoUtil.bows.push(bow)

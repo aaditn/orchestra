@@ -117,6 +117,9 @@
           {"l_knee": [{"bend": 100}]},
           {"r_leg": [{"raise": 65}, {"turn": -25}]},
           {"r_knee": [{"bend": 100}]},
+          {"r_arm": [{"straddle": 90}, {"tilt": 0}]},
+          {"r_elbow": [{"bend": 0}]},
+          {"r_wrist": [{"tilt": -10}, {"bend": 0}]},
           {"position": {"x": null, "y": -17, "z": null}}
         ]
       }
