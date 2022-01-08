@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { Male, rad, sin } from '../../libs/mannequin'
+import { Mannequin, Male, rad, sin } from './mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
 import { Chair, Violin, Bow } from "./models"
 
@@ -178,7 +178,7 @@ const VideoUtil = {
           actor = VideoUtil.lights[e.actor_id]
           break
         case "influence":
-          actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
+          // actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
           break
       }
       if (actor) {
@@ -244,13 +244,23 @@ const VideoUtil = {
     })
 
     // Load animatable face
+    /*
     const ktx2Loader =
       new KTX2Loader()
         .setTranscoderPath('../node_modules/three/examples/js/libs/basis/')
-        .detectSupport(VideoUtil.renderer);
+        .detectSupport(VideoUtil.renderer)
     promises.push(new GLTFLoader().setKTX2Loader(ktx2Loader)
                       .setMeshoptDecoder(MeshoptDecoder)
-                      .loadAsync('/models/facecap.glb'))
+                      .loadAsync("/models/facecap.glb")) 
+    */
+    const ktx2Loader =
+    new KTX2Loader()
+      .setTranscoderPath('three/examples/js/libs/basis/')
+      .detectSupport(VideoUtil.renderer)
+    const gltfLoader = new GLTFLoader().setKTX2Loader(ktx2Loader).setMeshoptDecoder(MeshoptDecoder)
+    const gltfPromise = gltfLoader.loadAsync("/models/facecap.glb")  
+    promises.push(gltfPromise)       
+
     Promise.all(promises).then((allObjects) => {
 
       allObjects.forEach((object, i) => {
@@ -296,7 +306,10 @@ const VideoUtil = {
   },
 
   initScene: () => {
-    VideoUtil.createScene();
+    VideoUtil.createScene()
+    Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
+    Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
+
     VideoUtil.players = []
 
     // Load movie script
@@ -386,7 +399,6 @@ const VideoUtil = {
 
     VideoUtil.testcount++
     if (VideoUtil.testcount >= 100000) VideoUtil.testcount = 0
-    /*
     if (VideoUtil.facecap_mesh) {
       const head = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
       const influences = head.morphTargetInfluences
@@ -399,7 +411,6 @@ const VideoUtil = {
         for (let i in infs) influences[infs[i]] = 2 - tval
       }
     }
-    */
 
     // cycle through events and process as needed
     VideoUtil.all_events.forEach((evt) => {

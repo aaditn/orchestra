@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Mannequin, LimbShape, rad } from '../../libs/mannequin'
+import { Mannequin, LimbShape, rad } from './mannequin'
 
 export class Chair extends THREE.Group {
   constructor(x, angle) {

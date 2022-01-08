@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
-import { SampleLibrary } from '../../libs/Tonejs-Instruments'
-import { VideoUtil } from '../video/video_util'
+import { SampleLibrary } from './Tonejs-Instruments'
+import { VideoUtil } from '../../video/components/video_util'
 
 const AudioUtil = {
 
