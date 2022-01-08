@@ -77,7 +77,7 @@ const VideoUtil = {
 
     VideoUtil.scene.rotation.x = rad(10)
     VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
-    VideoUtil.clock = new THREE.Clock();
+    VideoUtil.clock = new THREE.Clock()
   },
 
   processActorData: (actorData) => {
@@ -393,24 +393,11 @@ const VideoUtil = {
 
   // animate loop (runs ~50ms right now)
   animate: (t) => {
-    // test animation for model from face cap
-
     VideoUtil.testcount++
     if (VideoUtil.testcount >= 100000) VideoUtil.testcount = 0
-    /*
-    if (VideoUtil.facecap_mesh) {
-      const head = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
-      const influences = head.morphTargetInfluences
-      // VideoUtil.mixer.update(0.015)
-      const tval = (VideoUtil.testcount % 200) * 0.01
-      const infs = [24, 28]
-      if (tval <= 1) {
-        for (let i in infs) influences[infs[i]] = tval
-      } else {
-        for (let i in infs) influences[infs[i]] = 2 - tval
-      }
+    if (VideoUtil.testcount % 10 == 0) {
+      // console.log("t = ", t, " count = ", VideoUtil.testcount)
     }
-    */
 
     // cycle through events and process as needed
     VideoUtil.all_events.forEach((evt) => {
