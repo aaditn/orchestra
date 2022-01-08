@@ -41,29 +41,27 @@ const VideoUtil = {
 
   // overridden from mannequin.js
   createScene: () => {
-    VideoUtil.renderer = new THREE.WebGLRenderer({ antialias: true });
-    VideoUtil.renderer.setSize(1200, 750);
+    VideoUtil.renderer = new THREE.WebGLRenderer({ antialias: true })
+    VideoUtil.renderer.setSize(1200, 750)
     // renderer.domElement.style = 'width:300px; height:300px; position:fixed; top:0; left:0;';
-    VideoUtil.renderer.shadowMap.enabled = true;
-    VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame);
-    document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement);
+    VideoUtil.renderer.shadowMap.enabled = true
 
-    VideoUtil.scene = new THREE.Scene();
+    VideoUtil.scene = new THREE.Scene()
     VideoUtil.scene.background = new THREE.Color('gainsboro');
-    // VideoUtil.scene.fog = new THREE.Fog('gainsboro', 100, 600);
+    // VideoUtil.scene.fog = new THREE.Fog('gainsboro', 100, 600)
 
     VideoUtil.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
-    VideoUtil.camera.position.set(0, 0, 300);
+    VideoUtil.camera.position.set(0, 0, 300)
 
     const onWindowResize = (event) => {
-      VideoUtil.camera.aspect = window.innerWidth / window.innerHeight;
-      VideoUtil.camera.updateProjectionMatrix();
-      // VideoUtil.renderer.setSize(window.innerWidth, window.innerHeight, true);
+      VideoUtil.camera.aspect = window.innerWidth / window.innerHeight
+      VideoUtil.camera.updateProjectionMatrix()
+      // VideoUtil.renderer.setSize(window.innerWidth, window.innerHeight, true)
     }
-    window.addEventListener('resize', onWindowResize, false);
-    onWindowResize();
+    window.addEventListener('resize', onWindowResize, false)
+    onWindowResize()
 
-    const texture = new THREE.TextureLoader().load("/textures/wood_floor.jpg");
+    const texture = new THREE.TextureLoader().load("/textures/wood_floor.jpg")
     var ground = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(1000, 1000),
       new THREE.MeshPhongMaterial({
@@ -230,14 +228,14 @@ const VideoUtil = {
     VideoUtil.movie = await response.json()
   },
 
-  loadAssets: () => {
+  loadAssets: (doneCallback, doneVal) => {
 
     // load faces with textures (cannot animate)
-    const modelPaths   = ["/models/face1", "/models/brett_face"]
+    const modelPaths = ["/models/face1", "/models/brett_face"]
     const attachPoints = [VideoUtil.players[0].neck, VideoUtil.players[1].neck]
     const textures = []
     const promises = []
-    const loader   = new OBJLoader()
+    const loader = new OBJLoader()
     modelPaths.forEach((modelPath, i) => {
       textures.push(new THREE.TextureLoader().load(modelPath + "/model.png")) // sync
       promises.push(loader.loadAsync(modelPath + "/model.obj")) // push promise for each model
@@ -254,9 +252,9 @@ const VideoUtil = {
                       .loadAsync("/models/facecap.glb")) 
     */
     const ktx2Loader =
-    new KTX2Loader()
-      .setTranscoderPath('three/examples/js/libs/basis/')
-      .detectSupport(VideoUtil.renderer)
+      new KTX2Loader()
+        .setTranscoderPath('three/examples/js/libs/basis/')
+        .detectSupport(VideoUtil.renderer)
     const gltfLoader = new GLTFLoader().setKTX2Loader(ktx2Loader).setMeshoptDecoder(MeshoptDecoder)
     promises.push(gltfLoader.loadAsync("/models/facecap.glb"))
 
@@ -301,10 +299,11 @@ const VideoUtil = {
       // Process event data after assets are loaded
       VideoUtil.processEventData(VideoUtil.movie.events)
 
+      doneCallback(doneVal) // callback after assets loaded
     }) // end of Promise.all
   },
 
-  initScene: () => {
+  initScene: (doneCallback, doneVal) => {
     VideoUtil.createScene()
     Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
     Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
@@ -328,7 +327,7 @@ const VideoUtil = {
         actor.r_fingers[0].attach(bow)
         VideoUtil.bows.push(bow)
       }
-      VideoUtil.loadAssets()
+      VideoUtil.loadAssets(doneCallback, doneVal)
 
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
 
