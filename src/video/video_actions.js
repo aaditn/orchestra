@@ -66,23 +66,6 @@ const VideoActions = {
 		actor.rotation.z = startRot.z + (endRot.z - startRot.z) * paramt
     },
 
-	sit: (t, evt) => {
-        const actor  = evt.actor
-		const paramt = (t - evt.start) / (evt.end - evt.start)
-
-		actor['bend'] = -40 * paramt
-		actor.torso.bend = 30 * paramt
-		actor.l_leg.raise = 70 * paramt
-		actor.l_knee.bend = 100 * paramt
-
-		actor.r_leg.raise = 65 * paramt
-		actor.r_leg.turn = -25 * paramt
-		actor.r_knee.bend = 100 * paramt
-
-		// Lower entire mannequin
-		actor.position.y = -17 * paramt
-	},
-
 	posture: (t, evt) => {
         const actor  = evt.actor
 		const paramt = (t - evt.start) / (evt.end - evt.start)
@@ -106,7 +89,7 @@ const VideoActions = {
 			} else if ('bend' in pos) {
 				actor.bend = pos.bend * paramt
 			} else {
-				for (let key in pos) { // should be one key only
+				for (let key in pos) { // should be one key only	
 					if (bodyParts.includes(key)) {
 						const changes = pos[key]
 						changes.forEach((change) => {
