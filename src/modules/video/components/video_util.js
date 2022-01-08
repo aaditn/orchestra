@@ -178,7 +178,7 @@ const VideoUtil = {
           actor = VideoUtil.lights[e.actor_id]
           break
         case "influence":
-          // actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
+          actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
           break
       }
       if (actor) {
@@ -258,8 +258,7 @@ const VideoUtil = {
       .setTranscoderPath('three/examples/js/libs/basis/')
       .detectSupport(VideoUtil.renderer)
     const gltfLoader = new GLTFLoader().setKTX2Loader(ktx2Loader).setMeshoptDecoder(MeshoptDecoder)
-    const gltfPromise = gltfLoader.loadAsync("/models/facecap.glb")  
-    promises.push(gltfPromise)       
+    promises.push(gltfLoader.loadAsync("/models/facecap.glb"))
 
     Promise.all(promises).then((allObjects) => {
 
@@ -399,6 +398,7 @@ const VideoUtil = {
 
     VideoUtil.testcount++
     if (VideoUtil.testcount >= 100000) VideoUtil.testcount = 0
+    /*
     if (VideoUtil.facecap_mesh) {
       const head = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
       const influences = head.morphTargetInfluences
@@ -411,6 +411,7 @@ const VideoUtil = {
         for (let i in infs) influences[infs[i]] = 2 - tval
       }
     }
+    */
 
     // cycle through events and process as needed
     VideoUtil.all_events.forEach((evt) => {

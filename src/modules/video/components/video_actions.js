@@ -107,7 +107,6 @@ const VideoActions = {
 
 	animateInfluence: (t, evt) => {
 		// influences = [{id: <influence_id>, startParam: <val>, endParam: <val>}, ...]
-		/*
 		const infs   = evt.data.influences
 		const paramt = (t - evt.start) / (evt.end - evt.start) // 0 <= paramt <= 1
 		const head   = evt.actor
@@ -119,7 +118,6 @@ const VideoActions = {
 			const infVal   = start + (end - start) * paramt
 			targetInfs[id] = infVal
 		})
-		*/
 	},
 }
 
