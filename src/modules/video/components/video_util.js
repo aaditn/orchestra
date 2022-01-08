@@ -37,13 +37,12 @@ const VideoUtil = {
   mixer: null,
   facecap_mesh: null,
   facecap_action: null,
-  testcount: 0,
+  gameCounter: 0,
 
   // overridden from mannequin.js
   createScene: () => {
     VideoUtil.renderer = new THREE.WebGLRenderer({ antialias: true })
     VideoUtil.renderer.setSize(1200, 750)
-    // renderer.domElement.style = 'width:300px; height:300px; position:fixed; top:0; left:0;';
     VideoUtil.renderer.shadowMap.enabled = true
 
     VideoUtil.scene = new THREE.Scene()
@@ -393,11 +392,12 @@ const VideoUtil = {
 
   // animate loop (runs ~50ms right now)
   animate: (t) => {
-    VideoUtil.testcount++
-    if (VideoUtil.testcount >= 100000) VideoUtil.testcount = 0
-    if (VideoUtil.testcount % 10 == 0) {
-      // console.log("t = ", t, " count = ", VideoUtil.testcount)
+    VideoUtil.gameCounter++
+    if (VideoUtil.gameCounter >= 1000000) VideoUtil.ganeCounter = 0
+    if (VideoUtil.gameCounter % 10 == 0) {
+      // console.log("t = ", t, " count = ", VideoUtil.gameCounter)
     }
+    const proxyt = VideoUtil.gameCounter
 
     // cycle through events and process as needed
     VideoUtil.all_events.forEach((evt) => {
@@ -424,7 +424,6 @@ const VideoUtil = {
             VideoUtil.processEvent(t, evt, false) // 0 < t < T
           } else {
             evt.status = 'done' // t >= T
-            // console.log("EVT done: ", evt)
             // post-process here if needed
             VideoUtil.processEvent(t, evt, true) // reset if appropriate
           }

@@ -48,6 +48,7 @@ export default function Home() {
       // document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
       setAnimationButtonText("Stop Animation")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
+      VideoUtil.clock.elapsedTime = VideoUtil.clock.oldTime
       VideoUtil.clock.start()
     }
   }

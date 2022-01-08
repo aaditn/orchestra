@@ -53,18 +53,18 @@
       "data": {
         "action": "posture",
         "posture": [
-          {"bend": -40},
-          {"torso": [{"bend": 30}]},
-          {"l_leg": [{"raise": 70}]},
-          {"l_knee": [{"bend": 100}]},
-          {"r_leg": [{"raise": 65}, {"turn": -25}]},
-          {"r_knee": [{"bend": 100}]},
-          {"r_arm": [{"straddle": 90}, {"tilt": 0}]},
-          {"r_elbow": [{"bend": 0}]},
-          {"r_wrist": [{"tilt": -10}, {"bend": 0}]},
-          {"l_arm": [{"raise": 35}, {"straddle": 10}, {"turn": -10}]},
-          {"l_elbow": [{"bend": 75}, {"turn": 0}]},
-          {"l_wrist": [{"tilt": 120}, {"bend": 0}, {"turn": 155}]},
+          {"bend": [0,-40]},
+          {"torso": [{"bend": [0,30]}]},
+          {"l_leg": [{"raise": [0,70]}]},
+          {"l_knee": [{"bend": [0,100]}]},
+          {"r_leg": [{"raise": [0,65]}, {"turn": [0,-25]}]},
+          {"r_knee": [{"bend": [0,100]}]},
+          {"r_arm": [{"straddle": [0,90]}, {"tilt": [0,0]}]},
+          {"r_elbow": [{"bend": [0,0]}]},
+          {"r_wrist": [{"tilt": [0,-10]}, {"bend": [0,0]}]},
+          {"l_arm": [{"raise": [0,35]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
+          {"l_elbow": [{"bend": [0,75]}, {"turn": [0,0]}]},
+          {"l_wrist": [{"tilt": [0,120]}, {"bend": [0,0]}, {"turn": [0,155]}]},
           {"position": {"x": null, "y": -17, "z": null}},
           {"rotation": {"x": null, "y": 1.5708, "z": 0}}
         ]
@@ -114,23 +114,28 @@
         "endPos": {"x": 25, "y": 0, "z": 0}
       }
     },
-    {"ID": 5, "start": 350, "end": 400, "actor_id": 1, "actor_type": "player", "data": { "action": "bow" }},
+    {"start": 350, "end": 375, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "posture", "posture": [{"torso": [{"bend": [0, 90]}]}]}
+    },
+    {"start": 375, "end": 400, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
+    },
     {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
-          {"bend": -40},
-          {"torso": [{"bend": 30}]},
-          {"l_leg": [{"raise": 70}]},
-          {"l_knee": [{"bend": 100}]},
-          {"r_leg": [{"raise": 65}, {"turn": -25}]},
-          {"r_knee": [{"bend": 100}]},
-          {"r_arm": [{"straddle": 90}, {"tilt": 0}]},
-          {"r_elbow": [{"bend": 0}]},
-          {"r_wrist": [{"tilt": -10}, {"bend": 0}]},
-          {"l_arm": [{"raise": 35}, {"straddle": 10}, {"turn": -10}]},
-          {"l_elbow": [{"bend": 75}, {"turn": 0}]},
-          {"l_wrist": [{"tilt": -120}, {"bend": 0}, {"turn": 155}]},
+          {"bend": [0,-40]},
+          {"torso": [{"bend": [0,30]}]},
+          {"l_leg": [{"raise": [0,70]}]},
+          {"l_knee": [{"bend": [0,100]}]},
+          {"r_leg": [{"raise": [0,65]}, {"turn": [0,-25]}]},
+          {"r_knee": [{"bend": [0,100]}]},
+          {"r_arm": [{"straddle": [0,90]}, {"tilt": [0,0]}]},
+          {"r_elbow": [{"bend": [0,0]}]},
+          {"r_wrist": [{"tilt": [0,-10]}, {"bend": [0,0]}]},
+          {"l_arm": [{"raise": [0,35]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
+          {"l_elbow": [{"bend": [0,75]}, {"turn": [0,0]}]},
+          {"l_wrist": [{"tilt": [0,-120]}, {"bend": [0,0]}, {"turn": [0,155]}]},
           {"position": {"x": null, "y": -17, "z": null}}
         ]
       }
@@ -173,17 +178,22 @@
         "endRot": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 13, "start": 350, "end": 450, "actor_id": 2, "actor_type": "player", "data": { "action": "bow" }},
+    {"start": 350, "end": 400, "actor_id": 2, "actor_type": "player", "comment": "Bow down",
+      "data": { "action": "posture", "posture": [{"torso": [{"bend": [0, 90]}]}]}
+    },
+    {"start": 400, "end": 450, "actor_id": 2, "actor_type": "player", "comment": "Bow up",
+      "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
+    },
     {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
-          {"bend": -40},
-          {"torso": [{"bend": 30}]},
-          {"l_leg": [{"raise": 70}]},
-          {"l_knee": [{"bend": 100}]},
-          {"r_leg": [{"raise": 65}, {"turn": -25}]},
-          {"r_knee": [{"bend": 100}]},
+          {"bend": [0,-40]},
+          {"torso": [{"bend": [0,30]}]},
+          {"l_leg": [{"raise": [0,70]}]},
+          {"l_knee": [{"bend": [0,100]}]},
+          {"r_leg": [{"raise": [0,65]}, {"turn": [0,-25]}]},
+          {"r_knee": [{"bend": [0,100]}]},
           {"position": {"x": null, "y": -17, "z": null}}
         ]
       }

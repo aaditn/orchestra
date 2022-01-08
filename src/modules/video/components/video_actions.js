@@ -21,25 +21,10 @@ const VideoActions = {
 		}
 	},
 
-	bow: (t, evt, reset) => {
-        const actor = evt.actor
-		const paramt   = (t - evt.start) / (evt.end - evt.start)
-		// walking motion
-		if (! reset) {
-			if (paramt <= 0.5) {
-				actor.torso.bend = 180 * paramt
-			} else {
-				actor.torso.bend = 180 * (1 - paramt)
-			}
-		} else {
-			actor.torso.bend = 0
-		}
-	},
-
 	// move instantly, no transition
 	move: (t, evt) => {
-        const actor    = evt.actor
-		const endPos   = evt.data.endPos
+        const actor  = evt.actor
+		const endPos = evt.data.endPos
 		actor.position.set(endPos.x, endPos.y, endPos.z)
 	},
 
@@ -87,16 +72,17 @@ const VideoActions = {
 				if (pos.rotation.y) actor.rotation.y = pos.rotation.y * paramt
 				if (pos.rotation.z) actor.rotation.z = pos.rotation.z * paramt
 			} else if ('bend' in pos) {
-				actor.bend = pos.bend * paramt
+				actor.bend = pos.bend[0] + (pos.bend[1] - pos.bend[0]) * paramt
 			} else if ('turn' in pos) {
-				actor.turn = pos.turn * paramt
+				actor.turn = pos.turn[0] + (pos.turn[1] - pos.turn[0]) * paramt
 			} else {
 				for (let key in pos) { // should be one key only	
 					if (bodyParts.includes(key)) {
 						const changes = pos[key]
 						changes.forEach((change) => {
 							for (let subk in change) {
-								actor[key][subk] = change[subk] * paramt
+								actor[key][subk] = 
+									change[subk][0] + (change[subk][1] - change[subk][0]) * paramt
 							}
 						})
 					}
