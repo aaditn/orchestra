@@ -84,6 +84,8 @@ const VideoUtil = {
 
   processActorData: (actorData) => {
     const actor = new Male()
+    actor.head.hide()
+
     const pos = actorData.position
     const rot = actorData.rotation
     const posture = actorData.posture
@@ -195,6 +197,7 @@ const VideoUtil = {
     }
   },
 
+  /*
   // have to figure how to posture fingers in movie file
   // may need a separate posture, rather than current initial posture
   createPlayer: (instrument, pos, rot) => {
@@ -213,9 +216,9 @@ const VideoUtil = {
     player.l_fingers[2].turn = -80;
     player.l_fingers[3].bend = 40;
     player.l_fingers[3].turn = -80;
-
     return player
   },
+  */
 
   loadMovieScript: async function (fileUrl) {
     const response = await fetch(fileUrl, {
@@ -403,9 +406,10 @@ const VideoUtil = {
       const start = evt.start
       const end = evt.end
       const instant = start >= end
+      evt.instant = instant
       switch (evt.status) {
         case 'ready':
-          if (instant) { // no duration event, only start time needed
+          if (evt.instant) { // no duration event, only start time needed
             if (t >= start) {
               evt.status = 'done' // bypass active for instant
               VideoUtil.processEvent(t, evt) // instant

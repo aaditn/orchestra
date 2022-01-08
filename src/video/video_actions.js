@@ -68,8 +68,8 @@ const VideoActions = {
 
 	posture: (t, evt) => {
         const actor  = evt.actor
-		const paramt = (t - evt.start) / (evt.end - evt.start)
-
+		let paramt   = (t - evt.start) / (evt.end - evt.start)
+		if (evt.instant) paramt = 1.0
 		// posture = [{position: {}}, {t_leg: [{raise: 20}, {turn: 20}]}, ...]
 		const bodyParts = [
 			'pelvis', 'torso', 'neck', 'head',
@@ -88,6 +88,8 @@ const VideoActions = {
 				if (pos.rotation.z) actor.rotation.z = pos.rotation.z * paramt
 			} else if ('bend' in pos) {
 				actor.bend = pos.bend * paramt
+			} else if ('turn' in pos) {
+				actor.turn = pos.turn * paramt
 			} else {
 				for (let key in pos) { // should be one key only	
 					if (bodyParts.includes(key)) {
