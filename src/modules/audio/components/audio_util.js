@@ -96,23 +96,23 @@ const AudioUtil = {
 		let intvl = setInterval(() => {
 			const n = Tone.now()
 			if (n > times[0][1]) { // next note time has arrived
-			if (n - times[0][1] < 0.1) {
-				AudioUtil.updateNumNotes(voiceIdx)
-				// play video of next note
-				// format: [voiceIdx, curr, duration, note, strNum]
-				const dur    = times[0][2] * 0.6
-				const note   = times[0][3]
-				const strNum = times[0][4]
-				const fingerNum = times[0][5]
-				console.log(times[0][1].toFixed(2), n.toFixed(2), (n - times[0][1]).toFixed(2), times.length, note, strNum )
-				VideoUtil.moveBow(voiceIdx, bowdir, dur, note, strNum, fingerNum)
-				bowdir = !bowdir
-			}
-			times.shift()
-			if (times.length <= 0) {
-				// recorder.stop();
-				clearInterval(intvl)
-			}
+				if (n - times[0][1] < 0.1) {
+					AudioUtil.updateNumNotes(voiceIdx)
+					// play video of next note
+					// format: [voiceIdx, curr, duration, note, strNum]
+					const dur    = times[0][2] * 0.9
+					const note   = times[0][3]
+					const strNum = times[0][4]
+					const fingerNum = times[0][5]
+					console.log(times[0][1].toFixed(2), n.toFixed(2), (n - times[0][1]).toFixed(2), dur, note )
+					VideoUtil.moveBow(voiceIdx, bowdir, dur, strNum, fingerNum)
+					bowdir = !bowdir
+				}
+				times.shift()
+				if (times.length <= 0) {
+					// recorder.stop();
+					clearInterval(intvl)
+				}
 			}
 		}, 40)
 

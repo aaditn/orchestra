@@ -86,10 +86,24 @@
       }
     },
     {"start": 100, "end": 300, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
-    {"inactive": true, "start": 100, "end": 300, "actor_id": 2, "actor_type": "light",
+    {"start": 100, "end": 200, "actor_id": 2, "actor_type": "light",
       "data": { 
         "action": "translate",
-        "startPos": {"x": 150, "y": 50, "z": 0},
+        "startPos": {"x": 100, "y": 50, "z": 0},
+        "endPos": {"x": 50, "y": 50, "z": 0}
+      }
+    },
+    {"start": 200, "end": 250, "actor_id": 2, "actor_type": "light",
+      "data": {
+        "action": "translate",
+        "startPos": {"x": 50, "y": 50, "z": 0},
+        "endPos": {"x": 25, "y": 50, "z": 25}
+      }
+    },
+    {"start": 250, "end": 300, "actor_id": 2, "actor_type": "light",
+      "data": {
+        "action": "translate",
+        "startPos": {"x": 25, "y": 50, "z": 25},
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },

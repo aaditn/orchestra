@@ -363,7 +363,7 @@ const VideoUtil = {
 
   },
 
-  moveBow: (playerIdx, upbow, speed, note, strNum, fingerNum) => {
+  moveBow: (playerIdx, upbow, speed, strNum, fingerNum) => {
     let t = -30
     let msecs = Math.floor(30 * speed)
     let player = VideoUtil.players[playerIdx]
@@ -380,26 +380,21 @@ const VideoUtil = {
     if (upbow) {
       // Execute up bow
       player.r_arm.straddle = 90 + strNum * 5 // play on default string
-      let intvl = setInterval(() => {
-        player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * t))
-        player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * t))
-        if (t >= 30) {
-          clearInterval(intvl)
-        }
-        t += 1
-      }, msecs)
+      const now = 50 * VideoUtil.clock.getElapsedTime()
+      const evt = new Event( now, now + 50 * speed, VideoUtil.players[playerIdx], {
+            action: "posture",
+            posture: [{r_elbow: [{bend: [60, 120]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
+      })
+      VideoUtil.all_events.push(evt)
     } else {
       // Execute down bow
       player.r_arm.straddle = 90 + strNum * 5 // play on default string
-      let intvl = setInterval(() => {
-        const tdown = 0 - t
-        player.r_elbow.bend = (90 + 30 * sin(2 * 1.7 * tdown))
-        player.r_wrist.tilt = (-28.5 * sin(2 * 1.7 * tdown))
-        if (t >= 30) {
-          clearInterval(intvl)
-        }
-        t += 1
-      }, msecs)
+      const now = 50 * VideoUtil.clock.getElapsedTime()
+      const evt = new Event( now, now + 50 * speed, VideoUtil.players[playerIdx], {
+            action: "posture",
+            posture: [{r_elbow: [{bend: [120, 60]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
+      })
+      VideoUtil.all_events.push(evt)
     }
   },
 
