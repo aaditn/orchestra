@@ -29,11 +29,12 @@ export class Clock {
 // if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
 // for events with duration, event transition from ready -> active -> done
 class Event {
-  constructor(start, end, actor, data) {
+  constructor(id, start, end, actor, data) {
+    this.ID = id
     this.start = start   // duration start
     this.end = end     // duration end
     this.actor = actor
-    this.data = data
+    this.data = data || {}
     this.status = 'ready'
     this.data.t0 = null
   }
@@ -49,13 +50,14 @@ const VideoUtil = {
   controls: null,
   movie: {},
   players: [],
-  all_events: [],
+  all_events: {},
   bows: [],
 
   mixer: null,
   facecap_mesh: null,
   facecap_action: null,
   gameCounter: 0,
+  evtCount: 1,
 
   // overridden from mannequin.js
   createScene: () => {
@@ -197,7 +199,9 @@ const VideoUtil = {
           break
       }
       if (actor && !e.inactive) {
-        VideoUtil.all_events.push(new Event(e.start, e.end, actor, e.data))
+        VideoUtil.all_events[VideoUtil.evtCount] =
+          new Event(VideoUtil.evtCount, e.start, e.end, actor, e.data)
+        VideoUtil.evtCount++
       }
     })
   },
@@ -259,15 +263,6 @@ const VideoUtil = {
     })
 
     // Load animatable face
-    /*
-    const ktx2Loader =
-      new KTX2Loader()
-        .setTranscoderPath('../node_modules/three/examples/js/libs/basis/')
-        .detectSupport(VideoUtil.renderer)
-    promises.push(new GLTFLoader().setKTX2Loader(ktx2Loader)
-                      .setMeshoptDecoder(MeshoptDecoder)
-                      .loadAsync("/models/facecap.glb")) 
-    */
     const ktx2Loader =
       new KTX2Loader()
         .setTranscoderPath('three/examples/js/libs/basis/')
@@ -360,12 +355,9 @@ const VideoUtil = {
       })
 
     })
-
   },
 
-  moveBow: (playerIdx, upbow, speed, strNum, fingerNum) => {
-    let t = -30
-    let msecs = Math.floor(30 * speed)
+  moveBow: (playerIdx, upbow, duration, strNum, fingerNum) => {
     let player = VideoUtil.players[playerIdx]
     // Put the left finger down
     for (let i = 1; i < 5; i++) { // finger numbers
@@ -377,24 +369,24 @@ const VideoUtil = {
         player.l_fingers[i - 1].turn = -80
       }
     }
-    if (upbow) {
-      // Execute up bow
-      player.r_arm.straddle = 90 + strNum * 5 // play on default string
-      const now = 50 * VideoUtil.clock.getElapsedTime()
-      const evt = new Event( now, now + 50 * speed, VideoUtil.players[playerIdx], {
+    player.r_arm.straddle = 90 + strNum * 5 // play on appropriate string
+    const now = 50 * VideoUtil.clock.getElapsedTime()
+    if (upbow) { // Execute up bow
+      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [60, 120]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
       })
-      VideoUtil.all_events.push(evt)
-    } else {
-      // Execute down bow
-      player.r_arm.straddle = 90 + strNum * 5 // play on default string
-      const now = 50 * VideoUtil.clock.getElapsedTime()
-      const evt = new Event( now, now + 50 * speed, VideoUtil.players[playerIdx], {
+      VideoUtil.all_events[VideoUtil.evtCount] = evt
+      VideoUtil.evtCount++
+      // VideoUtil.all_events.push(evt)
+    } else { // Execute down bow
+      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [120, 60]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
       })
-      VideoUtil.all_events.push(evt)
+      VideoUtil.all_events[VideoUtil.evtCount] = evt
+      VideoUtil.evtCount++
+      // VideoUtil.all_events.push(evt)
     }
   },
 
@@ -414,7 +406,9 @@ const VideoUtil = {
     const proxyt = VideoUtil.gameCounter
 
     // cycle through events and process as needed
-    VideoUtil.all_events.forEach((evt) => {
+    // VideoUtil.all_events.forEach((evt) => {
+    for (let evtId in VideoUtil.all_events) {
+      const evt = VideoUtil.all_events[evtId]
       const start = evt.start
       const end = evt.end
       const instant = start >= end
@@ -448,7 +442,7 @@ const VideoUtil = {
         default:
           break
       }
-    })
+    }
 
   },
 
