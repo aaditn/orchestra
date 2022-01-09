@@ -29,27 +29,27 @@
       "castShadow": true
     },
     {
-      "ID": 1, "type": "SpotLight", "color": "white", "intensity": 0.01,
+      "ID": 1, "type": "SpotLight", "color": "white", "intensity": 0.2,
       "position": {"x": 0, "y": 50, "z": 0},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "angle": 0.35, "castShadow": true,
       "target": {"actor": "player", "actor_id": 2}
     },
     {
-      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.01,
+      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.2,
       "position": {"x": 150, "y": 50, "z": 0},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "angle": 0.35, "castShadow": true,
       "target": {"actor": "player", "actor_id": 1}
     },
     {
-      "ID": 3, "type": "AmbientLight", "color": "white", "intensity": 0.4
+      "ID": 3, "type": "AmbientLight", "color": "white", "intensity": 0.2
     }
   ],
 
   "events": [
 
-    {"ID": -1, "start": 75, "end": 75, "actor_id": 0, "actor_type": "player",
+    {"start": 75, "end": 75, "actor_id": 0, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -71,43 +71,43 @@
       }
     },
 
-    {"ID": 0, "start": 50, "end": 50, "actor_id": 1, "actor_type": "player",
+    {"start": 50, "end": 50, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": 150, "y": 0, "z": 0}
       }
     },
-    {"ID": 1, "start": 50, "end": 100, "actor_id": 1, "actor_type": "player",
+    {"start": 50, "end": 100, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
         "endRot": {"x": 0, "y": -1.570796, "z": 0}
       }
     },
-    {"ID": 2, "start": 100, "end": 300, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
-    {"ID": 3, "start": 100, "end": 300, "actor_id": 2, "actor_type": "light",
+    {"start": 100, "end": 300, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
+    {"inactive": true, "start": 100, "end": 300, "actor_id": 2, "actor_type": "light",
       "data": { 
         "action": "translate",
         "startPos": {"x": 150, "y": 50, "z": 0},
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },
-    {"ID": 4, "start": 100, "end": 200, "actor_id": 1, "actor_type": "player",
+    {"start": 100, "end": 200, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 100, "y": 0, "z": 0},
         "endPos": {"x": 50, "y": 0, "z": 0}
       }
     },
-    {"ID": 4, "start": 200, "end": 250, "actor_id": 1, "actor_type": "player",
+    {"start": 200, "end": 250, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 50, "y": 0, "z": 0},
         "endPos": {"x": 25, "y": 0, "z": 25}
       }
     },
-    {"ID": 4, "start": 250, "end": 300, "actor_id": 1, "actor_type": "player",
+    {"start": 250, "end": 300, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 25, "y": 0, "z": 25},
@@ -120,7 +120,7 @@
     {"start": 375, "end": 400, "actor_id": 1, "actor_type": "player",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
     },
-    {"ID": 6, "start": 400, "end": 500, "actor_id": 1, "actor_type": "player",
+    {"start": 400, "end": 500, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -141,38 +141,37 @@
       }
     },
 
-    {"ID": 7, "start": 50, "end": 50, "actor_id": 2, "actor_type": "player",
+    {"start": 50, "end": 50, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": -150, "y": 0, "z": -150}
       }
     },
-    {"ID": 8, "start": 50, "end": 75, "actor_id": 2, "actor_type": "player",
+    {"start": 50, "end": 75, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
         "endRot": {"x": 0, "y": 0.785398, "z": 0}
       }
     },
-    {"ID": 9, "start": 100, "end": 300, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
-    {"ID": 10, "start": 100, "end": 300, "actor_id": 2, "actor_type": "player",
+    {"start": 100, "end": 300, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
+    {"start": 100, "end": 300, "actor_id": 2, "actor_type": "player",
       "data": { 
         "action": "translate",
         "startPos": {"x": -150, "y": 0, "z": -150},
         "endPos": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"ID": 11, "start": 100, "end": 300, "actor_id": 1, "actor_type": "light",
-      "data":
-       { 
+    {"start": 100, "end": 300, "actor_id": 1, "actor_type": "light",
+      "data": {
         "action": "translate",
         "startPos": {"x": -150, "y": 50, "z": -150},
         "endPos": {"x": 0, "y": 50, "z": 0}
       }
     },
-    {"ID": 12, "start": 300, "end": 350, "actor_id": 2, "actor_type": "player",
-      "data": { 
+    {"start": 300, "end": 350, "actor_id": 2, "actor_type": "player",
+      "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y":  0.785398, "z": 0},
         "endRot": {"x": 0, "y": 0, "z": 0}
@@ -184,7 +183,7 @@
     {"start": 400, "end": 450, "actor_id": 2, "actor_type": "player", "comment": "Bow up",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
     },
-    {"ID": 14, "start": 450, "end": 500, "actor_id": 2, "actor_type": "player",
+    {"start": 450, "end": 500, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -198,7 +197,7 @@
         ]
       }
     },
-    {"ID": 15, "start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
+    {"start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",
         "influences": [
@@ -207,7 +206,7 @@
         ]
       }
     },
-    {"ID": 15, "start": 600, "end": 700, "actor_id": 2, "actor_type": "influence",
+    {"start": 600, "end": 700, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",
         "influences": [

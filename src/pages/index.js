@@ -8,7 +8,7 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false)
-  const [startAnimation, setStartAnimation] = useState(false)
+  const [animationRunning, setAnimationRunning] = useState(false)
   const [animationButtonText, setAnimationButtonText] = useState("Start Animation")
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Home() {
     console.log("Assetsloaded = ", assetsLoaded)
     if (assetsLoaded) {
       document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
-      setStartAnimation(true)
+      setAnimationRunning(true)
       setAnimationButtonText("Stop Animation")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
     } else {
@@ -36,16 +36,26 @@ export default function Home() {
   }
 
   const toggleAnimation = () => {
-    if (startAnimation) { // animation runnun
-      setStartAnimation(false)
+    if (animationRunning) { // stop animation
+
+      setAnimationRunning(false)
       setAnimationButtonText("Start Animation")
       // document.getElementById("three-scene").innerHTML = ""
       VideoUtil.renderer.setAnimationLoop(null)
-    } else {
-      setStartAnimation(true)
+      let now = performance.now() / 1000.0
+      VideoUtil.clock.stopTime = now
+      VideoUtil.clock.activeTime += VideoUtil.clock.stopTime - VideoUtil.clock.startTime
+
+    } else { // start animation
+
+      setAnimationRunning(true)
       // document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
       setAnimationButtonText("Stop Animation")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
+      let now = performance.now() / 1000.0
+      VideoUtil.clock.startTime = now
+      VideoUtil.clock.inactiveTime += VideoUtil.clock.startTime - VideoUtil.clock.stopTime
+
     }
   }
 

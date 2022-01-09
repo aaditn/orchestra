@@ -11,12 +11,18 @@ import { Chair, Violin, Bow } from "./models"
 export class Clock {
   constructor() {
     this.t0 = null
+    this.startTime = 0
+    this.stopTime = 0
+    this.activeTime = 0
+    this.inactiveTime = 0
   }
   start() {
     this.t0 = performance.now() / 1000.0
+    this.startTime = this.t0
+    this.stopTime  = this.t0
   }
   getElapsedTime() {
-    return (performance.now() / 1000.0 - this.t0)
+    return (performance.now() / 1000.0 - this.t0 - this.inactiveTime)
   }
 }
 
@@ -190,7 +196,7 @@ const VideoUtil = {
           actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
           break
       }
-      if (actor) {
+      if (actor && !e.inactive) {
         VideoUtil.all_events.push(new Event(e.start, e.end, actor, e.data))
       }
     })
