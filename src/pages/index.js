@@ -41,15 +41,11 @@ export default function Home() {
       setAnimationButtonText("Start Animation")
       // document.getElementById("three-scene").innerHTML = ""
       VideoUtil.renderer.setAnimationLoop(null)
-      VideoUtil.clock.stop()
-
     } else {
       setStartAnimation(true)
       // document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
       setAnimationButtonText("Stop Animation")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
-      VideoUtil.clock.elapsedTime = VideoUtil.clock.oldTime
-      VideoUtil.clock.start()
     }
   }
 

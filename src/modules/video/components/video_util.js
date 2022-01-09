@@ -8,6 +8,18 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { VideoActions } from './video_actions'
 import { Chair, Violin, Bow } from "./models"
 
+export class Clock {
+  constructor() {
+    this.t0 = null
+  }
+  start() {
+    this.t0 = performance.now() / 1000.0
+  }
+  getElapsedTime() {
+    return (performance.now() / 1000.0 - this.t0)
+  }
+}
+
 // if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
 // for events with duration, event transition from ready -> active -> done
 class Event {
@@ -76,7 +88,7 @@ const VideoUtil = {
 
     VideoUtil.scene.rotation.x = rad(10)
     VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
-    VideoUtil.clock = new THREE.Clock()
+    VideoUtil.clock = new Clock()
   },
 
   processActorData: (actorData) => {
@@ -297,6 +309,7 @@ const VideoUtil = {
       }) // close allObjects.forEach
       // Process event data after assets are loaded
       VideoUtil.processEventData(VideoUtil.movie.events)
+      VideoUtil.clock.start()
 
       doneCallback(doneVal) // callback after assets loaded
     }) // end of Promise.all
@@ -386,8 +399,8 @@ const VideoUtil = {
 
   // refresh rate is every 50ms
   drawFrame: () => {
-    VideoUtil.animate(50 * VideoUtil.clock.getElapsedTime());
-    VideoUtil.renderer.render(VideoUtil.scene, VideoUtil.camera);
+    VideoUtil.animate(50 * VideoUtil.clock.getElapsedTime())
+    VideoUtil.renderer.render(VideoUtil.scene, VideoUtil.camera)
   },
 
   // animate loop (runs ~50ms right now)
