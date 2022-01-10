@@ -100,7 +100,7 @@ const AudioUtil = {
 					AudioUtil.updateNumNotes(voiceIdx)
 					// play video of next note
 					// format: [voiceIdx, curr, duration, note, strNum]
-					const dur    = times[0][2] * 0.9
+					const dur    = times[0][2]
 					const note   = times[0][3]
 					const strNum = times[0][4]
 					const fingerNum = times[0][5]

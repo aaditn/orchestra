@@ -10,6 +10,12 @@ export default function Home() {
   const [assetsLoaded, setAssetsLoaded] = useState(false)
   const [animationRunning, setAnimationRunning] = useState(false)
   const [animationButtonText, setAnimationButtonText] = useState("Start Animation")
+  const [pieceSelected, setPieceSelected] = useState("BachDouble")
+  const pieces = {
+    BumbleBee: "/data/music/flight_of_the_bumble_bee.json",
+    BachFugue: "/data/music/fugue_sonata1_bach.json",
+    BachDouble: "/data/music/bach_double_vivace.json"
+  }
 
   useEffect(() => {
     VideoUtil.initScene(setAssetsLoaded, true)
@@ -28,11 +34,8 @@ export default function Home() {
     }
   }, [assetsLoaded])
 
-  const handleClickPlay = () => {
-    // get initial voice data                                                                                           
-    // AudioUtil.handlePlayAudio("/data/music/flight_of_the_bumble_bee.json")
-    // AudioUtil.handlePlayAudio("/data/music/fugue_sonata1_bach.json")
-    AudioUtil.handlePlayAudio("/data/music/bach_double_vivace.json")
+  const handleClickPlay = () => { // get initial voice data
+    AudioUtil.handlePlayAudio(pieces[pieceSelected])
   }
 
   const toggleAnimation = () => {
@@ -55,6 +58,10 @@ export default function Home() {
     }
   }
 
+  const changePieceSelected = (evt) => {
+    setPieceSelected(evt.target.value)
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -64,6 +71,12 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className={styles.grid}>
+          <select value={pieceSelected} onChange={changePieceSelected}>
+            <option value="BumbleBee">Bumble Bee</option>
+            <option value="BachFugue">Bach fugue</option>
+            <option value="BachDouble">Bach Double</option>
+          </select>
+          &nbsp; &nbsp;
           <button onClick={handleClickPlay}>Start Audio</button>
           &nbsp; &nbsp;
           <button onClick={toggleAnimation}>{animationButtonText}</button>
