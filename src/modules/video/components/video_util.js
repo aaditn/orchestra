@@ -438,6 +438,7 @@ const VideoUtil = {
           break
         case 'done':
           // do nothing
+          delete VideoUtil.all_events[evt.ID]
           break
         default:
           break

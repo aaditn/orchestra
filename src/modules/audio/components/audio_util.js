@@ -104,7 +104,7 @@ const AudioUtil = {
 					const note   = times[0][3]
 					const strNum = times[0][4]
 					const fingerNum = times[0][5]
-					console.log(times[0][1].toFixed(2), n.toFixed(2), (n - times[0][1]).toFixed(2), dur, note )
+					console.log("sched =", times[0][1].toFixed(2), "now -", n.toFixed(2), " diff =", (n - times[0][1]).toFixed(2), " dur =", dur.toFixed(2), " note =", note )
 					VideoUtil.moveBow(voiceIdx, bowdir, dur, strNum, fingerNum)
 					bowdir = !bowdir
 				}
