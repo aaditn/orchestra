@@ -52,10 +52,10 @@ const AudioUtil = {
     },
     
     // synth, notes, startTime
-    playNotes: (synth, notes, startTime, speed, updateNumNotes, voiceIdx) => {
-		let bowdir = true
-		let curr = startTime
-		const times = []
+    playNotes: (synth, notes, startTime, vstartTime, speed, updateNumNotes, voiceIdx) => {
+		let bowdir  = true
+		let curr    = startTime // audio clock (Tone.now())
+		// const times = []
 
 		/*
 		const audio = document.querySelector('audio');
@@ -75,24 +75,30 @@ const AudioUtil = {
 		notes.forEach((noteArr, i) => {
 			let duration = 0
 			noteArr.forEach((el, j) => {
-			if (j == 0) {
-				duration = el * speed
-			} else {
-				const note = el
-				if (note != "R") { // "R" is a rest
-					AudioUtil.playNote(synth, note, duration, curr)
-					if (j == 1) {
-						// push only once for chords
-						const strNum = AudioUtil.getViolinStringFromNote(note)
-						const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-						times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
+				if (j == 0) {
+					duration = el * speed
+				} else {
+					const note = el
+					if (note != "R") { // "R" is a rest
+						AudioUtil.playNote(synth, note, duration, curr)
+						if (j == 1) {
+							// push only once for chords
+							const strNum = AudioUtil.getViolinStringFromNote(note)
+							const fingerNum = AudioUtil.getViolinFingerFromNote(note)
+							// times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
+							// queue video event
+							const vsched = vstartTime + 50 * (curr - startTime)
+							const vdur   = 50 * duration
+							VideoUtil.queueMoveBow(voiceIdx, vsched, vdur, bowdir, strNum, fingerNum)
+							bowdir = !bowdir
+						}
 					}
 				}
-			}
 			})
 			curr += duration
 		})
 
+		/*
 		let intvl = setInterval(() => {
 			const n = Tone.now()
 			if (n > times[0][1]) { // next note time has arrived
@@ -104,7 +110,7 @@ const AudioUtil = {
 					const note   = times[0][3]
 					const strNum = times[0][4]
 					const fingerNum = times[0][5]
-					console.log("sched =", times[0][1].toFixed(2), "now -", n.toFixed(2), " diff =", (n - times[0][1]).toFixed(2), " dur =", dur.toFixed(2), " note =", note )
+					// console.log("sched =", times[0][1].toFixed(2), "now -", n.toFixed(2), " diff =", (n - times[0][1]).toFixed(2), " dur =", dur.toFixed(2), " note =", note )
 					VideoUtil.moveBow(voiceIdx, bowdir, dur, strNum, fingerNum)
 					bowdir = !bowdir
 				}
@@ -115,6 +121,7 @@ const AudioUtil = {
 				}
 			}
 		}, 40)
+		*/
 
     },
 
@@ -155,12 +162,13 @@ const AudioUtil = {
 		}
 
 		Tone.loaded().then(() => {
-			const now = Tone.now()
+			const now  = Tone.now()
+			const vnow = 50 * VideoUtil.clock.getElapsedTime() // video startTime
 			console.log("NOW = ", now)
 			score.forEach((blob, blobIdx) => {
 				if (! blob.voice.muted) {
 					AudioUtil.playNotes( 
-						blob.synth, blob.voice.data, now, blob.voice.speed, 
+						blob.synth, blob.voice.data, now, vnow, blob.voice.speed, 
 						AudioUtil.updateNumNotes, blobIdx
 					)
 				}
