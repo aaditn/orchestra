@@ -216,6 +216,10 @@ const VideoUtil = {
     }
   },
 
+  clearEvents: () => {
+    VideoUtil.all_events = {}
+  },
+
   /*
   // have to figure how to posture fingers in movie file
   // may need a separate posture, rather than current initial posture

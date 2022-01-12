@@ -8,8 +8,10 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false)
-  const [animationRunning, setAnimationRunning] = useState(false)
-  const [animationButtonText, setAnimationButtonText] = useState("Start Animation")
+  const [audioRunning, setAudioRunning] = useState(false)
+  const [audioButtonText, setAudioButtonText] = useState("Start Audio")
+  const [videoRunning, setVideoRunning] = useState(false)
+  const [videoButtonText, setVideoButtonText] = useState("Start Video")
   const [pieceSelected, setPieceSelected] = useState("BachDouble")
   const pieces = {
     BumbleBee: "/data/music/flight_of_the_bumble_bee.json",
@@ -21,36 +23,51 @@ export default function Home() {
     VideoUtil.initScene(setAssetsLoaded, true)
   }, [])
 
-  // start load scene into DOM and start animation loop only when assets loaded
+  // start load scene into DOM and start video loop only when assets loaded
   useEffect(() => {
     console.log("Assetsloaded = ", assetsLoaded)
     if (assetsLoaded) {
       document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
-      setAnimationRunning(true)
-      setAnimationButtonText("Stop Animation")
+      setVideoRunning(true)
+      setVideoButtonText("Pause Video")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
     } else {
       document.getElementById("three-scene").innerHTML = ""
     }
   }, [assetsLoaded])
 
+  /*
   const handleClickPlay = () => { // get initial voice data
     AudioUtil.handlePlayAudio(pieces[pieceSelected])
   }
+  */
 
-  const toggleAnimation = () => {
-    if (animationRunning) { // stop animation
-      setAnimationRunning(false)
-      setAnimationButtonText("Start Animation")
+  const toggleAudio = () => {
+    if (audioRunning) { // stop video
+      AudioUtil.handleStopAudio()
+      VideoUtil.clearEvents()
+      setAudioRunning(false)
+      setAudioButtonText("Start Audio")
+    } else { // start video
+      AudioUtil.handleStartAudio(pieces[pieceSelected])
+      setAudioRunning(true)
+      setAudioButtonText("Stop Audio")
+    }
+  }
+
+  const toggleVideo = () => {
+    if (videoRunning) { // stop video
+      setVideoRunning(false)
+      setVideoButtonText("Start Video")
       // document.getElementById("three-scene").innerHTML = ""
       VideoUtil.renderer.setAnimationLoop(null)
       let now = performance.now() / 1000.0
       VideoUtil.clock.stopTime = now
       VideoUtil.clock.activeTime += VideoUtil.clock.stopTime - VideoUtil.clock.startTime
-    } else { // start animation
-      setAnimationRunning(true)
+    } else { // start video
+      setVideoRunning(true)
       // document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
-      setAnimationButtonText("Stop Animation")
+      setVideoButtonText("Stop Video")
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
       let now = performance.now() / 1000.0
       VideoUtil.clock.startTime = now
@@ -77,9 +94,9 @@ export default function Home() {
             <option value="BachDouble">Bach Double</option>
           </select>
           &nbsp; &nbsp;
-          <button onClick={handleClickPlay}>Start Audio</button>
+          <button onClick={toggleAudio}>{audioButtonText}</button>
           &nbsp; &nbsp;
-          <button onClick={toggleAnimation}>{animationButtonText}</button>
+          <button onClick={toggleVideo}>{videoButtonText}</button>
           <div id="three-scene"></div>
         </div>
       </main>

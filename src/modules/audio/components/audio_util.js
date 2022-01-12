@@ -4,6 +4,7 @@ import { VideoUtil, Event } from '../../video/components/video_util'
 
 const AudioUtil = {
 
+	score: [],
     voices: {},
     setVoices: (vs) => { AudioUtil.voices = vs },
 
@@ -39,7 +40,7 @@ const AudioUtil = {
 		}
     },
 
-    playNote: (synth, note, duration, when) => {
+	playNote: (synth, note, duration, when) => {
 		synth.triggerAttackRelease(note, duration, when)
     },
 
@@ -124,8 +125,14 @@ const AudioUtil = {
 
     },
 
-    
-    handlePlayAudio: async function(fileUrl) {
+	handleStopAudio: () => {
+		AudioUtil.score.forEach((voiceBlob) => {
+			voiceBlob.synth.dispose()
+		})
+		AudioUtil.score = []
+	},
+
+	handleStartAudio: async function(fileUrl) {
 		// fetch the JSON audio data from fileUrl
 		const response = await fetch(fileUrl ,{
 			headers : { 
@@ -134,7 +141,7 @@ const AudioUtil = {
 			}
 		})
 		const responseJson = await response.json()
-		console.log(responseJson);
+		console.log(responseJson)
 		AudioUtil.setVoices(responseJson)
 		const num = []
 		for (let vname in responseJson) num.push(responseJson[vname].data.length)
@@ -144,7 +151,7 @@ const AudioUtil = {
 		// playMidiFile(synth, "/midi/tchaik_serenade.mid")
 
 		// Play a score with multiple parts
-		let score   = []
+		AudioUtil.score   = []
 		if (Object.keys(AudioUtil.voices).length > 0) {
 			for(let vname in AudioUtil.voices) {
 				const voice = AudioUtil.voices[vname]
@@ -154,15 +161,15 @@ const AudioUtil = {
 				const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
 				synth.chain(panner3d, Tone.Destination)
 				synth.toDestination()
-				score.push({synth: synth, voice: voice})
+				AudioUtil.score.push({synth: synth, voice: voice})
 			}
 		}
 
 		Tone.loaded().then(() => {
 			const now  = Tone.now()
 			const vnow = 50 * VideoUtil.clock.getElapsedTime() // video startTime
-			console.log("NOW = ", now)
-			score.forEach((blob, blobIdx) => {
+			console.log("Audio start at:", now)
+			AudioUtil.score.forEach((blob, blobIdx) => {
 				if (! blob.voice.muted) {
 					AudioUtil.playNotes( 
 						blob.synth, blob.voice.data, now, vnow, blob.voice.speed, blobIdx
