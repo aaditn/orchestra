@@ -1,19 +1,11 @@
 import * as Tone from 'tone'
 import { SampleLibrary } from './Tonejs-Instruments'
-import { VideoUtil } from '../../video/components/video_util'
+import { VideoUtil, Event } from '../../video/components/video_util'
 
 const AudioUtil = {
 
     voices: {},
-    numNotes: [],
-    setNumNotes: (num) => { AudioUtil.numNotes = num },
     setVoices: (vs) => { AudioUtil.voices = vs },
-
-    updateNumNotes: (voiceIdx) => {
-		const num = AudioUtil.numNotes
-		num[voiceIdx] -= 1
-		AudioUtil.setNumNotes(num)
-    },
 
     // returns 0 (E), 1 (A), 2 (D) or 3 (G)
     getViolinStringFromNote: (note) => {
@@ -50,9 +42,17 @@ const AudioUtil = {
     playNote: (synth, note, duration, when) => {
 		synth.triggerAttackRelease(note, duration, when)
     },
-    
-    // synth, notes, startTime
-    playNotes: (synth, notes, startTime, vstartTime, speed, updateNumNotes, voiceIdx) => {
+
+	queuePlayNote: (synth, note, when, duration) => {
+		const player = null
+		let evt = new Event( VideoUtil.evtCount, when, when + duration, player, {
+			action: "playNote", synth: synth, note: note
+		})
+		VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    },
+
+	// synth, notes, startTime
+    playNotes: (synth, notes, startTime, vstartTime, speed, voiceIdx) => {
 		let bowdir  = true
 		let curr    = startTime // audio clock (Tone.now())
 		// const times = []
@@ -78,17 +78,17 @@ const AudioUtil = {
 				if (j == 0) {
 					duration = el * speed
 				} else {
-					const note = el
+					const note   = el
+					const vsched = vstartTime + 50 * (curr - startTime)
+					const vdur   = 50 * duration
 					if (note != "R") { // "R" is a rest
 						AudioUtil.playNote(synth, note, duration, curr)
+						// AudioUtil.queuePlayNote(synth, note, vsched, duration)
 						if (j == 1) {
 							// push only once for chords
 							const strNum = AudioUtil.getViolinStringFromNote(note)
 							const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-							// times.push([voiceIdx, curr, duration, note, strNum, fingerNum])
 							// queue video event
-							const vsched = vstartTime + 50 * (curr - startTime)
-							const vdur   = 50 * duration
 							VideoUtil.queueMoveBow(voiceIdx, vsched, vdur, bowdir, strNum, fingerNum)
 							bowdir = !bowdir
 						}
@@ -103,7 +103,6 @@ const AudioUtil = {
 			const n = Tone.now()
 			if (n > times[0][1]) { // next note time has arrived
 				if (n - times[0][1] < 0.1) {
-					AudioUtil.updateNumNotes(voiceIdx)
 					// play video of next note
 					// format: [voiceIdx, curr, duration, note, strNum]
 					const dur    = times[0][2]
@@ -137,10 +136,8 @@ const AudioUtil = {
 		const responseJson = await response.json()
 		console.log(responseJson);
 		AudioUtil.setVoices(responseJson)
-		// initialize AudioUtil.numNotes for each voice
 		const num = []
 		for (let vname in responseJson) num.push(responseJson[vname].data.length)
-		AudioUtil.setNumNotes(num)
 		
 		// const synth = new Tone.Synth().toDestination();
 		// const synth = SampleLibrary.load({ instruments: "saxophone" }).toDestination();
@@ -168,8 +165,7 @@ const AudioUtil = {
 			score.forEach((blob, blobIdx) => {
 				if (! blob.voice.muted) {
 					AudioUtil.playNotes( 
-						blob.synth, blob.voice.data, now, vnow, blob.voice.speed, 
-						AudioUtil.updateNumNotes, blobIdx
+						blob.synth, blob.voice.data, now, vnow, blob.voice.speed, blobIdx
 					)
 				}
 			})

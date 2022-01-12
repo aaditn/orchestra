@@ -105,6 +105,15 @@ const VideoActions = {
 			targetInfs[id] = infVal
 		})
 	},
+
+	playNote: (t, evt) => {
+		const when  = evt.start
+		const duration = evt.end - evt.start
+		const synth = evt.data.synth
+		const note  = evt.data.note
+		// console.log("Playing note at: ", when, " dur = ", duration)
+		synth.triggerAttackRelease(note, duration)
+	}
 }
 
 export { VideoActions }

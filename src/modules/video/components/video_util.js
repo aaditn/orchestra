@@ -28,7 +28,7 @@ export class Clock {
 
 // if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
 // for events with duration, event transition from ready -> active -> done
-class Event {
+export class Event {
   constructor(id, start, end, actor, data) {
     this.ID = id
     this.start = start   // duration start
