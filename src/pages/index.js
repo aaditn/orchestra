@@ -3,6 +3,9 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { AudioUtil } from '../modules/audio/components/audio_util'
 import { VideoUtil } from '../modules/video/components/video_util'
+import Button from '@mui/material/Button'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
@@ -88,15 +91,25 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className={styles.grid}>
-          <select value={pieceSelected} onChange={changePieceSelected}>
-            <option value="BumbleBee">Bumble Bee</option>
-            <option value="BachFugue">Bach fugue</option>
-            <option value="BachDouble">Bach Double</option>
-          </select>
+          <Select
+            variant="standard"
+            id="music"
+            value={pieceSelected}
+            label="Select Music"
+            onChange={changePieceSelected}
+          >
+            <MenuItem value={"BumbleBee"}>Bumble Bee</MenuItem>
+            <MenuItem value={"BachFugue"}>Bach fugue</MenuItem>
+            <MenuItem value={"BachDouble"}>Bach Double</MenuItem>
+          </Select>
           &nbsp; &nbsp;
-          <button onClick={toggleAudio}>{audioButtonText}</button>
+          <Button onClick={toggleAudio} variant="contained">
+            {audioButtonText}
+          </Button>
           &nbsp; &nbsp;
-          <button onClick={toggleVideo}>{videoButtonText}</button>
+          <Button onClick={toggleVideo} variant="contained">
+            {videoButtonText}
+          </Button>
           <div id="three-scene"></div>
         </div>
       </main>
