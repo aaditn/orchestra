@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { AudioUtil } from '../modules/audio/components/audio_util'
 import { VideoUtil } from '../modules/video/components/video_util'
+import MusicPlayerSlider from '../modules/video/components/PlayerSlider'
 import Button from '@mui/material/Button'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
@@ -110,6 +111,7 @@ export default function Home() {
           <Button onClick={toggleVideo} variant="contained">
             {videoButtonText}
           </Button>
+          <MusicPlayerSlider />
           <div id="three-scene"></div>
         </div>
       </main>

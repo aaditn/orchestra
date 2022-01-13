@@ -454,9 +454,11 @@ const VideoUtil = {
               evt.status = 'done' // bypass active for instant
               VideoUtil.processEvent(t, evt) // instant
             }
-          } else if (t >= start && t <= end) { // default event has duration
-            // console.log("EVT active: ", evt)
+          } else if (t >= start) { // default event has duration
             evt.status = 'active'
+            if (evt.data.action == 'playNote') { // execute playNote exactly once
+              evt.status = 'done'
+            }
             evt.data.t0 = t
             VideoUtil.processEvent(t, evt) // first time
           }
@@ -464,9 +466,8 @@ const VideoUtil = {
         case 'active':
           if (t >= start && t <= end) {
             VideoUtil.processEvent(t, evt, false) // 0 < t < T
-          } else {
+          } else { // post-process here if needed
             evt.status = 'done' // t >= T
-            // post-process here if needed
             VideoUtil.processEvent(t, evt, true) // reset if appropriate
           }
           break

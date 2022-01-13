@@ -83,8 +83,8 @@ const AudioUtil = {
 					const vsched = vstartTime + 50 * (curr - startTime)
 					const vdur   = 50 * duration
 					if (note != "R") { // "R" is a rest
-						AudioUtil.playNote(synth, note, duration, curr)
-						// AudioUtil.queuePlayNote(synth, note, vsched, duration)
+						// AudioUtil.playNote(synth, note, duration, curr)
+						AudioUtil.queuePlayNote(synth, note, vsched, duration)
 						if (j == 1) {
 							// push only once for chords
 							const strNum = AudioUtil.getViolinStringFromNote(note)
