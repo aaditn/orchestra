@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
+import { Event, EventStream } from '../../event/event'
 import { Chair, Violin, Bow } from "./models"
 
 export class Clock {
@@ -26,20 +27,6 @@ export class Clock {
   }
 }
 
-// if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
-// for events with duration, event transition from ready -> active -> done
-export class Event {
-  constructor(id, start, end, actor, data) {
-    this.ID = id
-    this.start = start   // duration start
-    this.end = end     // duration end
-    this.actor = actor
-    this.data = data || {}
-    this.status = 'ready'
-    this.data.t0 = null
-  }
-}
-
 //-------- START VideoUtil --------//
 const VideoUtil = {
   scene: null,
@@ -51,13 +38,13 @@ const VideoUtil = {
   movie: {},
   players: [],
   all_events: {},
+  evtStream: new EventStream(),
   bows: [],
 
   mixer: null,
   facecap_mesh: null,
   facecap_action: null,
   gameCounter: 0,
-  evtCount: 1,
 
   // overridden from mannequin.js
   createScene: () => {
@@ -199,9 +186,9 @@ const VideoUtil = {
           break
       }
       if (actor && !e.inactive) {
-        VideoUtil.all_events[VideoUtil.evtCount] =
-          new Event(VideoUtil.evtCount, e.start, e.end, actor, e.data)
-        VideoUtil.evtCount++
+        VideoUtil.all_events[Event.evtCount] =
+          new Event(Event.evtCount, e.start, e.end, actor, e.data)
+        Event.evtCount++
       }
     })
   },
@@ -361,37 +348,6 @@ const VideoUtil = {
     })
   },
 
-  /*
-  moveBow: (playerIdx, upbow, duration, strNum, fingerNum) => {
-    let player = VideoUtil.players[playerIdx]
-    // Put the left finger down
-    for (let i = 1; i < 5; i++) { // finger numbers
-      if (i == fingerNum) {
-        player.l_fingers[i - 1].bend = 60
-        player.l_fingers[i - 1].turn = -90
-      } else {
-        player.l_fingers[i - 1].bend = 40
-        player.l_fingers[i - 1].turn = -80
-      }
-    }
-    player.r_arm.straddle = 75 + strNum * 5 // play on appropriate string
-    const now = 50 * VideoUtil.clock.getElapsedTime()
-    if (upbow) { // Execute up bow
-      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
-            action: "posture",
-            posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    } else { // Execute down bow
-      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
-            action: "posture",
-            posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    }
-  },
-  */
-
   queueMoveBow: (playerIdx, sched, duration, upbow, strNum, fingerNum) => {
     let player = VideoUtil.players[playerIdx]
     // Put the left finger down
@@ -407,23 +363,23 @@ const VideoUtil = {
     }
     */
     // player.r_arm.straddle = 75 + strNum * 5 // play on appropriate string
-    let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+    let evt = new Event( Event.evtCount, sched, sched + duration, player, {
           action: "posture",
           posture: [{r_arm: [{straddle: [75 + strNum * 5, 75 + strNum * 5]}]}]
     })
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    VideoUtil.all_events[Event.evtCount++] = evt
     if (upbow) { // Execute up bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+      let evt = new Event( Event.evtCount, sched, sched + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
       })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      VideoUtil.all_events[Event.evtCount++] = evt
     } else { // Execute down bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+      let evt = new Event( Event.evtCount, sched, sched + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
       })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      VideoUtil.all_events[Event.evtCount++] = evt
     }
   },
 

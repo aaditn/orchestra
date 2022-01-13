@@ -111,7 +111,7 @@ export default function Home() {
           <Button onClick={toggleVideo} variant="contained">
             {videoButtonText}
           </Button>
-          <MusicPlayerSlider />
+          <MusicPlayerSlider duration={200}/>
           <div id="three-scene"></div>
         </div>
       </main>
