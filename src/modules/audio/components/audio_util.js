@@ -99,30 +99,6 @@ const AudioUtil = {
 			curr += duration
 		})
 
-		/*
-		let intvl = setInterval(() => {
-			const n = Tone.now()
-			if (n > times[0][1]) { // next note time has arrived
-				if (n - times[0][1] < 0.1) {
-					// play video of next note
-					// format: [voiceIdx, curr, duration, note, strNum]
-					const dur    = times[0][2]
-					const note   = times[0][3]
-					const strNum = times[0][4]
-					const fingerNum = times[0][5]
-					// console.log("sched =", times[0][1].toFixed(2), "now -", n.toFixed(2), " diff =", (n - times[0][1]).toFixed(2), " dur =", dur.toFixed(2), " note =", note )
-					VideoUtil.moveBow(voiceIdx, bowdir, dur, strNum, fingerNum)
-					bowdir = !bowdir
-				}
-				times.shift()
-				if (times.length <= 0) {
-					// recorder.stop();
-					clearInterval(intvl)
-				}
-			}
-		}, 40)
-		*/
-
     },
 
 	handleStopAudio: () => {
