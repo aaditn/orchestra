@@ -80,8 +80,8 @@ const AudioUtil = {
 					duration = el * speed
 				} else {
 					const note   = el
-					const vsched = vstartTime + 50 * (curr - startTime)
-					const vdur   = 50 * duration
+					const vsched = vstartTime + (curr - startTime)
+					const vdur   = duration
 					if (note != "R") { // "R" is a rest
 						// AudioUtil.playNote(synth, note, duration, curr)
 						AudioUtil.queuePlayNote(synth, note, vsched, duration)
@@ -143,7 +143,7 @@ const AudioUtil = {
 
 		Tone.loaded().then(() => {
 			const now  = Tone.now()
-			const vnow = 50 * VideoUtil.clock.getElapsedTime() // video startTime
+			const vnow = VideoUtil.clock.getElapsedTime() // video startTime
 			console.log("Audio start at:", now)
 			AudioUtil.score.forEach((blob, blobIdx) => {
 				if (! blob.voice.muted) {

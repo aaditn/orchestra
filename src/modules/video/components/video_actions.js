@@ -5,7 +5,8 @@ const VideoActions = {
 
     walk: (t, evt, reset) => {
         const actor = evt.actor
-		const t0    = evt.data.t0 || 0 // start from a 0 position (t-t0)
+		const t0    = 50 * evt.data.t0 || 0 // start from a 0 position (t-t0)
+		t          *= 50
 		// walking motion
 		if (! reset) {
 			const sint =  sin(4 * (t-t0))

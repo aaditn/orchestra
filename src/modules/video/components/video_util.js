@@ -375,15 +375,15 @@ const VideoUtil = {
       }
     }
     player.r_arm.straddle = 75 + strNum * 5 // play on appropriate string
-    const now = 50 * VideoUtil.clock.getElapsedTime()
+    const now = VideoUtil.clock.getElapsedTime()
     if (upbow) { // Execute up bow
-      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
+      const evt = new Event( VideoUtil.evtCount, now, now + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
       })
       VideoUtil.all_events[VideoUtil.evtCount++] = evt
     } else { // Execute down bow
-      const evt = new Event( VideoUtil.evtCount, now, now + 50 * duration, player, {
+      const evt = new Event( VideoUtil.evtCount, now, now + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
       })
@@ -428,11 +428,10 @@ const VideoUtil = {
   },
 
   drawFrame: () => {
-    VideoUtil.animate(50 * VideoUtil.clock.getElapsedTime())
+    VideoUtil.animate(VideoUtil.clock.getElapsedTime())
     VideoUtil.renderer.render(VideoUtil.scene, VideoUtil.camera)
   },
 
-  // animate loop (runs ~50ms right now)
   animate: (t) => {
     VideoUtil.gameCounter++
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0

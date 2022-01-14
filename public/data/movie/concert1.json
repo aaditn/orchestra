@@ -49,7 +49,7 @@
 
   "events": [
 
-    {"start": 75, "end": 75, "actor_id": 0, "actor_type": "player",
+    {"start": 1.5, "end": 1.5, "actor_id": 0, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -71,70 +71,70 @@
       }
     },
 
-    {"start": 50, "end": 50, "actor_id": 1, "actor_type": "player",
+    {"start": 1, "end": 1, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": 150, "y": 0, "z": 0}
       }
     },
-    {"start": 50, "end": 100, "actor_id": 1, "actor_type": "player",
+    {"start": 1, "end": 2, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
         "endRot": {"x": 0, "y": -1.570796, "z": 0}
       }
     },
-    {"start": 100, "end": 300, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
-    {"start": 100, "end": 200, "actor_id": 2, "actor_type": "light",
+    {"start": 2, "end": 6, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
+    {"start": 2, "end": 4, "actor_id": 2, "actor_type": "light",
       "data": { 
         "action": "translate",
         "startPos": {"x": 100, "y": 50, "z": 0},
         "endPos": {"x": 50, "y": 50, "z": 0}
       }
     },
-    {"start": 200, "end": 250, "actor_id": 2, "actor_type": "light",
+    {"start": 4, "end": 5, "actor_id": 2, "actor_type": "light",
       "data": {
         "action": "translate",
         "startPos": {"x": 50, "y": 50, "z": 0},
         "endPos": {"x": 25, "y": 50, "z": 25}
       }
     },
-    {"start": 250, "end": 300, "actor_id": 2, "actor_type": "light",
+    {"start": 5, "end": 6, "actor_id": 2, "actor_type": "light",
       "data": {
         "action": "translate",
         "startPos": {"x": 25, "y": 50, "z": 25},
         "endPos": {"x": 25, "y": 50, "z": 0}
       }
     },
-    {"start": 100, "end": 200, "actor_id": 1, "actor_type": "player",
+    {"start": 2, "end": 4, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 100, "y": 0, "z": 0},
         "endPos": {"x": 50, "y": 0, "z": 0}
       }
     },
-    {"start": 200, "end": 250, "actor_id": 1, "actor_type": "player",
+    {"start": 4, "end": 5, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 50, "y": 0, "z": 0},
         "endPos": {"x": 25, "y": 0, "z": 25}
       }
     },
-    {"start": 250, "end": 300, "actor_id": 1, "actor_type": "player",
+    {"start": 5, "end": 6, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "translate",
         "startPos": {"x": 25, "y": 0, "z": 25},
         "endPos": {"x": 25, "y": 0, "z": 0}
       }
     },
-    {"start": 350, "end": 375, "actor_id": 1, "actor_type": "player",
+    {"start": 7, "end": 7.5, "actor_id": 1, "actor_type": "player",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [0, 90]}]}]}
     },
-    {"start": 375, "end": 400, "actor_id": 1, "actor_type": "player",
+    {"start": 7.5, "end": 8, "actor_id": 1, "actor_type": "player",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
     },
-    {"start": 400, "end": 500, "actor_id": 1, "actor_type": "player",
+    {"start": 8, "end": 10, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -155,49 +155,49 @@
       }
     },
 
-    {"start": 50, "end": 50, "actor_id": 2, "actor_type": "player",
+    {"start": 1, "end": 1, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "move",
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": -150, "y": 0, "z": -150}
       }
     },
-    {"start": 50, "end": 75, "actor_id": 2, "actor_type": "player",
+    {"start": 1, "end": 1.5, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y": 0, "z": 0},
         "endRot": {"x": 0, "y": 0.785398, "z": 0}
       }
     },
-    {"start": 100, "end": 300, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
-    {"start": 100, "end": 300, "actor_id": 2, "actor_type": "player",
-      "data": { 
+    {"start": 2, "end": 6, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
+    {"start": 2, "end": 6, "actor_id": 2, "actor_type": "player",
+      "data": {
         "action": "translate",
         "startPos": {"x": -150, "y": 0, "z": -150},
         "endPos": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"start": 100, "end": 300, "actor_id": 1, "actor_type": "light",
+    {"start": 2, "end": 6, "actor_id": 1, "actor_type": "light",
       "data": {
         "action": "translate",
         "startPos": {"x": -150, "y": 50, "z": -150},
         "endPos": {"x": 0, "y": 50, "z": 0}
       }
     },
-    {"start": 300, "end": 350, "actor_id": 2, "actor_type": "player",
+    {"start": 6, "end": 7, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "rotate",
         "startRot": {"x": 0, "y":  0.785398, "z": 0},
         "endRot": {"x": 0, "y": 0, "z": 0}
       }
     },
-    {"start": 350, "end": 400, "actor_id": 2, "actor_type": "player", "comment": "Bow down",
+    {"start": 7, "end": 8, "actor_id": 2, "actor_type": "player", "comment": "Bow down",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [0, 90]}]}]}
     },
-    {"start": 400, "end": 450, "actor_id": 2, "actor_type": "player", "comment": "Bow up",
+    {"start": 8, "end": 9, "actor_id": 2, "actor_type": "player", "comment": "Bow up",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
     },
-    {"start": 450, "end": 500, "actor_id": 2, "actor_type": "player",
+    {"start": 9, "end": 10, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "posture",
         "posture": [
@@ -211,7 +211,7 @@
         ]
       }
     },
-    {"start": 500, "end": 600, "actor_id": 2, "actor_type": "influence",
+    {"start": 10, "end": 12, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",
         "influences": [
@@ -220,7 +220,7 @@
         ]
       }
     },
-    {"start": 600, "end": 700, "actor_id": 2, "actor_type": "influence",
+    {"start": 12, "end": 14, "actor_id": 2, "actor_type": "influence",
       "data": {
         "action": "animateInfluence",
         "influences": [

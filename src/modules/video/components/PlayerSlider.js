@@ -7,19 +7,6 @@ import IconButton from '@mui/material/IconButton';
 import PauseRounded from '@mui/icons-material/PauseRounded';
 import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded';
 
-const Widget = styled('div')(({ theme }) => ({
-  padding: 16,
-  borderRadius: 16,
-  width: 243,
-  maxWidth: '100%',
-  margin: 'auto',
-  position: 'relative',
-  zIndex: 1,
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.4)',
-  backdropFilter: 'blur(40px)',
-}));
-
 const TinyText = styled(Typography)({
   fontSize: '0.75rem',
   opacity: 0.38,
@@ -38,8 +25,6 @@ export default function MusicPlayerSlider() {
     return `${minute}:${secondLeft < 9 ? `0${secondLeft}` : secondLeft}`;
   }
   const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
-  const lightIconColor =
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
       <Slider
