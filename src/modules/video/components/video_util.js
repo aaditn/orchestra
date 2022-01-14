@@ -186,9 +186,7 @@ const VideoUtil = {
           break
       }
       if (actor && !e.inactive) {
-        VideoUtil.all_events[Event.evtCount] =
-          new Event(Event.evtCount, e.start, e.end, actor, e.data)
-        Event.evtCount++
+        VideoUtil.all_events[Event.evtCount] = new Event(e.start, e.end, actor, e.data)
       }
     })
   },
@@ -363,23 +361,23 @@ const VideoUtil = {
     }
     */
     // player.r_arm.straddle = 75 + strNum * 5 // play on appropriate string
-    let evt = new Event( Event.evtCount, sched, sched + duration, player, {
+    let evt = new Event( sched, sched + duration, player, {
           action: "posture",
           posture: [{r_arm: [{straddle: [75 + strNum * 5, 75 + strNum * 5]}]}]
     })
-    VideoUtil.all_events[Event.evtCount++] = evt
+    VideoUtil.all_events[Event.evtCount] = evt
     if (upbow) { // Execute up bow
-      let evt = new Event( Event.evtCount, sched, sched + duration, player, {
+      let evt = new Event( sched, sched + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
       })
-      VideoUtil.all_events[Event.evtCount++] = evt
+      VideoUtil.all_events[Event.evtCount] = evt
     } else { // Execute down bow
-      let evt = new Event( Event.evtCount, sched, sched + duration, player, {
+      let evt = new Event( sched, sched + duration, player, {
             action: "posture",
             posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
       })
-      VideoUtil.all_events[Event.evtCount++] = evt
+      VideoUtil.all_events[Event.evtCount] = evt
     }
   },
 
