@@ -1,7 +1,6 @@
 import * as Tone from 'tone'
 import { SampleLibrary } from './Tonejs-Instruments'
-import { VideoUtil } from '../../video/components/video_util'
-import { Event } from '../../event/event'
+import { VideoUtil, Event } from '../../video/components/video_util'
 
 const AudioUtil = {
 
@@ -47,10 +46,10 @@ const AudioUtil = {
 
 	queuePlayNote: (synth, note, when, duration) => {
 		const player = null
-		const evt = new Event( when, when + duration, player, {
+		let evt = new Event( VideoUtil.evtCount, when, when + duration, player, {
 			action: "playNote", synth: synth, note: note
 		})
-		VideoUtil.all_events[Event.evtCount] = evt
+		VideoUtil.all_events[VideoUtil.evtCount++] = evt
     },
 
 	// synth, notes, startTime
