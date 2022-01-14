@@ -20,10 +20,21 @@ export class Event {
 
 export class EventStream {
   constructor() {
-    this.map = {}
+    this.all_events_map = {}
   }
-  add(evt) {
-    this.map[Event.evtCount] = evt
-    Event.evtCount++
+  getEvent(evtId) {
+    return this.all_events_map[evtId]
+  }
+  addEvent(evt) {
+    this.all_events_map[Event.evtCount] = evt
+  }
+  deleteEvent(evtId) {
+    delete this.all_events_map[evtId]
+  }
+  getAllEvents() {
+    return this.all_events_map
+  }
+  clearStream() {
+    this.all_events_map = {}
   }
 }
