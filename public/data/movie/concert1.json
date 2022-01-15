@@ -30,17 +30,17 @@
     },
     {
       "ID": 1, "type": "SpotLight", "color": "white", "intensity": 0.2,
-      "position": {"x": 0, "y": 50, "z": 0},
-      "mapSize.width": 1024, "mapSize.height": 1024,
-      "angle": 0.35, "castShadow": true,
-      "target": {"actor": "player", "actor_id": 2}
-    },
-    {
-      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.2,
       "position": {"x": 150, "y": 50, "z": 0},
       "mapSize.width": 1024, "mapSize.height": 1024,
       "angle": 0.35, "castShadow": true,
       "target": {"actor": "player", "actor_id": 1}
+    },
+    {
+      "ID": 2, "type": "SpotLight", "color": "white", "intensity": 0.2,
+      "position": {"x": 0, "y": 50, "z": 0},
+      "mapSize.width": 1024, "mapSize.height": 1024,
+      "angle": 0.35, "castShadow": true,
+      "target": {"actor": "player", "actor_id": 2}
     },
     {
       "ID": 3, "type": "AmbientLight", "color": "white", "intensity": 0.2
@@ -79,29 +79,41 @@
       "data": { "action": "rotate", "endRot": {"x": 0, "y": -1.570796, "z": 0} }
     },
     {"start": 2, "end": 6, "actor_id": 1, "actor_type": "player", "data": { "action": "walk" }},
-    {"start": 2, "end": 4, "actor_id": 2, "actor_type": "light",
+    {"start": 2, "end": 4, "actor_id": 1, "actor_type": "light",
       "data": { "action": "translate", "endPos": {"x": 50, "y": 50, "z": 0} }
     },
-    {"start": 4, "end": 5, "actor_id": 2, "actor_type": "light",
+    {"start": 4, "end": 5, "actor_id": 1, "actor_type": "light",
       "data": { "action": "translate", "endPos": {"x": 25, "y": 50, "z": 25} }
     },
-    {"start": 5, "end": 6, "actor_id": 2, "actor_type": "light",
+    {"start": 5, "end": 6, "actor_id": 1, "actor_type": "light",
       "data": { "action": "translate", "endPos": {"x": 25, "y": 50, "z": 0}  }
     },
     {"start": 2, "end": 4, "actor_id": 1, "actor_type": "player",
       "data": { "action": "translate", "endPos": {"x": 50, "y": 0, "z": 0} }
     },
+    {"start": 3.5, "end": 4, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "rotate", "endRot": {"x": 0, "y": -0.7853, "z": 0} }
+    },
     {"start": 4, "end": 5, "actor_id": 1, "actor_type": "player",
-      "data": { "action": "translate", "endPos": {"x": 25, "y": 0, "z": 25} }
+      "data": { "action": "translate", "endPos": {"x": 15, "y": 0, "z": 25} }
+    },
+    {"start": 5, "end": 5.25, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "rotate", "endRot": {"x": 0, "y": -3.1416, "z": 0} }
     },
     {"start": 5, "end": 6, "actor_id": 1, "actor_type": "player",
-      "data": { "action": "translate", "endPos": {"x": 25, "y": 0, "z": 0} }
+      "data": { "action": "translate", "endPos": {"x": 15, "y": 0, "z": 0} }
+    },
+    {"start": 6, "end": 6.25, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "rotate", "endRot": {"x": 0, "y": -1.5707, "z": 0} }
     },
     {"start": 7, "end": 7.5, "actor_id": 1, "actor_type": "player",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [0, 90]}]}]}
     },
     {"start": 7.5, "end": 8, "actor_id": 1, "actor_type": "player",
       "data": { "action": "posture", "posture": [{"torso": [{"bend": [90, 0]}]}]}
+    },
+    {"start": 8, "end": 10, "actor_id": 1, "actor_type": "player",
+      "data": { "action": "translate", "endPos": {"x": 25, "y": 0, "z": 0} }
     },
     {"start": 8, "end": 10, "actor_id": 1, "actor_type": "player",
       "data": {
@@ -125,24 +137,20 @@
     },
 
     {"start": 1, "end": 1, "actor_id": 2, "actor_type": "player",
-      "data": {
-        "action": "move", "run_once": true, "endPos": {"x": -150, "y": 0, "z": -150} }
+      "data": { "action": "move", "run_once": true, "endPos": {"x": -150, "y": 0, "z": -150} }
+    },
+    {"start": 1, "end": 1, "actor_id": 2, "actor_type": "light",
+      "data": { "action": "move", "run_once": true, "endPos": {"x": -150, "y": 0, "z": -150} }
     },
     {"start": 1, "end": 1.5, "actor_id": 2, "actor_type": "player",
       "data": { "action": "rotate", "endRot": {"x": 0, "y": 0.785398, "z": 0} }
     },
     {"start": 2, "end": 6, "actor_id": 2, "actor_type": "player", "data": { "action": "walk" }},
     {"start": 2, "end": 6, "actor_id": 2, "actor_type": "player",
-      "data": {
-        "action": "translate",
-        "endPos": {"x": 0, "y": 0, "z": 0}
-      }
+      "data": { "action": "translate", "endPos": {"x": 0, "y": 0, "z": 0} }
     },
-    {"start": 2, "end": 6, "actor_id": 1, "actor_type": "light",
-      "data": {
-        "action": "translate",
-        "endPos": {"x": 0, "y": 50, "z": 0}
-      }
+    {"start": 2, "end": 6, "actor_id": 2, "actor_type": "light",
+      "data": { "action": "translate", "endPos": {"x": 0, "y": 50, "z": 0} }
     },
     {"start": 6, "end": 7, "actor_id": 2, "actor_type": "player",
       "data": { "action": "rotate", "endRot": {"x": 0, "y": 0, "z": 0} }
