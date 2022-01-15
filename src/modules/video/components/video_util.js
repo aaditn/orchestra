@@ -34,8 +34,9 @@ export class Event {
     this.start = start   // duration start
     this.end = end     // duration end
     this.actor = actor
-    this.data = data || {}
     this.status = 'ready'
+    this.iter = 0
+    this.data = data || {}
     this.data.t0 = null
   }
 }

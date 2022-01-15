@@ -153,7 +153,6 @@ const AudioUtil = {
 					if (dur > maxDur) maxDur = dur
 				}
 			})
-			console.log("MAXDR = ", maxDur)
 			durationCallback(maxDur)
 		})
     },

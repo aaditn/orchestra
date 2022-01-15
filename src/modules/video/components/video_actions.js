@@ -20,6 +20,7 @@ const VideoActions = {
 			actor.l_arm.raise = 0
 			actor.r_arm.raise = 0
 		}
+		evt.iter++
 	},
 
 	// move right away without any transition
@@ -27,10 +28,15 @@ const VideoActions = {
         const actor  = evt.actor
 		const endPos = evt.data.endPos
 		actor.position.set(endPos.x, endPos.y, endPos.z)
+		evt.iter++
 	},
 
     translate: (t, evt) => {
         const actor    = evt.actor
+		if (evt.iter == 0) { // set startPos in the first iteration
+			const pos  = actor.position
+			evt.data.startPos = {x: pos.x, y: pos.y, z: pos.z}
+		}
 		const startPos = evt.data.startPos
 		const endPos   = evt.data.endPos
 		const paramt   = (t - evt.start) / (evt.end - evt.start)
@@ -39,10 +45,15 @@ const VideoActions = {
 		const newPosY = startPos.y + (endPos.y - startPos.y) * paramt
 		const newPosZ = startPos.z + (endPos.z - startPos.z) * paramt
 		actor.position.set(newPosX, newPosY, newPosZ)
+		evt.iter++
 	},
 
     rotate: (t, evt) => {
         const actor    = evt.actor
+		if (evt.iter == 0) { // set startPos in the first iteration
+			const rot  = actor.rotation
+			evt.data.startRot = {x: rot.x, y: rot.y, z: rot.z}
+		}
 		const startRot = evt.data.startRot
 		const endRot   = evt.data.endRot
 		const paramt   = (t - evt.start) / (evt.end - evt.start)
@@ -50,6 +61,7 @@ const VideoActions = {
 		actor.rotation.x = startRot.x + (endRot.x - startRot.x) * paramt
 		actor.rotation.y = startRot.y + (endRot.y - startRot.y) * paramt
 		actor.rotation.z = startRot.z + (endRot.z - startRot.z) * paramt
+		evt.iter++
     },
 
 	posture: (t, evt) => {
@@ -90,6 +102,7 @@ const VideoActions = {
 				}
 			}
 		})
+		evt.iter++
 	},
 
 	animateInfluence: (t, evt) => {
@@ -105,6 +118,7 @@ const VideoActions = {
 			const infVal   = start + (end - start) * paramt
 			targetInfs[id] = infVal
 		})
+		evt.iter++
 	},
 
 	playNote: (t, evt) => {
@@ -113,6 +127,7 @@ const VideoActions = {
 		const note  = evt.data.note
 		// console.log("Playing note at: ", when, " dur = ", duration)
 		synth.triggerAttackRelease(note, duration)
+		evt.iter++
 	}
 }
 
