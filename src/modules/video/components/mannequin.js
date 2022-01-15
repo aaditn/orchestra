@@ -738,24 +738,28 @@ export class Mannequin extends Group {
 		this.l_arm = new Arm(this.torso, LEFT);
 		this.l_elbow = new Elbow(this.l_arm);
 		this.l_wrist = new Wrist(this.l_elbow);
-		// this.l_fingers = new Fingers(this.l_wrist);
+		this.l_finger1 = new Finger(this.l_wrist, -0.75)
+		this.l_finger2 = new Finger(this.l_wrist, -0.25)
+		this.l_finger3 = new Finger(this.l_wrist, 0.25)
+		this.l_finger4 = new Finger(this.l_wrist, 0.75)
+		/*
 		this.l_fingers = [
 			new Finger(this.l_wrist, -0.75),
 			new Finger(this.l_wrist, -0.25),
 			new Finger(this.l_wrist, +0.25),
 			new Finger(this.l_wrist, +0.75)
 		]
+		*/
 
 		this.r_arm = new Arm(this.torso, RIGHT);
 		this.r_elbow = new Elbow(this.r_arm);
 		this.r_wrist = new Wrist(this.r_elbow);
 		// this.r_fingers = new Fingers(this.r_wrist);
-		this.r_fingers = [
-			new Finger(this.r_wrist, -0.75),
-			new Finger(this.r_wrist, -0.25),
-			new Finger(this.r_wrist, +0.25),
-			new Finger(this.r_wrist, +0.75)
-		]
+		this.r_finger1 = new Finger(this.r_wrist, -0.75)
+		this.r_finger2 = new Finger(this.r_wrist, -0.25)
+		this.r_finger3 = new Finger(this.r_wrist, 0.25)
+		this.r_finger4 = new Finger(this.r_wrist, 0.75)
+
 		this.add(this.body);
 
 		var s = 1.5 / (0.5 + height);
@@ -786,9 +790,6 @@ export class Mannequin extends Group {
 		this.l_wrist.bend = -15;
 		this.r_wrist.bend = -15;
 
-		// this.l_fingers.bend = 10;
-		// this.r_fingers.bend = 10;
-
 	} // Mannequin.constructor
 
 	get bend() { return -this.body.z; }
@@ -813,18 +814,18 @@ export class Mannequin extends Group {
 			this.l_elbow.posture,
 			this.l_wrist.posture,
 			// this.l_fingers.posture,
-			this.l_fingers[0].posture,
-			this.l_fingers[1].posture,
-			this.l_fingers[2].posture,
-			this.l_fingers[3].posture,
+			this.l_finger1.posture,
+			this.l_finger2.posture,
+			this.l_finger3.posture,
+			this.l_finger4.posture,
 			this.r_arm.posture,
 			this.r_elbow.posture,
 			this.r_wrist.posture,
 			// this.r_fingers.posture
-			this.r_fingers[0].posture,
-			this.r_fingers[1].posture,
-			this.r_fingers[2].posture,
-			this.r_fingers[3].posture,
+			this.r_finger1.posture,
+			this.r_finger2.posture,
+			this.r_finger3.posture,
+			this.r_finger4.posture,
 		];
 		return {
 			version: MANNEQUIN_POSTURE_VERSION,
@@ -852,18 +853,18 @@ export class Mannequin extends Group {
 		this.l_elbow.posture = posture.data[i++];
 		this.l_wrist.posture = posture.data[i++];
 		// this.l_fingers.posture = posture.data[i++];
-		this.l_fingers[0].posture = posture.data[i++];
-		this.l_fingers[1].posture = posture.data[i++];
-		this.l_fingers[2].posture = posture.data[i++];
-		this.l_fingers[3].posture = posture.data[i++];
+		this.l_finger1.posture = posture.data[i++];
+		this.l_finger2.posture = posture.data[i++];
+		this.l_finger3.posture = posture.data[i++];
+		this.l_finger4.posture = posture.data[i++];
 		this.r_arm.posture = posture.data[i++];
 		this.r_elbow.posture = posture.data[i++];
 		this.r_wrist.posture = posture.data[i++];
 		// this.r_fingers.posture = posture.data[i++];
-		this.r_fingers[0].posture = posture.data[i++];
-		this.r_fingers[1].posture = posture.data[i++];
-		this.r_fingers[2].posture = posture.data[i++];
-		this.r_fingers[3].posture = posture.data[i++];
+		this.r_finger1.posture = posture.data[i++];
+		this.r_finger2.posture = posture.data[i++];
+		this.r_finger3.posture = posture.data[i++];
+		this.r_finger4.posture = posture.data[i++];
 	} // Mannequin.posture
 
 	get postureString() { return JSON.stringify(this.posture); }

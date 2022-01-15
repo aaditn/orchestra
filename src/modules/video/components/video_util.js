@@ -220,29 +220,6 @@ const VideoUtil = {
     VideoUtil.all_events = {}
   },
 
-  /*
-  // have to figure how to posture fingers in movie file
-  // may need a separate posture, rather than current initial posture
-  createPlayer: (instrument, pos, rot) => {
-    const player = new Male()
-
-    player.r_fingers[0].bend = 60;
-    player.r_fingers[1].bend = 60;
-    player.r_fingers[2].bend = 60;
-    player.r_fingers[3].bend = 60;
-
-    player.l_fingers[0].bend = 40;
-    player.l_fingers[0].turn = -80;
-    player.l_fingers[1].bend = 40;
-    player.l_fingers[1].turn = -80;
-    player.l_fingers[2].bend = 40;
-    player.l_fingers[2].turn = -80;
-    player.l_fingers[3].bend = 40;
-    player.l_fingers[3].turn = -80;
-    return player
-  },
-  */
-
   loadMovieScript: async function (fileUrl) {
     const response = await fetch(fileUrl, {
       headers: {
@@ -341,7 +318,7 @@ const VideoUtil = {
         // actor.torso.attach(new Violin(17, 7, 20))
         actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
         const bow = new Bow()
-        actor.r_fingers[0].attach(bow)
+        actor.r_finger1.attach(bow)
         VideoUtil.bows.push(bow)
       }
       VideoUtil.loadAssets(doneCallback, doneVal)
@@ -395,20 +372,33 @@ const VideoUtil = {
   queueMoveBow: (playerIdx, sched, duration, upbow, strNum, fingerNum) => {
     let player = VideoUtil.players[playerIdx]
     // Put the left finger down
+
     /*
-    for (let i = 1; i < 5; i++) { // finger numbers
+    for (let i = 1; i < 4; i++) { // finger numbers
       if (i == fingerNum) {
-        player.l_fingers[i - 1].bend = 60
-        player.l_fingers[i - 1].turn = -90
+        let pos = {}
+        pos['l_finger' + i] = [{bend: [60, 50]}, [{turn: [-90, -90]}]]
+        let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          action: "posture", run_once: true, posture: [pos]
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        // player['l_finger' + i].bend = 60
+        // player['l_finger' + i].turn = -90
       } else {
-        player.l_fingers[i - 1].bend = 40
-        player.l_fingers[i - 1].turn = -80
+        let pos = {}
+        pos['l_finger' + i] = [{bend: [40, 40]}, [{turn: [-80, -80]}]]
+        let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          action: "posture", run_once: true, posture: [pos]
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        // player['l_finger' + i].bend = 40
+        // player['l_finger' + i].turn = -80
       }
     }
     */
-    // player.r_arm.straddle = 75 + strNum * 5 // play on appropriate string
+
     let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-          action: "posture",
+          action: "posture", run_once: true,
           posture: [{r_arm: [{straddle: [75 + strNum * 5, 75 + strNum * 5]}]}]
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
@@ -437,6 +427,8 @@ const VideoUtil = {
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0
     if (VideoUtil.gameCounter % 10 == 0) {
       // console.log("t = ", t, " count = ", VideoUtil.gameCounter)
+      // const player = VideoUtil.players[1]
+      // console.log("POSTURE l_finger: ", player.l_arm.posture)
     }
 
     // cycle through events and process as needed
