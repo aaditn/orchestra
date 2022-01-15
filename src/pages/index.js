@@ -12,6 +12,8 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const [position, setPosition] = useState(0)
   const [audioRunning, setAudioRunning] = useState(false)
   const [audioButtonText, setAudioButtonText] = useState("Start Audio")
   const [videoRunning, setVideoRunning] = useState(false)
@@ -40,12 +42,6 @@ export default function Home() {
     }
   }, [assetsLoaded])
 
-  /*
-  const handleClickPlay = () => { // get initial voice data
-    AudioUtil.handlePlayAudio(pieces[pieceSelected])
-  }
-  */
-
   const toggleAudio = () => {
     if (audioRunning) { // stop video
       AudioUtil.handleStopAudio()
@@ -53,7 +49,7 @@ export default function Home() {
       setAudioRunning(false)
       setAudioButtonText("Start Audio")
     } else { // start video
-      AudioUtil.handleStartAudio(pieces[pieceSelected])
+      AudioUtil.handleStartAudio(pieces[pieceSelected], setDuration)
       setAudioRunning(true)
       setAudioButtonText("Stop Audio")
     }
@@ -111,7 +107,7 @@ export default function Home() {
           <Button onClick={toggleVideo} variant="contained">
             {videoButtonText}
           </Button>
-          <MusicPlayerSlider />
+          <MusicPlayerSlider duration={duration} position={5}/>
           <div id="three-scene"></div>
         </div>
       </main>

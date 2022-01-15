@@ -52,11 +52,10 @@ const AudioUtil = {
 		VideoUtil.all_events[VideoUtil.evtCount++] = evt
     },
 
-	// synth, notes, startTime
+	// synth, notes, startTime - returns duration on this synth
     playNotes: (synth, notes, startTime, vstartTime, speed, voiceIdx) => {
-		let bowdir  = true
-		let curr    = startTime // audio clock (Tone.now())
-		// const times = []
+		let bowdir = true
+		let curr   = startTime // audio clock (Tone.now())
 
 		/*
 		const audio = document.querySelector('audio');
@@ -98,7 +97,6 @@ const AudioUtil = {
 			})
 			curr += duration
 		})
-
     },
 
 	handleStopAudio: () => {
@@ -108,7 +106,7 @@ const AudioUtil = {
 		AudioUtil.score = []
 	},
 
-	handleStartAudio: async function(fileUrl) {
+	handleStartAudio: async function(fileUrl, durationCallback) {
 		// fetch the JSON audio data from fileUrl
 		const response = await fetch(fileUrl ,{
 			headers : { 
@@ -132,10 +130,10 @@ const AudioUtil = {
 			for(let vname in AudioUtil.voices) {
 				const voice = AudioUtil.voices[vname]
 				const synth = SampleLibrary.load({ instruments: voice.instrument });
-				const distortion = new Tone.Distortion(0.5);
-				const filter = new Tone.AutoFilter(4).start();
-				const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
-				synth.chain(panner3d, Tone.Destination)
+				// const distortion = new Tone.Distortion(0.5);
+				// const filter = new Tone.AutoFilter(4).start();
+				// const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
+				// synth.chain(panner3d, Tone.Destination)
 				synth.toDestination()
 				AudioUtil.score.push({synth: synth, voice: voice})
 			}
@@ -145,13 +143,18 @@ const AudioUtil = {
 			const now  = Tone.now()
 			const vnow = VideoUtil.clock.getElapsedTime() // video startTime
 			console.log("Audio start at:", now)
+			let maxDur = 0
 			AudioUtil.score.forEach((blob, blobIdx) => {
 				if (! blob.voice.muted) {
-					AudioUtil.playNotes( 
-						blob.synth, blob.voice.data, now, vnow, blob.voice.speed, blobIdx
-					)
+					const dur =
+						AudioUtil.playNotes( 
+							blob.synth, blob.voice.data, now, vnow, blob.voice.speed, blobIdx
+						)
+					if (dur > maxDur) maxDur = dur
 				}
 			})
+			console.log("MAXDR = ", maxDur)
+			durationCallback(maxDur)
 		})
     },
 

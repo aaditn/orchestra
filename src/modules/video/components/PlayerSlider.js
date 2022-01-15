@@ -14,10 +14,10 @@ const TinyText = styled(Typography)({
   letterSpacing: 0.2,
 });
 
-export default function MusicPlayerSlider() {
+export default function MusicPlayerSlider(props) {
   const theme = useTheme();
-  const duration = 200; // seconds
-  const [position, setPosition] = React.useState(32);
+  const duration = props.duration; // seconds
+  const [position, setPosition] = React.useState(props.position);
   const [paused, setPaused] = React.useState(false);
   function formatDuration(value) {
     const minute = Math.floor(value / 60);
@@ -70,7 +70,7 @@ export default function MusicPlayerSlider() {
         }}
       >
         <TinyText>{formatDuration(position)}</TinyText>
-        <TinyText>-{formatDuration(duration - position)}</TinyText>
+        {/* <TinyText>-{formatDuration(duration - position)}</TinyText> */}
       </Box>
       <Box
         sx={{
