@@ -444,20 +444,15 @@ const VideoUtil = {
       const evt = VideoUtil.all_events[evtId]
       const start = evt.start
       const end = evt.end
-      const instant = start >= end
-      evt.instant = instant
       switch (evt.status) {
         case 'ready':
-          if (evt.instant) { // no duration event, only start time needed
+          if (evt.data.run_once) { // no duration event, only start time needed
             if (t >= start) {
-              evt.status = 'done' // bypass active for instant
-              VideoUtil.processEvent(t, evt) // instant
+              evt.status = 'done' // bypass active state for run_once
+              VideoUtil.processEvent(t, evt)
             }
           } else if (t >= start) { // default event has duration
             evt.status = 'active'
-            if (evt.data.action == 'playNote') { // execute playNote exactly once
-              evt.status = 'done'
-            }
             evt.data.t0 = t
             VideoUtil.processEvent(t, evt) // first time
           }
@@ -472,7 +467,7 @@ const VideoUtil = {
           break
         case 'done':
           // do nothing
-          delete VideoUtil.all_events[evt.ID]
+          delete VideoUtil.all_events[evtId]
           break
         default:
           break

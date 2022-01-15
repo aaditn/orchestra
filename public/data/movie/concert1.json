@@ -52,6 +52,7 @@
     {"start": 1.5, "end": 1.5, "actor_id": 0, "actor_type": "player",
       "data": {
         "action": "posture",
+        "run_once": true,
         "posture": [
           {"bend": [0,-40]},
           {"torso": [{"bend": [0,30]}]},
@@ -74,6 +75,7 @@
     {"start": 1, "end": 1, "actor_id": 1, "actor_type": "player",
       "data": {
         "action": "move",
+        "run_once": true,
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": 150, "y": 0, "z": 0}
       }
@@ -158,6 +160,7 @@
     {"start": 1, "end": 1, "actor_id": 2, "actor_type": "player",
       "data": {
         "action": "move",
+        "run_once": true,
         "startPos": {"x": 0, "y": 0, "z": 0},
         "endPos": {"x": -150, "y": 0, "z": -150}
       }

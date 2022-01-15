@@ -47,7 +47,7 @@ const AudioUtil = {
 	queuePlayNote: (synth, note, when, duration) => {
 		const player = null
 		let evt = new Event( VideoUtil.evtCount, when, when + duration, player, {
-			action: "playNote", synth: synth, note: note
+			action: "playNote", synth: synth, note: note, run_once: true
 		})
 		VideoUtil.all_events[VideoUtil.evtCount++] = evt
     },

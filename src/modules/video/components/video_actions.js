@@ -22,7 +22,7 @@ const VideoActions = {
 		}
 	},
 
-	// move instantly, no transition
+	// move right away without any transition
 	move: (t, evt) => {
         const actor  = evt.actor
 		const endPos = evt.data.endPos
@@ -55,7 +55,7 @@ const VideoActions = {
 	posture: (t, evt) => {
         const actor  = evt.actor
 		let paramt   = (t - evt.start) / (evt.end - evt.start)
-		if (evt.instant) paramt = 1.0
+		if (evt.data.run_once) paramt = 1.0
 		// posture = [{position: {}}, {t_leg: [{raise: 20}, {turn: 20}]}, ...]
 		const bodyParts = [
 			'pelvis', 'torso', 'neck', 'head',
@@ -108,7 +108,6 @@ const VideoActions = {
 	},
 
 	playNote: (t, evt) => {
-		const when  = evt.start
 		const duration = evt.end - evt.start
 		const synth = evt.data.synth
 		const note  = evt.data.note
