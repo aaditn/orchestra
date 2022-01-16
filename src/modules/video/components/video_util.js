@@ -263,10 +263,8 @@ const VideoUtil = {
           object.rotation.y = Math.PI / 2
           object.position.set(1, 4, 0)
           object.traverse(function (child) {
-            if (child instanceof THREE.Mesh) {
-              child.material = material
-            }
-          });
+            if (child instanceof THREE.Mesh) child.material = material
+          })
           attachPoints[i].attach(object)
 
         } else if (i == 2) { // animatable face
@@ -283,7 +281,6 @@ const VideoUtil = {
           // VideoUtil.facecap_action = VideoUtil.mixer.clipAction(gltf.animations[0])
           let head = VideoUtil.facecap_mesh.getObjectByName('mesh_2');
           const dict = head.morphTargetDictionary
-          console.log("HEAD: ", head, " DICT: ", dict)
           // VideoUtil.facecap_action.setLoop(THREE.LoopRepeat, 2)
           // VideoUtil.facecap_action.play()
           VideoUtil.players[2].head.attach(VideoUtil.facecap_mesh)
