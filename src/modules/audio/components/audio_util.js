@@ -6,6 +6,8 @@ const AudioUtil = {
 
 	score: [],
     voices: {},
+	recorder: null,
+	chunks: [],
     setVoices: (vs) => { AudioUtil.voices = vs },
 
     // returns 0 (E), 1 (A), 2 (D) or 3 (G)
@@ -56,21 +58,6 @@ const AudioUtil = {
     playNotes: (synth, notes, startTime, vstartTime, speed, voiceIdx) => {
 		let bowdir = true
 		let curr   = startTime // audio clock (Tone.now())
-
-		/*
-		const audio = document.querySelector('audio');
-		const actx  = Tone.context;
-		const dest  = actx.createMediaStreamDestination();
-		const recorder = new MediaRecorder(dest.stream);
-		synth.connect(dest);
-		const chunks = [];
-		recorder.start()
-		recorder.ondataavailable = evt => chunks.push(evt.data);
-		recorder.onstop = evt => {
-		let blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-		audio.src = URL.createObjectURL(blob);
-		};
-		*/
 
 		notes.forEach((noteArr, i) => {
 			let duration = 0
@@ -124,6 +111,19 @@ const AudioUtil = {
 		// const synth = SampleLibrary.load({ instruments: "saxophone" }).toDestination();
 		// playMidiFile(synth, "/midi/tchaik_serenade.mid")
 
+		// Turn recorder on by default
+		const audio = document.querySelector('audio')
+		const actx  = Tone.context;
+		const dest  = actx.createMediaStreamDestination()
+		AudioUtil.recorder = new MediaRecorder(dest.stream)
+		AudioUtil.recorder.start()
+		AudioUtil.recorder.ondataavailable = e => { AudioUtil.chunks.push(e.data)}
+		AudioUtil.recorder.onstop = evt => {
+			let blob = new Blob(AudioUtil.chunks.flat(), { type: 'audio/ogg; codecs=opus' })
+			audio.src = URL.createObjectURL(blob)
+		};
+		setTimeout(() => { AudioUtil.recorder.stop() }, 30000) // test dumping audio
+
 		// Play a score with multiple parts
 		AudioUtil.score   = []
 		if (Object.keys(AudioUtil.voices).length > 0) {
@@ -135,6 +135,7 @@ const AudioUtil = {
 				// const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
 				// synth.chain(panner3d, Tone.Destination)
 				synth.toDestination()
+				synth.connect(dest) // connect synth to AudioUtil.recorder as well
 				AudioUtil.score.push({synth: synth, voice: voice})
 			}
 		}
