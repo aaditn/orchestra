@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
-import { Chair, Violin, Bow } from "./models"
+import { Chair, Violin, Bow, Piano } from "./models"
 
 export class Clock {
   constructor() {
@@ -53,6 +53,7 @@ const VideoUtil = {
   players: [],
   all_events: {},
   bows: [],
+  piano: null,
 
   mixer: null,
   facecap_mesh: null,
@@ -322,6 +323,8 @@ const VideoUtil = {
       VideoUtil.loadAssets(doneCallback, doneVal)
 
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
+      VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
+      VideoUtil.scene.add(VideoUtil.piano)
 
       // handle lights
       const lights = VideoUtil.movie.lights
@@ -413,6 +416,38 @@ const VideoUtil = {
       })
       VideoUtil.all_events[VideoUtil.evtCount++] = evt
     }
+  },
+
+  queueHammerPiano: (playerIdx, sched, duration, note) => {
+    // let player = VideoUtil.players[playerIdx]
+
+    const playedKey = VideoUtil.piano.keys[Math.floor(Math.random() * 84)]
+    let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
+      action: "move", run_once: true,
+      endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
+    })
+    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    evt = new Event( VideoUtil.evtCount, sched + duration, sched + duration, playedKey, {
+      action: "move", run_once: true,
+      endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
+    })
+    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    /*
+    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    if (upbow) { // Execute up bow
+      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+            action: "posture",
+            posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
+      })
+      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    } else { // Execute down bow
+      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+            action: "posture",
+            posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
+      })
+      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    }
+    */
   },
 
   drawFrame: () => {

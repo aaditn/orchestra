@@ -42,10 +42,6 @@ const AudioUtil = {
 		}
     },
 
-	playNote: (synth, note, duration, when) => {
-		synth.triggerAttackRelease(note, duration, when)
-    },
-
 	queuePlayNote: (synth, note, when, duration) => {
 		const player = null
 		let evt = new Event( VideoUtil.evtCount, when, when + duration, player, {
@@ -55,10 +51,10 @@ const AudioUtil = {
     },
 
 	// synth, notes, startTime - returns duration on this synth
-    playNotes: (synth, notes, startTime, vstartTime, speed, voiceIdx) => {
+    playNotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
 		let bowdir = true
 		let curr   = startTime // audio clock (Tone.now())
-
+		const voice = AudioUtil.voices[voiceIdx]
 		notes.forEach((noteArr, i) => {
 			let duration = 0
 			noteArr.forEach((el, j) => {
@@ -69,16 +65,23 @@ const AudioUtil = {
 					const vsched = vstartTime + (curr - startTime)
 					const vdur   = duration
 					if (note != "R") { // "R" is a rest
-						// AudioUtil.playNote(synth, note, duration, curr)
 						AudioUtil.queuePlayNote(synth, note, vsched, duration)
-						if (j == 1) {
-							// push only once for chords
-							const strNum = AudioUtil.getViolinStringFromNote(note)
-							const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-							// queue video event
-							VideoUtil.queueMoveBow(voiceIdx, vsched, vdur, bowdir, strNum, fingerNum)
-							bowdir = !bowdir
+						switch (instrument){
+							case "violin":
+								if (j == 1) {
+									// push only once for chords
+									const strNum = AudioUtil.getViolinStringFromNote(note)
+									const fingerNum = AudioUtil.getViolinFingerFromNote(note)
+									// queue video event
+									VideoUtil.queueMoveBow(voiceIdx, vsched, vdur, bowdir, strNum, fingerNum)
+									bowdir = !bowdir
+								}
+								break;
+							case "piano":
+								VideoUtil.queueHammerPiano(voiceIdx, vsched, vdur, note)
+								break;
 						}
+
 					}
 				}
 			})
@@ -160,7 +163,8 @@ const AudioUtil = {
 				if (! blob.voice.muted) {
 					const dur =
 						AudioUtil.playNotes( 
-							blob.synth, blob.voice.data, now, vnow, blob.voice.speed, blobIdx
+							blob.synth, blob.voice.instrument, blob.voice.data,
+							now, vnow, blob.voice.speed, blobIdx
 						)
 					if (dur > maxDur) maxDur = dur
 				}

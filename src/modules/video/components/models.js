@@ -83,6 +83,48 @@ export class Bow extends THREE.Group {
   }
 }
 
+export class Piano extends THREE.Group {
+  constructor(pos, rot) {
+    super();
+    this.keys = []
+    this.position.set(pos.x, pos.y, pos.z)
+    this.rotation.x = rad(rot.x);
+    this.rotation.y = rad(rot.y);
+    this.rotation.z = rad(rot.z);
+
+    const BASELEN = 50
+    const pianoMaterial = new THREE.MeshLambertMaterial({ color: 0xf4c4a4 })
+    let base = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 1, 6), pianoMaterial)
+    base.position.set(0, -9, 0); base.castShadow = true
+
+    let back = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 30, 1), pianoMaterial)
+    back.position.set(0, -6, -4); base.add(back)
+
+
+    // 84 keys on the keyboard: C1 .. B7
+    for (let octave = 0; octave < 7; octave++) {
+      for (let i = 0; i < 7; i++) {
+        const wmaterial = new THREE.MeshLambertMaterial({ color: 0xeeeeee })
+        let whitekey = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1, 5), wmaterial)
+        whitekey.position.set(i + octave * 7 - BASELEN/2 + 1, 1.2, 0)
+        this.keys.push(whitekey)
+
+        if (i != 2 && i != 6) {
+          const bmaterial = new THREE.MeshLambertMaterial({ color: 0x444444 })
+          let blackkey = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1, 3), bmaterial)
+          blackkey.position.set(i + octave * 7 - BASELEN/2 + 1.5, 1.75, -0.5)
+          this.keys.push(blackkey)
+        }
+      }
+    }
+    this.keys.forEach(key => {
+      base.add(key)
+    })
+
+    this.add(base)
+  }
+}
+
 class Mask extends THREE.Group {
   constructor(zScale = 1, color = 'lightgray') {
     super();
