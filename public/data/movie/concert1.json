@@ -82,7 +82,7 @@
       "data": { "action": "translate", "endPos": {"x": -15, "y": 0, "z": 25} }
     },
     {"start": 5, "end": 5.25, "actor_id": 0, "actor_type": "player",
-      "data": { "action": "rotate", "endRot": {"x": 0, "y": -3.1416, "z": 0} }
+      "data": { "action": "rotate", "endRot": {"x": 0, "y": 3.1416, "z": 0} }
     },
     {"start": 5, "end": 6, "actor_id": 0, "actor_type": "player",
       "data": { "action": "translate", "endPos": {"x": -15, "y": 0, "z": 0} }
