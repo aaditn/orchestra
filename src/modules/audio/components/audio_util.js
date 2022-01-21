@@ -93,6 +93,20 @@ const AudioUtil = {
 		AudioUtil.score = []
 	},
 
+	setupRecorder: () => {
+		const audioElem = document.querySelector('audio')
+		const actx  = Tone.context;
+		const dest  = actx.createMediaStreamDestination()
+		AudioUtil.recorder = new MediaRecorder(dest.stream)
+		AudioUtil.recorder.start()
+		AudioUtil.recorder.ondataavailable = e => { AudioUtil.chunks.push(e.data)}
+		AudioUtil.recorder.onstop = e => {
+			const blob = new Blob(AudioUtil.chunks.flat(), { type: 'audio/ogg; codecs=opus' })
+			audioElem.src = URL.createObjectURL(blob)
+		}
+		return dest
+	},
+
 	handleStartAudio: async function(fileUrl, durationCallback) {
 		// fetch the JSON audio data from fileUrl
 		const response = await fetch(fileUrl ,{
@@ -112,6 +126,7 @@ const AudioUtil = {
 		// playMidiFile(synth, "/midi/tchaik_serenade.mid")
 
 		// Turn recorder on by default
+		/*
 		const audio = document.querySelector('audio')
 		const actx  = Tone.context;
 		const dest  = actx.createMediaStreamDestination()
@@ -122,6 +137,8 @@ const AudioUtil = {
 			let blob = new Blob(AudioUtil.chunks.flat(), { type: 'audio/ogg; codecs=opus' })
 			audio.src = URL.createObjectURL(blob)
 		};
+		*/
+		const dest = AudioUtil.setupRecorder()
 		setTimeout(() => { AudioUtil.recorder.stop() }, 30000) // test dumping audio
 
 		// Play a score with multiple parts
