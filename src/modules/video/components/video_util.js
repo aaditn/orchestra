@@ -429,7 +429,7 @@ const VideoUtil = {
       endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    evt = new Event( VideoUtil.evtCount, sched + duration, sched + duration, playedKey, {
+    evt = new Event( VideoUtil.evtCount, sched + duration * 0.75, sched + duration * 0.75, playedKey, {
       action: "move", run_once: true,
       endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
     })
