@@ -418,10 +418,12 @@ const VideoUtil = {
     }
   },
 
-  queueHammerPiano: (playerIdx, sched, duration, note) => {
-    // let player = VideoUtil.players[playerIdx]
-
-    const playedKey = VideoUtil.piano.keys[Math.floor(Math.random() * 84)]
+  queuePianoKey: (playerIdx, sched, duration, note) => {
+    const keyIdx = VideoUtil.piano.keyMap[note] || 0
+    if (keyIdx == 0) {
+      console.log("ALERT: ", note)
+    }
+    const playedKey = VideoUtil.piano.keys[keyIdx]
     let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
       action: "move", run_once: true,
       endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
@@ -432,22 +434,6 @@ const VideoUtil = {
       endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    /*
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    if (upbow) { // Execute up bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-            action: "posture",
-            posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [28.5, -28.5]}]}]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    } else { // Execute down bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-            action: "posture",
-            posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-28.5, 28.5]}]}]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    }
-    */
   },
 
   drawFrame: () => {

@@ -87,6 +87,7 @@ export class Piano extends THREE.Group {
   constructor(pos, rot) {
     super();
     this.keys = []
+    this.keyMap = {}
     this.position.set(pos.x, pos.y, pos.z)
     this.rotation.x = rad(rot.x);
     this.rotation.y = rad(rot.y);
@@ -102,18 +103,29 @@ export class Piano extends THREE.Group {
 
 
     // 84 keys on the keyboard: C1 .. B7
+    let keyCount  = 0
+    let note      = null
+    const noteMap = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     for (let octave = 0; octave < 7; octave++) {
       for (let i = 0; i < 7; i++) {
         const wmaterial = new THREE.MeshLambertMaterial({ color: 0xeeeeee })
         let whitekey = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1, 5), wmaterial)
         whitekey.position.set(i + octave * 7 - BASELEN/2 + 1, 1.2, 0)
         this.keys.push(whitekey)
+        note = noteMap[i] + (octave + 1)
+        this.keyMap[note] = keyCount; keyCount++
+
 
         if (i != 2 && i != 6) {
           const bmaterial = new THREE.MeshLambertMaterial({ color: 0x444444 })
           let blackkey = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1, 3), bmaterial)
           blackkey.position.set(i + octave * 7 - BASELEN/2 + 1.5, 1.75, -0.5)
           this.keys.push(blackkey)
+          note = noteMap[i] + "#" + (octave + 1) // sharp of same key
+          this.keyMap[note] = keyCount
+          note = noteMap[(i+1)%7] + "b" + (octave + 1) // flat of next note
+          this.keyMap[note] = keyCount
+          keyCount++
         }
       }
     }

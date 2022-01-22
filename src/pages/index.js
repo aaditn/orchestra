@@ -22,7 +22,8 @@ export default function Home() {
   const pieces = {
     BumbleBee: "/data/music/flight_of_the_bumble_bee.json",
     BachFugue: "/data/music/fugue_sonata1_bach.json",
-    BachDouble: "/data/music/bach_double_vivace.json"
+    BachDouble: "/data/music/bach_double_vivace.json",
+    ChopinPrelude: "/data/music/chopin_prelude_eminor.json"
   }
 
   useEffect(() => {
@@ -98,6 +99,7 @@ export default function Home() {
             <MenuItem value={"BumbleBee"}>Bumble Bee</MenuItem>
             <MenuItem value={"BachFugue"}>Bach fugue</MenuItem>
             <MenuItem value={"BachDouble"}>Bach Double</MenuItem>
+            <MenuItem value={"ChopinPrelude"}>Chopin Prelude</MenuItem>
           </Select>
           &nbsp; &nbsp;
           <Button onClick={toggleAudio} variant="contained">

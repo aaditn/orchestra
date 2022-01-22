@@ -10,7 +10,7 @@ const AudioUtil = {
 	chunks: [],
     setVoices: (vs) => { AudioUtil.voices = vs },
 
-    // returns 0 (E), 1 (A), 2 (D) or 3 (G)
+	// returns 0 (E), 1 (A), 2 (D) or 3 (G)
     getViolinStringFromNote: (note) => {
 		// anything else is on E string
 		let strmap = {
@@ -78,7 +78,7 @@ const AudioUtil = {
 								}
 								break;
 							case "piano":
-								VideoUtil.queueHammerPiano(voiceIdx, vsched, vdur, note)
+								VideoUtil.queuePianoKey(voiceIdx, vsched, vdur, note)
 								break;
 						}
 
