@@ -73,20 +73,20 @@ const AudioUtil = {
     })
   },
 
+
   // synth, notes, startTime - returns duration on this synth
-  playNotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
+  playMIDINotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
     let bowdir = true
-    let curr = startTime // audio clock (Tone.now())
-    const voice = AudioUtil.voices[voiceIdx]
     notes.forEach((noteArr, i) => {
       let duration = 0
       noteArr.forEach((el, j) => {
         if (j == 0) {
-          duration = el * speed
+          vstartTime = el
+        } else if (j == 1) {
+          duration = el
         } else {
           const note = el
-          const vsched = vstartTime + (curr - startTime)
-          const vdur = duration
+          const vsched = vstartTime + startTime
           if (note != "R") { // "R" is a rest
             AudioUtil.queuePlayNote(synth, note, vsched, duration)
             switch (instrument) {
@@ -96,15 +96,54 @@ const AudioUtil = {
                   const strNum = AudioUtil.getViolinStringFromNote(note)
                   const fingerNum = AudioUtil.getViolinFingerFromNote(note)
                   // queue video event
-                  VideoUtil.queueMoveBow(voiceIdx, vsched, vdur, bowdir, strNum, fingerNum)
+                  if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
+                    VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
+                  }
                   bowdir = !bowdir
                 }
                 break;
               case "piano":
-                VideoUtil.queuePianoKey(voiceIdx, vsched, vdur, note)
+                VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
                 break;
             }
+          }
+        }
+      })
+      // curr += duration
+    })
+  },
 
+  // synth, notes, startTime - returns duration on this synth
+  playNotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
+    let bowdir = true
+    let curr = startTime // audio clock (Tone.now())
+    notes.forEach((noteArr, i) => {
+      let duration = 0
+      noteArr.forEach((el, j) => {
+        if (j == 0) {
+          duration = el * speed
+        } else {
+          const note = el
+          const vsched = vstartTime + (curr - startTime)
+          if (note != "R") { // "R" is a rest
+            AudioUtil.queuePlayNote(synth, note, vsched, duration)
+            switch (instrument) {
+              case "violin":
+                if (j == 1) {
+                  // push only once for chords
+                  const strNum = AudioUtil.getViolinStringFromNote(note)
+                  const fingerNum = AudioUtil.getViolinFingerFromNote(note)
+                  // queue video event
+                  if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
+                    VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
+                  }
+                  bowdir = !bowdir
+                }
+                break;
+              case "piano":
+                VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
+                break;
+            }
           }
         }
       })
@@ -128,7 +167,7 @@ const AudioUtil = {
   },
 
   stopRecorder: () => {
-    // this trigger callback recorder.onstop
+    // triggers callback recorder.onstop
     AudioUtil.recorder.stop()
   },
 
@@ -140,21 +179,48 @@ const AudioUtil = {
     AudioUtil.score = []
   },
 
-  handleStartAudio: async function (fileUrl, durationCallback) {
-    // fetch the JSON audio data from fileUrl
-    const response = await fetch(fileUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+  // json = {{ voice1: { instrument: "violin", muted: false, speed: 0.2, data: [}}, ...}
+  postProcessMIDI: (midi) => {
+    console.log("MIDI: ", midi)
+    midi.tracks.forEach(track => { // sort notes in each track by time
+      track.notes.sort((a, b) => (a.time > b.time) ? 1 : -1)
+    })
+    const modJson = {}
+    midi.tracks.forEach(track => { // sort notes in each track by time
+      const notes = []
+      for (let i = 0; i < track.notes.length; i++) {
+        const note = track.notes[i]
+        notes.push([note.time, note.duration, note.name]) // queue current note
+      }
+      if (notes.length > 0) { // (track.channel >= 1 && track.channel <= 15) {
+        modJson["voice" + track.channel] = {
+          "instrument": "piano",
+          "muted": false,
+          "speed": 1,
+          "data": notes
+        }
       }
     })
-    const responseJson = await response.json()
-    console.log(responseJson)
-    AudioUtil.setVoices(responseJson)
-    const num = []
-    for (let vname in responseJson) num.push(responseJson[vname].data.length)
+    return modJson
+  },
 
-    // AudioUtil.parseMidiFile()
+  handleStartAudio: async function (fileUrl, fileType, durationCallback) {
+    let responseJson = null
+    if (fileType == "json") { // handle JSON file
+      const response = await fetch(fileUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      responseJson = await response.json()
+      console.log(responseJson)
+      AudioUtil.setVoices(responseJson)
+    } else { // handle MIDI file
+      const midi = await Midi.fromUrl(fileUrl)
+      const modResponseJson = AudioUtil.postProcessMIDI(midi)
+      AudioUtil.setVoices(modResponseJson)
+    }
 
     // Turn recorder on by default
     const dest = AudioUtil.startRecorder()
@@ -182,12 +248,21 @@ const AudioUtil = {
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
         if (!blob.voice.muted) {
-          const dur =
-            AudioUtil.playNotes(
-              blob.synth, blob.voice.instrument, blob.voice.data,
-              now, vnow, blob.voice.speed, blobIdx
-            )
-          if (dur > maxDur) maxDur = dur
+          if (fileType == "json") {
+            const dur =
+              AudioUtil.playNotes(
+                blob.synth, blob.voice.instrument, blob.voice.data,
+                now, vnow, blob.voice.speed, blobIdx
+              )
+            if (dur > maxDur) maxDur = dur
+          } else if (fileType == "midi") {
+            const dur =
+              AudioUtil.playMIDINotes(
+                blob.synth, blob.voice.instrument, blob.voice.data,
+                now, vnow, blob.voice.speed, blobIdx
+              )
+            if (dur > maxDur) maxDur = dur
+          }
         }
       })
       durationCallback(maxDur)

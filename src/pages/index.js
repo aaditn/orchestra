@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import Head from 'next/head'
-import Image from 'next/image'
 import { AudioUtil } from '../modules/audio/components/audio_util'
 import { VideoUtil } from '../modules/video/components/video_util'
 import MusicPlayerSlider from '../modules/video/components/PlayerSlider'
@@ -20,10 +19,11 @@ export default function Home() {
   const [videoButtonText, setVideoButtonText] = useState("Start Video")
   const [pieceSelected, setPieceSelected] = useState("BachDouble")
   const pieces = {
-    BumbleBee: "/data/music/flight_of_the_bumble_bee.json",
-    BachFugue: "/data/music/fugue_sonata1_bach.json",
-    BachDouble: "/data/music/bach_double_vivace.json",
-    ChopinPrelude: "/data/music/chopin_prelude_eminor.json"
+    BumbleBee: {url: "/data/music/flight_of_the_bumble_bee.json", type: "json"},
+    BachFugue: {url: "/data/music/fugue_sonata1_bach.json", type: "json"},
+    BachDouble: {url: "/data/music/bach_double_vivace.json", type: "json"},
+    ChopinPrelude: {url: "/data/music/chopin_prelude_eminor.json", type: "json"},
+    NutcrackerWaltz: {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", type: "midi"}
   }
 
   useEffect(() => {
@@ -50,7 +50,8 @@ export default function Home() {
       setAudioRunning(false)
       setAudioButtonText("Start Audio")
     } else { // start video
-      AudioUtil.handleStartAudio(pieces[pieceSelected], setDuration)
+      const piece = pieces[pieceSelected]
+      AudioUtil.handleStartAudio(piece.url, piece.type, setDuration)
       setAudioRunning(true)
       setAudioButtonText("Stop Audio")
     }
@@ -100,6 +101,7 @@ export default function Home() {
             <MenuItem value={"BachFugue"}>Bach fugue</MenuItem>
             <MenuItem value={"BachDouble"}>Bach Double</MenuItem>
             <MenuItem value={"ChopinPrelude"}>Chopin Prelude</MenuItem>
+            <MenuItem value={"NutcrackerWaltz"}>Nutcracker Waltz</MenuItem>
           </Select>
           &nbsp; &nbsp;
           <Button onClick={toggleAudio} variant="contained">
