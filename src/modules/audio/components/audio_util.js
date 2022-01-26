@@ -194,7 +194,7 @@ const AudioUtil = {
       }
       if (notes.length > 0) { // (track.channel >= 1 && track.channel <= 15) {
         modJson["voice" + track.channel] = {
-          "instrument": "piano",
+          "instrument": "violin",
           "muted": false,
           "speed": 1,
           "data": notes

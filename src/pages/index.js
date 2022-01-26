@@ -23,7 +23,9 @@ export default function Home() {
     BachFugue: {url: "/data/music/fugue_sonata1_bach.json", type: "json"},
     BachDouble: {url: "/data/music/bach_double_vivace.json", type: "json"},
     ChopinPrelude: {url: "/data/music/chopin_prelude_eminor.json", type: "json"},
-    NutcrackerWaltz: {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", type: "midi"}
+    SerenadeStrings: {url: "/data/music/tchaik_serenade.mid", type: "midi"},
+    NutcrackerWaltz: {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", type: "midi"},
+    LucySky: {url: "/data/music/lucy_in_the_sky_with_diamonds.mid", type: "midi"}
   }
 
   useEffect(() => {
@@ -101,7 +103,9 @@ export default function Home() {
             <MenuItem value={"BachFugue"}>Bach fugue</MenuItem>
             <MenuItem value={"BachDouble"}>Bach Double</MenuItem>
             <MenuItem value={"ChopinPrelude"}>Chopin Prelude</MenuItem>
+            <MenuItem value={"SerenadeStrings"}>Serenade for Strings Waltz</MenuItem>
             <MenuItem value={"NutcrackerWaltz"}>Nutcracker Waltz</MenuItem>
+            <MenuItem value={"LucySky"}>Lucy in the Sky</MenuItem>
           </Select>
           &nbsp; &nbsp;
           <Button onClick={toggleAudio} variant="contained">
