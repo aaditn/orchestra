@@ -11,6 +11,18 @@ const AudioUtil = {
   chunks: [],
   setVoices: (vs) => { AudioUtil.voices = vs },
 
+  getInstrumentSampleMap: () => {
+    // clarinet samples are borked
+    return {
+      "violin": "violin", "viola": "violin", "cello": "cello", "contrabass": "contrabass",
+      "flute": "flute", "oboe": "flute", "clarinet": "flute", "bassoon": "bassoon",
+      "french horn": "french-horn", "trumpet": "trumpet", "trombone": "trombone",
+      "tuba": "tuba", "orchestra kit": "piano", "orchestral harp": "harp",
+      "string ensemble 1": "violin", "acoustic grand piano": "piano",
+      "pizzicato strings": "guitar-acoustic",
+    }
+  },
+
   // returns 0 (E), 1 (A), 2 (D) or 3 (G)
   getViolinStringFromNote: (note) => {
     // anything else is on E string
@@ -50,29 +62,6 @@ const AudioUtil = {
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
   },
-
-  parseMidiFile: async function(url) {
-    const midi = await Midi.fromUrl("/data/music/tchaikovsky_nutcracker_suite_flowers.mid")
-    // const name = midi.name
-    midi.tracks.forEach(track => {
-      //notes are an array
-      const notes = track.notes
-      notes.forEach(note => {
-        //note.midi, note.time, note.duration, note.name
-        console.log("track channel:", track.channel, " time:", note.time, " ticks:", note.ticks, " name:", note.name, " duration:", note.duration)
-      })
-
-      // the control changes are an objec, the keys are the CC number
-      track.controlChanges[64]
-      // they are also aliased to the CC number's common name (if it has one)
-      // track.controlChanges.sustain.forEach(cc => {
-        // cc.ticks, cc.value, cc.time
-      // })
-      // the track also has a channel and instrument
-      // track.instrument.name
-    })
-  },
-
 
   // synth, notes, startTime - returns duration on this synth
   playMIDINotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
@@ -182,19 +171,25 @@ const AudioUtil = {
   // json = {{ voice1: { instrument: "violin", muted: false, speed: 0.2, data: [}}, ...}
   postProcessMIDI: (midi) => {
     console.log("MIDI: ", midi)
+    const sampleMap = AudioUtil.getInstrumentSampleMap()
     midi.tracks.forEach(track => { // sort notes in each track by time
       track.notes.sort((a, b) => (a.time > b.time) ? 1 : -1)
     })
     const modJson = {}
     midi.tracks.forEach(track => { // sort notes in each track by time
       const notes = []
+      let instrument = "piano" // default instrument
+      const midi_instrument = track.instrument.name
+      if (midi_instrument in sampleMap) {
+        instrument = sampleMap[midi_instrument]
+      }
       for (let i = 0; i < track.notes.length; i++) {
         const note = track.notes[i]
         notes.push([note.time, note.duration, note.name]) // queue current note
       }
       if (notes.length > 0) { // (track.channel >= 1 && track.channel <= 15) {
         modJson["voice" + track.channel] = {
-          "instrument": "violin",
+          "instrument": instrument,
           "muted": false,
           "speed": 1,
           "data": notes
