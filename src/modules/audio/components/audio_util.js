@@ -6,10 +6,10 @@ import { VideoUtil, Event } from '../../video/components/video_util'
 const AudioUtil = {
 
   score: [],
-  voices: {},
+  tracks: {},
   recorder: null,
   chunks: [],
-  setVoices: (vs) => { AudioUtil.voices = vs },
+  setTracks: (trks) => { AudioUtil.tracks = trks },
 
   getInstrumentSampleMap: () => {
     // clarinet samples are borked
@@ -64,41 +64,34 @@ const AudioUtil = {
   },
 
   // synth, notes, startTime - returns duration on this synth
-  playMIDINotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
+  playMIDINotes: (synth, instrument, notes, startTime, voiceIdx) => {
     let bowdir = true
     notes.forEach((noteArr, i) => {
-      let duration = 0
-      noteArr.forEach((el, j) => {
-        if (j == 0) {
-          vstartTime = el
-        } else if (j == 1) {
-          duration = el
-        } else {
-          const note = el
-          const vsched = vstartTime + startTime
-          if (note != "R") { // "R" is a rest
-            AudioUtil.queuePlayNote(synth, note, vsched, duration)
-            switch (instrument) {
-              case "violin":
-                if (j == 1) {
-                  // push only once for chords
-                  const strNum = AudioUtil.getViolinStringFromNote(note)
-                  const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-                  // queue video event
-                  if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
-                    VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
-                  }
-                  bowdir = !bowdir
+      const vsched = noteArr[0] + startTime
+      let duration = noteArr[1]
+      for (let j = 2; j < noteArr.length; j++) {
+        const note = noteArr[j]
+        if (note != "R") { // "R" is a rest
+          AudioUtil.queuePlayNote(synth, note, vsched, duration)
+          switch (instrument) {
+            case "violin":
+              if (j == 2) {
+                // push only once for chords
+                const strNum = AudioUtil.getViolinStringFromNote(note)
+                const fingerNum = AudioUtil.getViolinFingerFromNote(note)
+                // queue video event
+                if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
+                  VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
                 }
-                break;
-              case "piano":
-                VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
-                break;
-            }
+                bowdir = !bowdir
+              }
+              break;
+            case "piano":
+              VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
+              break;
           }
         }
-      })
-      // curr += duration
+      }
     })
   },
 
@@ -210,11 +203,11 @@ const AudioUtil = {
       })
       responseJson = await response.json()
       console.log(responseJson)
-      AudioUtil.setVoices(responseJson)
+      AudioUtil.setTracks(responseJson)
     } else { // handle MIDI file
       const midi = await Midi.fromUrl(fileUrl)
       const modResponseJson = AudioUtil.postProcessMIDI(midi)
-      AudioUtil.setVoices(modResponseJson)
+      AudioUtil.setTracks(modResponseJson)
     }
 
     // Turn recorder on by default
@@ -222,9 +215,9 @@ const AudioUtil = {
 
     // Play a score with multiple parts
     AudioUtil.score = []
-    if (Object.keys(AudioUtil.voices).length > 0) {
-      for (let vname in AudioUtil.voices) {
-        const voice = AudioUtil.voices[vname]
+    if (Object.keys(AudioUtil.tracks).length > 0) {
+      for (let vname in AudioUtil.tracks) {
+        const voice = AudioUtil.tracks[vname]
         const synth = SampleLibrary.load({ instruments: voice.instrument });
         // const distortion = new Tone.Distortion(0.5);
         // const filter = new Tone.AutoFilter(4).start();
@@ -232,6 +225,7 @@ const AudioUtil = {
         // synth.chain(panner3d, Tone.Destination)
         synth.toDestination()
         synth.connect(dest) // connect synth to AudioUtil.recorder as well
+        synth.volume.value = -12
         AudioUtil.score.push({ synth: synth, voice: voice })
       }
     }
@@ -252,10 +246,7 @@ const AudioUtil = {
             if (dur > maxDur) maxDur = dur
           } else if (fileType == "midi") {
             const dur =
-              AudioUtil.playMIDINotes(
-                blob.synth, blob.voice.instrument, blob.voice.data,
-                now, vnow, blob.voice.speed, blobIdx
-              )
+              AudioUtil.playMIDINotes( blob.synth, blob.voice.instrument, blob.voice.data, now, blobIdx )
             if (dur > maxDur) maxDur = dur
           }
         }
