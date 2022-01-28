@@ -9,6 +9,7 @@ const AudioUtil = {
   tracks: {},
   recorder: null,
   chunks: [],
+  trackPlayerMap: {},
   setTracks: (trks) => { AudioUtil.tracks = trks },
 
   getInstrumentSampleMap: () => {
@@ -64,7 +65,7 @@ const AudioUtil = {
   },
 
   // synth, notes, startTime - returns duration on this synth
-  playMIDINotes: (synth, instrument, notes, startTime, voiceIdx) => {
+  playMIDINotes: (synth, instrument, notes, startTime, trackIdx) => {
     let bowdir = true
     notes.forEach((noteArr, i) => {
       const vsched = noteArr[0] + startTime
@@ -80,14 +81,14 @@ const AudioUtil = {
                 const strNum = AudioUtil.getViolinStringFromNote(note)
                 const fingerNum = AudioUtil.getViolinFingerFromNote(note)
                 // queue video event
-                if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
-                  VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
+                if (trackIdx < 2) { // TODO - fix this hack - 2 players needs generalization
+                  VideoUtil.queueMoveBow(trackIdx, vsched, duration, bowdir, strNum, fingerNum)
                 }
                 bowdir = !bowdir
               }
               break;
             case "piano":
-              VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
+              VideoUtil.queuePianoKey(trackIdx, vsched, duration, note)
               break;
           }
         }
@@ -96,7 +97,7 @@ const AudioUtil = {
   },
 
   // synth, notes, startTime - returns duration on this synth
-  playNotes: (synth, instrument, notes, startTime, vstartTime, speed, voiceIdx) => {
+  playNotes: (synth, instrument, notes, startTime, vstartTime, speed, trackIdx) => {
     let bowdir = true
     let curr = startTime // audio clock (Tone.now())
     notes.forEach((noteArr, i) => {
@@ -116,14 +117,14 @@ const AudioUtil = {
                   const strNum = AudioUtil.getViolinStringFromNote(note)
                   const fingerNum = AudioUtil.getViolinFingerFromNote(note)
                   // queue video event
-                  if (voiceIdx < 2) { // TODO - fix this hack - 2 players needs generalization
-                    VideoUtil.queueMoveBow(voiceIdx, vsched, duration, bowdir, strNum, fingerNum)
+                  if (trackIdx < 2) { // TODO - fix this hack - 2 players needs generalization
+                    VideoUtil.queueMoveBow(trackIdx, vsched, duration, bowdir, strNum, fingerNum)
                   }
                   bowdir = !bowdir
                 }
                 break;
               case "piano":
-                VideoUtil.queuePianoKey(voiceIdx, vsched, duration, note)
+                VideoUtil.queuePianoKey(trackIdx, vsched, duration, note)
                 break;
             }
           }
@@ -155,8 +156,8 @@ const AudioUtil = {
 
   handleStopAudio: () => {
     AudioUtil.stopRecorder()
-    AudioUtil.score.forEach((voiceBlob) => {
-      voiceBlob.synth.dispose()
+    AudioUtil.score.forEach((trackBlob) => {
+      trackBlob.synth.dispose()
     })
     AudioUtil.score = []
   },
@@ -214,19 +215,33 @@ const AudioUtil = {
     const dest = AudioUtil.startRecorder()
 
     // Play a score with multiple parts
+    AudioUtil.trackPlayerMap = { violins: {}, pianos: {}}
     AudioUtil.score = []
     if (Object.keys(AudioUtil.tracks).length > 0) {
+      let trackCount = 0
       for (let vname in AudioUtil.tracks) {
-        const voice = AudioUtil.tracks[vname]
-        const synth = SampleLibrary.load({ instruments: voice.instrument });
+        const track = AudioUtil.tracks[vname]
+        const synth = SampleLibrary.load({ instruments: track.instrument });
         // const distortion = new Tone.Distortion(0.5);
         // const filter = new Tone.AutoFilter(4).start();
         // const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
         // synth.chain(panner3d, Tone.Destination)
         synth.toDestination()
         synth.connect(dest) // connect synth to AudioUtil.recorder as well
-        synth.volume.value = -12
-        AudioUtil.score.push({ synth: synth, voice: voice })
+        synth.volume.value = -6
+
+        //---- Start Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
+        if (track.instrument == "violin") {
+          if (Object.keys(AudioUtil.trackPlayerMap.violins).length < 2) {
+            const nextId = Object.keys(AudioUtil.trackPlayerMap.violins).length
+            const blobIdx = AudioUtil.score.length
+            AudioUtil.trackPlayerMap.violins[blobIdx] = nextId
+          }
+        }
+        //---- End Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
+
+        AudioUtil.score.push({ synth: synth, track: track })
+        trackCount++
       }
     }
 
@@ -236,17 +251,21 @@ const AudioUtil = {
       console.log("Audio start at:", now)
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
-        if (!blob.voice.muted) {
+        if (!blob.track.muted) {
           if (fileType == "json") {
             const dur =
               AudioUtil.playNotes(
-                blob.synth, blob.voice.instrument, blob.voice.data,
-                now, vnow, blob.voice.speed, blobIdx
+                blob.synth, blob.track.instrument, blob.track.data,
+                now, vnow, blob.track.speed, blobIdx
               )
             if (dur > maxDur) maxDur = dur
           } else if (fileType == "midi") {
+            let trackIdx = blobIdx
+            if (blob.track.instrument == "violin") {
+              trackIdx = AudioUtil.trackPlayerMap.violins[blobIdx]
+            }
             const dur =
-              AudioUtil.playMIDINotes( blob.synth, blob.voice.instrument, blob.voice.data, now, blobIdx )
+              AudioUtil.playMIDINotes( blob.synth, blob.track.instrument, blob.track.data, now, trackIdx )
             if (dur > maxDur) maxDur = dur
           }
         }

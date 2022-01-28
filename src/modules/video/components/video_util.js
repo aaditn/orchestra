@@ -186,7 +186,6 @@ const VideoUtil = {
 
   processEventData: (evtsData) => {
     // Handle (movie) event data after assets have been loaded
-    const eventsData = VideoUtil.movie.events
     let actor
     evtsData.forEach((e) => {
       switch (e.actor_type) {
@@ -415,9 +414,7 @@ const VideoUtil = {
     VideoUtil.gameCounter++
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0
     if (VideoUtil.gameCounter % 10 == 0) {
-      // console.log("t = ", t, " count = ", VideoUtil.gameCounter)
-      // const player = VideoUtil.players[1]
-      // console.log("POSTURE l_finger: ", player.l_arm.posture)
+      // keep for debugging
     }
 
     // cycle through events and process as needed
