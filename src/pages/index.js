@@ -17,16 +17,17 @@ export default function Home() {
   const [audioButtonText, setAudioButtonText] = useState("Start Audio")
   const [videoRunning, setVideoRunning] = useState(false)
   const [videoButtonText, setVideoButtonText] = useState("Start Video")
-  const [pieceSelected, setPieceSelected] = useState("BachDouble")
-  const pieces = {
-    BumbleBee: {url: "/data/music/flight_of_the_bumble_bee.json", type: "json"},
-    BachFugue: {url: "/data/music/fugue_sonata1_bach.json", type: "json"},
-    BachDouble: {url: "/data/music/bach_double_vivace.json", type: "json"},
-    ChopinPrelude: {url: "/data/music/chopin_prelude_eminor.json", type: "json"},
-    SerenadeStrings: {url: "/data/music/tchaik_serenade.mid", type: "midi"},
-    NutcrackerWaltz: {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", type: "midi"},
-    LucySky: {url: "/data/music/lucy_in_the_sky_with_diamonds.mid", type: "midi"}
-  }
+  const [pieceSelected, setPieceSelected] = useState(0)
+  const pieces = [
+    {url: "/data/music/flight_of_the_bumble_bee.json", name: "Bumble Bee", type: "json"},
+    {url: "/data/music/fugue_sonata1_bach.json", name: "Bach Fugue", type: "json"},
+    {url: "/data/music/bach_double_vivace.json", name: "Bach Double", type: "json"},
+    {url: "/data/music/chopin_prelude_eminor.json", name: "Chopin Prelude", type: "json"},
+    {url: "/data/music/tchaik_serenade.mid", name: "Tchaikovsky Serenade", type: "midi"},
+    {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", name: "Nutcracker Waltz", type: "midi"},
+    {url: "/data/music/lucy_in_the_sky_with_diamonds.mid", name: "Lucy in the Sky", type: "midi"},
+    {url: "/data/music/abba_thank_you.mid", name: "ABBA - Thank You", type: "midi"},
+  ]
 
   useEffect(() => {
     VideoUtil.initScene(setAssetsLoaded, true)
@@ -39,6 +40,8 @@ export default function Home() {
       document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
       setVideoRunning(true)
       setVideoButtonText("Pause Video")
+      const piece = pieces[0]
+      AudioUtil.loadAudioFile(piece.url, piece.type)
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
     } else {
       document.getElementById("three-scene").innerHTML = ""
@@ -81,6 +84,8 @@ export default function Home() {
 
   const changePieceSelected = (evt) => {
     setPieceSelected(evt.target.value)
+    const piece = pieces[evt.target.value]
+    AudioUtil.loadAudioFile(piece.url, piece.type)
   }
 
   return (
@@ -99,13 +104,9 @@ export default function Home() {
             label="Select Music"
             onChange={changePieceSelected}
           >
-            <MenuItem value={"BumbleBee"}>Bumble Bee</MenuItem>
-            <MenuItem value={"BachFugue"}>Bach fugue</MenuItem>
-            <MenuItem value={"BachDouble"}>Bach Double</MenuItem>
-            <MenuItem value={"ChopinPrelude"}>Chopin Prelude</MenuItem>
-            <MenuItem value={"SerenadeStrings"}>Serenade for Strings Waltz</MenuItem>
-            <MenuItem value={"NutcrackerWaltz"}>Nutcracker Waltz</MenuItem>
-            <MenuItem value={"LucySky"}>Lucy in the Sky</MenuItem>
+            {pieces.map((piece, pieceIdx) => (
+              <MenuItem key={pieceIdx} value={pieceIdx}>{piece.name}</MenuItem>
+            ))}
           </Select>
           &nbsp; &nbsp;
           <Button onClick={toggleAudio} variant="contained">

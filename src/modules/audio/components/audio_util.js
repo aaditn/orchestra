@@ -193,7 +193,26 @@ const AudioUtil = {
     return modJson
   },
 
-  handleStartAudio: async function (fileUrl, fileType, durationCallback) {
+  loadAudioFile: async function (fileUrl, fileType) {
+    if (fileType == "json") { // handle JSON file
+      const response = await fetch(fileUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      const responseJson = await response.json()
+      console.log(responseJson)
+      AudioUtil.setTracks(responseJson)
+    } else { // handle MIDI file
+      const midi = await Midi.fromUrl(fileUrl)
+      const modResponseJson = AudioUtil.postProcessMIDI(midi)
+      AudioUtil.setTracks(modResponseJson)
+    }
+  },
+
+  handleStartAudio: function (fileUrl, fileType, durationCallback) {
+    /*
     let responseJson = null
     if (fileType == "json") { // handle JSON file
       const response = await fetch(fileUrl, {
@@ -210,6 +229,7 @@ const AudioUtil = {
       const modResponseJson = AudioUtil.postProcessMIDI(midi)
       AudioUtil.setTracks(modResponseJson)
     }
+    */
 
     // Turn recorder on by default
     const dest = AudioUtil.startRecorder()
