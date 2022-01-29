@@ -693,7 +693,7 @@ class Finger extends Phalange {
 		super(parentJoint, [1.2, 1.5, 1, 0, 45, 0.3, 0.4, 0.2]);
 		this.tips = new Phalange(this, [1.2, 1, 1, 45, 45, 0.3, 0.4, 0.2]);
 		this.position.z += zDelta
-		this.minRot = new Vector3(0, 0, -10);
+		this.minRot = new Vector3(0, 0, -100);
 		this.maxRot = new Vector3(0, 0, 120);
 	} // Finger.constructor
 

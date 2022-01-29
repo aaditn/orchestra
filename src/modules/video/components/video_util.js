@@ -343,29 +343,23 @@ const VideoUtil = {
     let player = VideoUtil.players[playerIdx]
     // Put the left finger down
 
-    /*
-    for (let i = 1; i < 4; i++) { // finger numbers
+    for (let i = 1; i <= 4; i++) { // finger numbers
       if (i == fingerNum) {
         let pos = {}
-        pos['l_finger' + i] = [{bend: [60, 50]}, [{turn: [-90, -90]}]]
-        let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+        pos['l_finger' + i] = [{bend: [90, 90]}]
+        let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
         VideoUtil.all_events[VideoUtil.evtCount++] = evt
-        // player['l_finger' + i].bend = 60
-        // player['l_finger' + i].turn = -90
       } else {
         let pos = {}
-        pos['l_finger' + i] = [{bend: [40, 40]}, [{turn: [-80, -80]}]]
-        let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+        pos['l_finger' + i] = [{bend: [30, 30]}]
+        let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
         VideoUtil.all_events[VideoUtil.evtCount++] = evt
-        // player['l_finger' + i].bend = 40
-        // player['l_finger' + i].turn = -80
       }
     }
-    */
 
     let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
           action: "posture", run_once: true,
@@ -416,6 +410,16 @@ const VideoUtil = {
     if (VideoUtil.gameCounter % 10 == 0) {
       // keep for debugging
     }
+    /*
+    const player = VideoUtil.players[0]
+    if (VideoUtil.gameCounter % 100 < 50) {
+      player.l_finger1.bend = 30
+      player.l_finger2.bend = 30
+    } else {
+      player.l_finger1.bend = 90
+      player.l_finger2.bend = 90
+    }
+    */
 
     // cycle through events and process as needed
     for (let evtId in VideoUtil.all_events) {

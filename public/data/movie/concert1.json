@@ -112,7 +112,7 @@
           {"r_arm": [{"straddle": [0,90]}, {"tilt": [0,0]}]},
           {"r_elbow": [{"bend": [0,0]}]},
           {"r_wrist": [{"tilt": [0,-10]}, {"bend": [0,0]}]},
-          {"l_arm": [{"raise": [0,35]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
+          {"l_arm": [{"raise": [0,40]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
           {"l_elbow": [{"bend": [0,75]}, {"turn": [0,0]}]},
           {"l_wrist": [{"tilt": [0,-120]}, {"bend": [0,0]}, {"turn": [0,155]}]},
           {"position": {"x": null, "y": -17, "z": null}}
@@ -176,7 +176,7 @@
           {"r_arm": [{"straddle": [0,90]}, {"tilt": [0,0]}]},
           {"r_elbow": [{"bend": [0,0]}]},
           {"r_wrist": [{"tilt": [0,-10]}, {"bend": [0,0]}]},
-          {"l_arm": [{"raise": [0,35]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
+          {"l_arm": [{"raise": [0,40]}, {"straddle": [0,10]}, {"turn": [0,-10]}]},
           {"l_elbow": [{"bend": [0,75]}, {"turn": [0,0]}]},
           {"l_wrist": [{"tilt": [0,-120]}, {"bend": [0,0]}, {"turn": [0,155]}]},
           {"position": {"x": null, "y": -17, "z": null}}

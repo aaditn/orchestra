@@ -72,7 +72,8 @@ const VideoActions = {
 		const bodyParts = [
 			'pelvis', 'torso', 'neck', 'head',
 			'l_arm', 'l_elbow', 'l_wrist', 'r_arm', 'r_elbow', 'r_wrist',
-			'l_leg', 'l_knee', 'l_ankle', 'r_leg', 'r_knee', 'r_ankle'
+			'l_leg', 'l_knee', 'l_ankle', 'r_leg', 'r_knee', 'r_ankle',
+			'l_finger1', 'l_finger2', 'l_finger3', 'l_finger4'
 		]
 		const posture = evt.data.posture
 		posture.forEach((pos) => {
