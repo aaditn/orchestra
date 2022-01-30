@@ -37,7 +37,7 @@ export default function Home() {
   useEffect(() => {
     console.log("Assetsloaded = ", assetsLoaded)
     if (assetsLoaded) {
-      document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
+      VideoUtil.attachRendererToDOM()
       setVideoRunning(true)
       setVideoButtonText("Pause Video")
       const piece = pieces[0]

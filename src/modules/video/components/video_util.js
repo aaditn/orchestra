@@ -83,7 +83,7 @@ const VideoUtil = {
     onWindowResize()
 
     const texture = new THREE.TextureLoader().load("/textures/wood_floor.jpg")
-    var ground = new THREE.Mesh(
+    const ground = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(1000, 1000),
       new THREE.MeshPhongMaterial({
         color: 'antiquewhite',
@@ -101,13 +101,124 @@ const VideoUtil = {
     VideoUtil.clock = new Clock()
   },
 
+  // Remove children of scene
+  clearScene: () => {
+    let i = VideoUtil.scene.children.length
+    while (i--) {
+      const child = VideoUtil.scene.children[i]
+      if (
+        child instanceof Male || child instanceof Chair || child instanceof Piano ||
+        child instanceof THREE.SpotLight ||
+        child instanceof THREE.AmbientLight || child instanceof THREE.PointLight) {
+        VideoUtil.scene.children.splice(i, 1)
+      }
+    }
+  },
+
+  // layout scene triggered by choice of song, done dynamically
+  // sceneSpec specifies how many players (position) and what type
+  layoutScene: (sceneSpec) => {
+    VideoUtil.players = []
+
+    // handle actor data
+    const actorsData = VideoUtil.movie.actors
+    actorsData.forEach((actorData) => {
+      const actor = VideoUtil.processActorData(actorData)
+      VideoUtil.players.push(actor)
+    })
+    for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
+      const actor = VideoUtil.players[i]
+      actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
+      const bow = new Bow()
+      actor.r_finger1.attach(bow)
+      VideoUtil.bows.push(bow)
+    }
+
+    VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
+    VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
+    VideoUtil.scene.add(VideoUtil.piano)
+
+    // handle lights
+    const lights = VideoUtil.movie.lights
+    lights.forEach((l) => {
+      let light = VideoUtil.processLightData(l)
+      if (light) {
+        VideoUtil.scene.add(light)
+        VideoUtil.lights.push(light)
+      }
+    })
+
+  },
+
+  initScene: (doneCallback, doneVal) => {
+    VideoUtil.createScene()
+    Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
+    Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
+
+    VideoUtil.players = []
+
+    // Load movie script
+    VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
+
+      // handle actor data
+      const actorsData = VideoUtil.movie.actors
+      actorsData.forEach((actorData) => {
+        const actor = VideoUtil.processActorData(actorData)
+        VideoUtil.players.push(actor)
+      })
+      for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
+        const actor = VideoUtil.players[i]
+        // actor.torso.attach(new Violin(17, 7, 20))
+        actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
+        const bow = new Bow()
+        actor.r_finger1.attach(bow)
+        VideoUtil.bows.push(bow)
+      }
+      VideoUtil.loadAssets(doneCallback, doneVal)
+
+      VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
+      VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
+      VideoUtil.scene.add(VideoUtil.piano)
+
+      // handle lights
+      const lights = VideoUtil.movie.lights
+      lights.forEach((l) => {
+        let light = VideoUtil.processLightData(l)
+        if (light) {
+          VideoUtil.scene.add(light)
+          VideoUtil.lights.push(light)
+        }
+      })
+
+    })
+  },
+
+  attachRendererToDOM: () => {
+    document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
+  },
+
+  // Move to general util file
+  makeId: (len) => {
+    let res      = ''
+    const chars  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    var charsLen = chars.length
+    for ( var i = 0; i < len; i++ ) {
+      res += chars.charAt(Math.floor(Math.random() * charsLen))
+    }
+    return res
+  },
+
+  createPlayer: (pos = {x: 0, y: 0, z: 0}, rot = {x: 0, y: 0, z: 0}) => {
+    return processActorData({ ID: VideoUtil.makeId(4), position: pos, rotation: rot })
+  },
+
+
   processActorData: (actorData) => {
     const actor = new Male()
     actor.head.hide()
 
     const pos = actorData.position
     const rot = actorData.rotation
-    const posture = actorData.posture
     actor.ID = actorData.ID
     if (pos) {
       actor.position.set(pos.x, pos.y, pos.z)
@@ -116,19 +227,6 @@ const VideoUtil = {
       actor.rotation.x = rot.x
       actor.rotation.y = rot.y
       actor.rotation.z = rot.z
-    }
-    // posture needs to be an array, order of transformations matters
-    for (let i in posture) {
-      const postureElem = posture[i]
-      for (let postureKey in postureElem) {
-        if (typeof postureElem[postureKey] == "object") {
-          for (let subkey in postureElem[postureKey]) {
-            actor[postureKey][subkey] = postureElem[postureKey][subkey]
-          }
-        } else {
-          actor[postureKey] = postureElem[postureKey]
-        }
-      }
     }
     return actor
   },
@@ -294,50 +392,6 @@ const VideoUtil = {
       doneCallback(doneVal) // callback after assets loaded
     }) // end of Promise.all
   },
-
-  initScene: (doneCallback, doneVal) => {
-    VideoUtil.createScene()
-    Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
-    Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
-
-    VideoUtil.players = []
-
-    // Load movie script
-    VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
-
-      // handle actor data
-      const actorsData = VideoUtil.movie.actors
-      actorsData.forEach((actorData) => {
-        const actor = VideoUtil.processActorData(actorData)
-        VideoUtil.players.push(actor)
-      })
-      for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
-        const actor = VideoUtil.players[i]
-        // actor.torso.attach(new Violin(17, 7, 20))
-        actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
-        const bow = new Bow()
-        actor.r_finger1.attach(bow)
-        VideoUtil.bows.push(bow)
-      }
-      VideoUtil.loadAssets(doneCallback, doneVal)
-
-      VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
-      VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
-      VideoUtil.scene.add(VideoUtil.piano)
-
-      // handle lights
-      const lights = VideoUtil.movie.lights
-      lights.forEach((l) => {
-        let light = VideoUtil.processLightData(l)
-        if (light) {
-          VideoUtil.scene.add(light)
-          VideoUtil.lights.push(light)
-        }
-      })
-
-    })
-  },
-
 
   queueMoveBow: (playerIdx, sched, duration, upbow, strNum, fingerNum) => {
     let player = VideoUtil.players[playerIdx]
