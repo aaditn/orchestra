@@ -126,8 +126,9 @@ const VideoActions = {
 		const duration = evt.end - evt.start
 		const synth = evt.data.synth
 		const note  = evt.data.note
-		// console.log("Playing note at: ", when, " dur = ", duration)
-		synth.triggerAttackRelease(note, duration)
+		const velocity = evt.data.velocity || 0.5
+		// console.log("Playing note at: ", evt.start, " velocity = ", velocity)
+		synth.triggerAttackRelease(note, duration, "+0", velocity)
 		evt.iter++
 	}
 }

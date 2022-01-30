@@ -56,10 +56,11 @@ const AudioUtil = {
     }
   },
 
-  queuePlayNote: (synth, note, when, duration) => {
+  queuePlayNote: (synth, note, when, duration, velocity) => {
     const player = null
+    const vel    = velocity || 0.5
     let evt = new Event(VideoUtil.evtCount, when, when + duration, player, {
-      action: "playNote", synth: synth, note: note, run_once: true
+      action: "playNote", synth: synth, note: note, run_once: true, velocity: vel
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
   },
@@ -67,16 +68,18 @@ const AudioUtil = {
   // synth, notes, startTime - returns duration on this synth
   playMIDINotes: (synth, instrument, notes, startTime, trackIdx) => {
     let bowdir = true
+    const len  = notes.length
     notes.forEach((noteArr, i) => {
-      const vsched = noteArr[0] + startTime
-      let duration = noteArr[1]
-      for (let j = 2; j < noteArr.length; j++) {
+      const vsched   = noteArr[0] + startTime
+      const duration = noteArr[1]
+      const velocity = noteArr[2]
+      for (let j = 3; j < noteArr.length; j++) {
         const note = noteArr[j]
         if (note != "R") { // "R" is a rest
-          AudioUtil.queuePlayNote(synth, note, vsched, duration)
+          AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity)
           switch (instrument) {
             case "violin":
-              if (j == 2) {
+              if (j == 3) {
                 // push only once for chords
                 const strNum = AudioUtil.getViolinStringFromNote(note)
                 const fingerNum = AudioUtil.getViolinFingerFromNote(note)
@@ -179,7 +182,7 @@ const AudioUtil = {
       }
       for (let i = 0; i < track.notes.length; i++) {
         const note = track.notes[i]
-        notes.push([note.time, note.duration, note.name]) // queue current note
+        notes.push([note.time, note.duration, note.velocity, note.name]) // queue current note
       }
       if (notes.length > 0) { // (track.channel >= 1 && track.channel <= 15) {
         modJson["voice" + track.channel] = {
@@ -212,25 +215,6 @@ const AudioUtil = {
   },
 
   handleStartAudio: function (fileUrl, fileType, durationCallback) {
-    /*
-    let responseJson = null
-    if (fileType == "json") { // handle JSON file
-      const response = await fetch(fileUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
-      responseJson = await response.json()
-      console.log(responseJson)
-      AudioUtil.setTracks(responseJson)
-    } else { // handle MIDI file
-      const midi = await Midi.fromUrl(fileUrl)
-      const modResponseJson = AudioUtil.postProcessMIDI(midi)
-      AudioUtil.setTracks(modResponseJson)
-    }
-    */
-
     // Turn recorder on by default
     const dest = AudioUtil.startRecorder()
 
