@@ -194,8 +194,13 @@ const VideoUtil = {
             angle: 0.35, castShadow: true
           }
         },
-        {instrument: "cello", position: {x: -20, y: 3, z: -25}, rotation: {x: 0, y: 0.75, z: 0}},
-        {instrument: "cello", position: {x: 20, y: 3, z: -25}, rotation: {x: 0, y: -0.75, z: 0}},
+        {instrument: "violin", position: {x: -70, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {instrument: "violin", position: {x: -100, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {instrument: "violin", position: {x: -130, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {instrument: "violin", position: {x: -160, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {instrument: "violin", position: {x: -50, y: 3, z: -50}, rotation: {x: 0, y: 0.75, z: 0}},
+        {instrument: "cello", position: {x: -25, y: 3, z: -25}, rotation: {x: 0, y: 0.75, z: 0}},
+        {instrument: "cello", position: {x: 25, y: 3, z: -25}, rotation: {x: 0, y: -0.75, z: 0}},
         {instrument: "cello", position: {x: 40, y: 3, z: 0}, rotation: {x: 0, y: -1.571, z: 0}},
       ],
       lights: [

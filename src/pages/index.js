@@ -29,6 +29,9 @@ export default function Home() {
     {url: "/data/music/abba_thank_you.mid", name: "ABBA - Thank You", type: "midi"},
     {url: "/data/music/abba_dancing_queen.mid", name: "ABBA - Dancing Queen", type: "midi"},
     {url: "/data/music/nessun_dorma.mid", name: "Nessun Dorma", type: "midi"},
+    {url: "/data/music/let_it_be.mid", name: "Beatles - Let It Be", type: "midi"},
+    {url: "/data/music/ode_to_joy.mid", name: "Ode to Joy", type: "midi"},
+    {url: "/data/music/brandenburg_3.mid", name: "Brandenburg Number 3", type: "midi"},
   ]
 
   useEffect(() => {
