@@ -50,7 +50,7 @@ const VideoUtil = {
   clock: null,
   controls: null,
   movie: {},
-  players: [],
+  players: {},
   all_events: {},
   bows: [],
   piano: null,
@@ -118,35 +118,61 @@ const VideoUtil = {
   // layout scene triggered by choice of song, done dynamically
   // sceneSpec specifies how many players (position) and what type
   layoutScene: (sceneSpec) => {
-    VideoUtil.players = []
+    VideoUtil.players = {}
+    VideoUtil.lights  = []
 
     // handle actor data
-    const actorsData = VideoUtil.movie.actors
-    actorsData.forEach((actorData) => {
-      const actor = VideoUtil.processActorData(actorData)
-      VideoUtil.players.push(actor)
-    })
-    for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
-      const actor = VideoUtil.players[i]
-      actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
-      const bow = new Bow()
-      actor.r_finger1.attach(bow)
-      VideoUtil.bows.push(bow)
+    const actorsArr = sceneSpec.actors
+    if (actorsArr) {
+      actorsArr.forEach((actorSpec) => {
+        let bow
+        
+        const actor = VideoUtil.processActorSpec(actorSpec)
+        actor.instrument = actorSpec.instrument
+        VideoUtil.players[actor.ID] = actor
+        switch (actor.instrument) {
+          case "violin":
+          case "cello":
+            actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
+            bow = new Bow()
+            actor.r_finger1.attach(bow)
+            VideoUtil.bows.push(bow)
+            break;
+          case "viola":
+            break
+          case "piano":
+            break;
+        }
+        if (actorSpec.light) {
+          actorSpec.light.target = {actor: "player", actor_id: actor.ID}
+          const light = VideoUtil.processLightData(actorSpec.light)
+          if (light) {
+            VideoUtil.scene.add(light)
+            VideoUtil.lights.push(light)
+          }
+        }
+        /*
+        VideoUtil.players.push(actor)
+        */
+      })
+    }
+    // handle independent lights (not tied to actors)
+    const lightsArr = sceneSpec.lights
+    if (lightsArr) {
+      lightsArr.forEach((lightSpec) => {
+        const light = VideoUtil.processLightData(lightSpec)
+        if (light) {
+          VideoUtil.scene.add(light)
+          VideoUtil.lights.push(light)
+        }
+      })
     }
 
+    /*
     VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
     VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
     VideoUtil.scene.add(VideoUtil.piano)
-
-    // handle lights
-    const lights = VideoUtil.movie.lights
-    lights.forEach((l) => {
-      let light = VideoUtil.processLightData(l)
-      if (light) {
-        VideoUtil.scene.add(light)
-        VideoUtil.lights.push(light)
-      }
-    })
+    */
 
   },
 
@@ -155,15 +181,42 @@ const VideoUtil = {
     Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
     Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
 
-    VideoUtil.players = []
+    VideoUtil.players = {}
 
+    const sceneSpec = {
+      actors: [
+        {
+          position: {x: -40, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0},
+          instrument: "violin", 
+          light: {
+            type: "SpotLight", color: "white", intensity: 0.2,
+            position: {x: -40, y: 40, z: 0}, "mapSize.width": 1024, "mapSize.height": 1024,
+            angle: 0.35, castShadow: true
+          }
+        },
+        {instrument: "cello", position: {x: -20, y: 3, z: -25}, rotation: {x: 0, y: 0.75, z: 0}},
+        {instrument: "cello", position: {x: 20, y: 3, z: -25}, rotation: {x: 0, y: -0.75, z: 0}},
+        {instrument: "cello", position: {x: 40, y: 3, z: 0}, rotation: {x: 0, y: -1.571, z: 0}},
+      ],
+      lights: [
+        {type: "AmbientLight", color: "white", intensity: 0.5},
+        {type: "PointLight", color: "white", intensity: 0.5, position: {x: 0, y: 100, z: 0},
+          "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
+      ]
+    }
+    VideoUtil.layoutScene(sceneSpec)
+    VideoUtil.loadAssets(doneCallback, doneVal)
     // Load movie script
+
     VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
 
       // handle actor data
+      /*
       const actorsData = VideoUtil.movie.actors
       actorsData.forEach((actorData) => {
-        const actor = VideoUtil.processActorData(actorData)
+        const actor = VideoUtil.processActorSpec(actorData)
+        actor.instrument = actorSpec.instrument
+        VideoUtil.players[actor.ID] = actor
         VideoUtil.players.push(actor)
       })
       for (let i = 0; i < 2; i++) { // violin + bow for player[0], player[1]
@@ -179,8 +232,10 @@ const VideoUtil = {
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
       VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
       VideoUtil.scene.add(VideoUtil.piano)
+      */
 
       // handle lights
+      /*
       const lights = VideoUtil.movie.lights
       lights.forEach((l) => {
         let light = VideoUtil.processLightData(l)
@@ -189,6 +244,7 @@ const VideoUtil = {
           VideoUtil.lights.push(light)
         }
       })
+      */
 
     })
   },
@@ -208,18 +264,13 @@ const VideoUtil = {
     return res
   },
 
-  createPlayer: (pos = {x: 0, y: 0, z: 0}, rot = {x: 0, y: 0, z: 0}) => {
-    return processActorData({ ID: VideoUtil.makeId(4), position: pos, rotation: rot })
-  },
-
-
-  processActorData: (actorData) => {
+  processActorSpec: (actorData) => {
     const actor = new Male()
-    actor.head.hide()
+    actor.ID  = VideoUtil.makeId(4)
+    // actor.head.hide()
 
     const pos = actorData.position
     const rot = actorData.rotation
-    actor.ID = actorData.ID
     if (pos) {
       actor.position.set(pos.x, pos.y, pos.z)
     }
@@ -233,6 +284,9 @@ const VideoUtil = {
 
   processLightData: (ldata) => {
     let light
+    if (ldata.inactive) {
+      return null
+    }
     switch (ldata.type) {
       case "PointLight":
         light = new THREE.PointLight(ldata.color, ldata.intensity)
@@ -285,29 +339,32 @@ const VideoUtil = {
   processEventData: (evtsData) => {
     // Handle (movie) event data after assets have been loaded
     let actor
-    evtsData.forEach((e) => {
-      switch (e.actor_type) {
-        case "player":
-          actor = VideoUtil.players[e.actor_id]
-          break
-        case "light":
-          actor = VideoUtil.lights[e.actor_id]
-          break
-        case "influence":
-          actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
-          break
-      }
-      if (actor && !e.inactive) {
-        VideoUtil.all_events[VideoUtil.evtCount] =
-          new Event(VideoUtil.evtCount, e.start, e.end, actor, e.data)
-        VideoUtil.evtCount++
-      }
-    })
+    if (evtsData) {
+      evtsData.forEach((e) => {
+        switch (e.actor_type) {
+          case "player":
+            actor = VideoUtil.players[e.actor_id]
+            break
+          case "light":
+            actor = VideoUtil.lights[e.actor_id]
+            break
+          case "influence":
+            actor = VideoUtil.facecap_mesh.getObjectByName('mesh_2')
+            break
+        }
+        if (actor && !e.inactive) {
+          VideoUtil.all_events[VideoUtil.evtCount] =
+            new Event(VideoUtil.evtCount, e.start, e.end, actor, e.data)
+          VideoUtil.evtCount++
+        }
+      })
+    }
   },
 
   processEvent: (t, evt, reset) => {
     const action = evt.data.action // actions are "walk", "sit", "rotate" etc.
     if (action in VideoActions) {
+      // console.log("EVENT: ", evt)
       VideoActions[action](t, evt, reset)
     } else {
       console.log("ACTION not found: ", action)
@@ -333,7 +390,12 @@ const VideoUtil = {
 
     // load faces with textures (cannot animate)
     const modelPaths = ["/models/face1", "/models/brett_face"]
-    const attachPoints = [VideoUtil.players[0].neck, VideoUtil.players[1].neck]
+    const attachPoints = [] // = [VideoUtil.players[0].neck, VideoUtil.players[1].neck]
+    for (let actor_id in VideoUtil.players) {
+      const actor = VideoUtil.players[actor_id]
+      attachPoints.push(actor.neck)
+    }
+    
     const textures = []
     const promises = []
     const loader = new OBJLoader()
@@ -375,28 +437,28 @@ const VideoUtil = {
 
           VideoUtil.scene.add(VideoUtil.facecap_mesh);
           VideoUtil.mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
-          // console.log("ANIMATIONS: ", gltf.animations)
-          // VideoUtil.facecap_action = VideoUtil.mixer.clipAction(gltf.animations[0])
           let head = VideoUtil.facecap_mesh.getObjectByName('mesh_2');
           const dict = head.morphTargetDictionary
           // VideoUtil.facecap_action.setLoop(THREE.LoopRepeat, 2)
           // VideoUtil.facecap_action.play()
+          /*
           VideoUtil.players[2].head.attach(VideoUtil.facecap_mesh)
+          */
 
         }
       }) // close allObjects.forEach
       // Process event data after assets are loaded
+      /*
       VideoUtil.processEventData(VideoUtil.movie.events)
+      */
       VideoUtil.clock.start()
 
       doneCallback(doneVal) // callback after assets loaded
     }) // end of Promise.all
   },
 
-  queueMoveBow: (playerIdx, sched, duration, upbow, strNum, fingerNum) => {
-    let player = VideoUtil.players[playerIdx]
-    // Put the left finger down
-
+  queueMoveBow: (player, sched, duration, upbow, strNum, fingerNum) => {
+    // left-hand fingers
     for (let i = 1; i <= 4; i++) { // finger numbers
       if (i == fingerNum) {
         let pos = {}
@@ -415,11 +477,14 @@ const VideoUtil = {
       }
     }
 
+    // right arm for the right string
     let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
           action: "posture", run_once: true,
           posture: [{r_arm: [{straddle: [75 + strNum * 5, 75 + strNum * 5]}]}]
     })
     VideoUtil.all_events[VideoUtil.evtCount++] = evt
+
+    // up-bow or down-bow
     if (upbow) { // Execute up bow
       let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
             action: "posture",
@@ -436,21 +501,23 @@ const VideoUtil = {
   },
 
   queuePianoKey: (playerIdx, sched, duration, note) => {
-    const keyIdx = VideoUtil.piano.keyMap[note] || 0
-    if (keyIdx == 0) {
-      console.log("ALERT: ", note)
+    if (VideoUtil.piano) {
+      const keyIdx = VideoUtil.piano.keyMap[note] || 0
+      if (keyIdx == 0) {
+        console.log("ALERT: ", note)
+      }
+      const playedKey = VideoUtil.piano.keys[keyIdx]
+      let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
+        action: "move", run_once: true,
+        endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
+      })
+      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      evt = new Event( VideoUtil.evtCount, sched + duration * 0.75, sched + duration * 0.75, playedKey, {
+        action: "move", run_once: true,
+        endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
+      })
+      VideoUtil.all_events[VideoUtil.evtCount++] = evt
     }
-    const playedKey = VideoUtil.piano.keys[keyIdx]
-    let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
-      action: "move", run_once: true,
-      endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
-    })
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    evt = new Event( VideoUtil.evtCount, sched + duration * 0.75, sched + duration * 0.75, playedKey, {
-      action: "move", run_once: true,
-      endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
-    })
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
   },
 
   drawFrame: () => {

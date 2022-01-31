@@ -27,6 +27,8 @@ export default function Home() {
     {url: "/data/music/tchaikovsky_nutcracker_suite_flowers.mid", name: "Nutcracker Waltz", type: "midi"},
     {url: "/data/music/lucy_in_the_sky_with_diamonds.mid", name: "Lucy in the Sky", type: "midi"},
     {url: "/data/music/abba_thank_you.mid", name: "ABBA - Thank You", type: "midi"},
+    {url: "/data/music/abba_dancing_queen.mid", name: "ABBA - Dancing Queen", type: "midi"},
+    {url: "/data/music/nessun_dorma.mid", name: "Nessun Dorma", type: "midi"},
   ]
 
   useEffect(() => {
