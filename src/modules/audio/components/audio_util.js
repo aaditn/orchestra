@@ -71,9 +71,10 @@ const AudioUtil = {
   // synth, notes, startTime - returns duration on this synth
   playMIDINotes: (synth, instrument, actor, notes, startTime) => {
     let bowdir = true
+    const tmult = 1.0 // will slow-down/speed-up by this factor
     notes.forEach((noteArr, i) => {
-      const vsched   = noteArr[0] + startTime
-      const duration = noteArr[1]
+      const vsched   = (noteArr[0] * tmult) + startTime
+      const duration = noteArr[1] * tmult
       const velocity = noteArr[2]
       for (let j = 3; j < noteArr.length; j++) {
         const note = noteArr[j]
@@ -210,32 +211,16 @@ const AudioUtil = {
       const responseJson = await response.json()
       console.log(responseJson)
       AudioUtil.setTracks(responseJson)
+      AudioUtil.createScoreFromTracks(AudioUtil.tracks)
     } else { // handle MIDI file
       const midi = await Midi.fromUrl(fileUrl)
       const modResponseJson = AudioUtil.postProcessMIDI(midi)
       AudioUtil.setTracks(modResponseJson)
+      AudioUtil.createScoreFromTracks(AudioUtil.tracks)
     }
   },
 
-  assignAvailablePlayer: (track) => {
-    let actor = null
-    let assigned  = false 
-    for (let actor_id in VideoUtil.players) {
-      if (! assigned) {
-        const testactor = VideoUtil.players[actor_id]
-        if (testactor.instrument == track.instrument) {
-          if (AudioUtil.trackPlayerMap[track.instrument].indexOf(actor_id) < 0) {
-            AudioUtil.trackPlayerMap[track.instrument].push(actor_id)
-            actor = testactor
-            assigned = true
-          }
-        }
-      }
-    }
-    return actor
-  },
-
-  handleStartAudio: function (fileUrl, fileType, durationCallback) {
+  createScoreFromTracks: (tracks) => {
     // Turn recorder on by default
     const dest = AudioUtil.startRecorder()
 
@@ -243,9 +228,9 @@ const AudioUtil = {
     AudioUtil.trackPlayerMap = { violin: [], viola: [], cello: []} // actor_id's
     AudioUtil.score = []
     const instruments = {}
-    if (Object.keys(AudioUtil.tracks).length > 0) {
-      for (let vname in AudioUtil.tracks) {
-        const track = AudioUtil.tracks[vname]
+    if (Object.keys(tracks).length > 0) {
+      for (let vname in tracks) {
+        const track = tracks[vname]
         const synth = SampleLibrary.load({ instruments: track.instrument })
         // const distortion = new Tone.Distortion(0.5);
         // const filter = new Tone.AutoFilter(4).start();
@@ -270,6 +255,28 @@ const AudioUtil = {
       }
       console.log("INSTRUMENTS:", instruments)
     }
+  },
+
+  assignAvailablePlayer: (track) => {
+    let actor = null
+    let assigned  = false
+    for (let actor_id in VideoUtil.players) {
+      if (! assigned) {
+        const testactor = VideoUtil.players[actor_id]
+        if (testactor.instrument == track.instrument) {
+          if (AudioUtil.trackPlayerMap[track.instrument].indexOf(actor_id) < 0) {
+            AudioUtil.trackPlayerMap[track.instrument].push(actor_id)
+            actor = testactor
+            assigned = true
+          }
+        }
+      }
+    }
+    return actor
+  },
+
+  // Assumes AudioUtil.tracks is populated
+  handleStartAudio: function (fileType, durationCallback) {
 
     Tone.loaded().then(() => {
       const now = Tone.now()

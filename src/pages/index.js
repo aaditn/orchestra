@@ -61,7 +61,7 @@ export default function Home() {
       setAudioButtonText("Start Audio")
     } else { // start video
       const piece = pieces[pieceSelected]
-      AudioUtil.handleStartAudio(piece.url, piece.type, setDuration)
+      AudioUtil.handleStartAudio(piece.type, setDuration)
       setAudioRunning(true)
       setAudioButtonText("Stop Audio")
     }
