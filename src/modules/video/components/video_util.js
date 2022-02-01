@@ -7,6 +7,7 @@ import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
 import { Chair, Violin, Bow, Piano } from "./models"
+import { DoorBack } from '@mui/icons-material'
 
 export class Clock {
   constructor() {
@@ -50,6 +51,7 @@ const VideoUtil = {
   clock: null,
   controls: null,
   movie: {},
+  sceneSpec: {},
   players: {},
   all_events: {},
   bows: [],
@@ -101,6 +103,27 @@ const VideoUtil = {
     VideoUtil.clock = new Clock()
   },
 
+  getPlayerPlacement: () => {
+    return { 
+      violin: [
+        {position: {x: -40, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {position: {x: -25, y: 3, z: -25}, rotation: {x: 0, y: 0.78, z: 0}},
+        {position: {x: -70, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {position: {x: -50, y: 3, z: -50}, rotation: {x: 0, y: 0.78, z: 0}},
+        {position: {x: -100, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {position: {x: -75, y: 3, z: -75}, rotation: {x: 0, y: 0.78, z: 0}},
+        {position: {x: -130, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
+        {position: {x: -100, y: 3, z: -100}, rotation: {x: 0, y: 0.78, z: 0}},
+      ],
+      cello: [
+        {position: {x: 40, y: 3, z: 0}, rotation: {x: 0, y: -1.571, z: 0}},
+        {position: {x: 25, y: 3, z: -25}, rotation: {x: 0, y: -0.78, z: 0}},
+        {position: {x: 70, y: 3, z: 0}, rotation: {x: 0, y: -1.571, z: 0}},
+        {position: {x: 50, y: 3, z: -50}, rotation: {x: 0, y: -0.78, z: 0}},
+      ]
+    }
+  },
+
   // Remove children of scene
   clearScene: () => {
     let i = VideoUtil.scene.children.length
@@ -117,25 +140,24 @@ const VideoUtil = {
 
   // layout scene triggered by choice of song, done dynamically
   // sceneSpec specifies how many players (position) and what type
-  layoutScene: (sceneSpec) => {
+  layoutScene: () => {
     VideoUtil.players = {}
     VideoUtil.lights  = []
 
     // handle actor data
-    const actorsArr = sceneSpec.actors
-    if (actorsArr) {
-      actorsArr.forEach((actorSpec) => {
+    const playerArr = VideoUtil.sceneSpec.players
+    if (playerArr) {
+      playerArr.forEach((playerSpec) => {
         let bow
-        
-        const actor = VideoUtil.processActorSpec(actorSpec)
-        actor.instrument = actorSpec.instrument
-        VideoUtil.players[actor.ID] = actor
-        switch (actor.instrument) {
+        const player = VideoUtil.processActorSpec(playerSpec)
+        player.instrument = playerSpec.instrument
+        VideoUtil.players[player.ID] = player
+        switch (player.instrument) {
           case "violin":
           case "cello":
-            actor.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
+            player.neck.attach(new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 }))
             bow = new Bow()
-            actor.r_finger1.attach(bow)
+            player.r_finger1.attach(bow)
             VideoUtil.bows.push(bow)
             break;
           case "viola":
@@ -143,21 +165,18 @@ const VideoUtil = {
           case "piano":
             break;
         }
-        if (actorSpec.light) {
-          actorSpec.light.target = {actor: "player", actor_id: actor.ID}
-          const light = VideoUtil.processLightData(actorSpec.light)
+        if (playerSpec.light) {
+          playerSpec.light.target = {actor: "player", actor_id: player.ID}
+          const light = VideoUtil.processLightData(playerSpec.light)
           if (light) {
             VideoUtil.scene.add(light)
             VideoUtil.lights.push(light)
           }
         }
-        /*
-        VideoUtil.players.push(actor)
-        */
       })
     }
     // handle independent lights (not tied to actors)
-    const lightsArr = sceneSpec.lights
+    const lightsArr = VideoUtil.sceneSpec.lights
     if (lightsArr) {
       lightsArr.forEach((lightSpec) => {
         const light = VideoUtil.processLightData(lightSpec)
@@ -176,15 +195,15 @@ const VideoUtil = {
 
   },
 
-  initScene: (doneCallback, doneVal) => {
+  initScene: (doneCallback = null, doneVal) => {
     VideoUtil.createScene()
     Mannequin.texHead = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEX////Ly8v5+fne3t5GRkby8vK4uLi/v7/GbmKXAAAAZklEQVRIx2MYQUAQHQgQVkBtwEjICkbK3MAkQFABpj+R5ZkJKTAxImCFSSkhBamYVgiQrAADEHQkIW+iqiBCAfXjAkMHpgKqgyHgBiwBRfu4ECScYEZGvkD1JxEKhkA5OVTqi8EOAOyFJCGMDsu4AAAAAElFTkSuQmCC");
     Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
 
     VideoUtil.players = {}
 
-    const sceneSpec = {
-      actors: [
+    VideoUtil.sceneSpec = {
+      players: [
         {
           position: {x: -40, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0},
           instrument: "violin", 
@@ -209,14 +228,15 @@ const VideoUtil = {
           "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
       ]
     }
-    VideoUtil.layoutScene(sceneSpec)
-    VideoUtil.loadAssets(doneCallback, doneVal)
-    // Load movie script
 
+    VideoUtil.layoutScene()
+    VideoUtil.loadAssets(doneCallback, doneVal)
+
+    // Load movie script
+    /*
     VideoUtil.loadMovieScript("/data/movie/concert1.json").then(() => {
 
       // handle actor data
-      /*
       const actorsData = VideoUtil.movie.actors
       actorsData.forEach((actorData) => {
         const actor = VideoUtil.processActorSpec(actorData)
@@ -237,10 +257,8 @@ const VideoUtil = {
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
       VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
       VideoUtil.scene.add(VideoUtil.piano)
-      */
 
       // handle lights
-      /*
       const lights = VideoUtil.movie.lights
       lights.forEach((l) => {
         let light = VideoUtil.processLightData(l)
@@ -249,9 +267,9 @@ const VideoUtil = {
           VideoUtil.lights.push(light)
         }
       })
-      */
 
     })
+    */
   },
 
   attachRendererToDOM: () => {
@@ -392,7 +410,6 @@ const VideoUtil = {
   },
 
   loadAssets: (doneCallback, doneVal) => {
-
     // load faces with textures (cannot animate)
     const modelPaths = ["/models/face1", "/models/brett_face"]
     const attachPoints = [] // = [VideoUtil.players[0].neck, VideoUtil.players[1].neck]
@@ -423,6 +440,7 @@ const VideoUtil = {
 
         if (i == 0 || i == 1) {
 
+          /*
           let material = new THREE.MeshBasicMaterial({ map: textures[i] })
           object.scale.set(40, 40, 40)
           object.rotation.y = Math.PI / 2
@@ -431,10 +449,12 @@ const VideoUtil = {
             if (child instanceof THREE.Mesh) child.material = material
           })
           attachPoints[i].attach(object)
+          */
 
         } else if (i == 2) { // animatable face
           // Load face with influences
           // from head.morphTargetDIctionary + head.morephTargetInfluences
+          /*
           VideoUtil.facecap_mesh = object.scene.children[0]
           VideoUtil.facecap_mesh.position.set(2, 2, 0)
           VideoUtil.facecap_mesh.rotation.y = Math.PI / 2
@@ -442,11 +462,6 @@ const VideoUtil = {
 
           VideoUtil.scene.add(VideoUtil.facecap_mesh);
           VideoUtil.mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
-          let head = VideoUtil.facecap_mesh.getObjectByName('mesh_2');
-          const dict = head.morphTargetDictionary
-          // VideoUtil.facecap_action.setLoop(THREE.LoopRepeat, 2)
-          // VideoUtil.facecap_action.play()
-          /*
           VideoUtil.players[2].head.attach(VideoUtil.facecap_mesh)
           */
 
@@ -458,7 +473,9 @@ const VideoUtil = {
       */
       VideoUtil.clock.start()
 
-      doneCallback(doneVal) // callback after assets loaded
+      if (doneCallback) {
+        doneCallback(doneVal) // callback after assets loaded
+      }
     }) // end of Promise.all
   },
 

@@ -69,7 +69,7 @@ const AudioUtil = {
   },
 
   // synth, notes, startTime - returns duration on this synth
-  playMIDINotes: (synth, instrument, actor, notes, startTime) => {
+  playMIDINotes: (synth, instrument, player, notes, startTime) => {
     let bowdir = true
     const tmult = 1.0 // will slow-down/speed-up by this factor
     notes.forEach((noteArr, i) => {
@@ -88,12 +88,12 @@ const AudioUtil = {
                 const strNum = AudioUtil.getViolinStringFromNote(note)
                 const fingerNum = AudioUtil.getViolinFingerFromNote(note)
                 // queue video event
-                VideoUtil.queueMoveBow(actor, vsched, duration, bowdir, strNum, fingerNum)
+                VideoUtil.queueMoveBow(player, vsched, duration, bowdir, strNum, fingerNum)
                 bowdir = !bowdir
               }
               break;
             case "piano":
-              VideoUtil.queuePianoKey(actor, vsched, duration, note)
+              VideoUtil.queuePianoKey(player, vsched, duration, note)
               break;
           }
         }
@@ -211,13 +211,47 @@ const AudioUtil = {
       const responseJson = await response.json()
       console.log(responseJson)
       AudioUtil.setTracks(responseJson)
-      AudioUtil.createScoreFromTracks(AudioUtil.tracks)
     } else { // handle MIDI file
       const midi = await Midi.fromUrl(fileUrl)
       const modResponseJson = AudioUtil.postProcessMIDI(midi)
       AudioUtil.setTracks(modResponseJson)
-      AudioUtil.createScoreFromTracks(AudioUtil.tracks)
     }
+
+    // Create new scene based on tracks
+    VideoUtil.clearScene()
+    VideoUtil.players = {}
+    VideoUtil.sceneSpec = AudioUtil.getSceneSpecFromTracks(AudioUtil.tracks)
+    console.log("sceneSpec: ", VideoUtil.sceneSpec)
+    VideoUtil.layoutScene()
+    AudioUtil.createScoreFromTracks(AudioUtil.tracks)
+    
+  },
+
+  getSceneSpecFromTracks: (tracks) => {
+    const placement = VideoUtil.getPlayerPlacement()
+    const sceneSpec = { 
+      players: [],
+      lights: [
+        {type: "AmbientLight", color: "white", intensity: 0.5},
+        {type: "PointLight", color: "white", intensity: 0.5, position: {x: 0, y: 100, z: 0},
+          "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
+      ]
+    }
+    const instrumentCount = { violin: 0, cello: 0}
+    if (Object.keys(tracks).length > 0) {
+      for (let vname in tracks) {
+        const track = tracks[vname]
+        //---- Start Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
+        if (track.instrument in instrumentCount && 
+            instrumentCount[track.instrument] < placement[track.instrument].length) {
+          const player = placement[track.instrument][instrumentCount[track.instrument]]
+          player.instrument = track.instrument
+          sceneSpec.players.push(player)
+          instrumentCount[track.instrument]++
+        }
+      }
+    }
+    return sceneSpec
   },
 
   createScoreFromTracks: (tracks) => {
@@ -243,36 +277,36 @@ const AudioUtil = {
         //---- Start Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
         if (instruments[track.instrument]) instruments[track.instrument] += 1
         else instruments[track.instrument] = 1
-        let actor = null
+        let player = null
         if (['violin', 'viola', 'cello'].indexOf(track.instrument) >= 0) {
-          actor   = AudioUtil.assignAvailablePlayer(track)
-          if (!actor) {
+          player   = AudioUtil.assignAvailablePlayer(track)
+          if (!player) {
             console.log("Unassigned: ", track.instrument)
           }
         }
         //---- End Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
-        AudioUtil.score.push({ synth: synth, track: track, actor: actor })
+        AudioUtil.score.push({ synth: synth, track: track, player: player })
       }
       console.log("INSTRUMENTS:", instruments)
     }
   },
 
   assignAvailablePlayer: (track) => {
-    let actor = null
+    let player = null
     let assigned  = false
     for (let actor_id in VideoUtil.players) {
       if (! assigned) {
-        const testactor = VideoUtil.players[actor_id]
-        if (testactor.instrument == track.instrument) {
+        const testplayer = VideoUtil.players[actor_id]
+        if (testplayer.instrument == track.instrument) {
           if (AudioUtil.trackPlayerMap[track.instrument].indexOf(actor_id) < 0) {
             AudioUtil.trackPlayerMap[track.instrument].push(actor_id)
-            actor = testactor
+            player = testplayer
             assigned = true
           }
         }
       }
     }
-    return actor
+    return player
   },
 
   // Assumes AudioUtil.tracks is populated
@@ -284,8 +318,8 @@ const AudioUtil = {
       console.log("Audio start at:", now)
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
-        if (blob.actor) {
-          console.log("TRACK: ", blob.track.instrument, " assigned to actor:", blob.actor.ID)
+        if (blob.player) {
+          console.log("TRACK: ", blob.track.instrument, " assigned to player:", blob.player.ID)
         }
         if (!blob.track.muted) {
           if (fileType == "json") {
@@ -297,7 +331,7 @@ const AudioUtil = {
             if (dur > maxDur) maxDur = dur
           } else if (fileType == "midi") {
             const dur =
-              AudioUtil.playMIDINotes( blob.synth, blob.track.instrument, blob.actor, blob.track.data, now )
+              AudioUtil.playMIDINotes( blob.synth, blob.track.instrument, blob.player, blob.track.data, now )
             if (dur > maxDur) maxDur = dur
           }
         }
