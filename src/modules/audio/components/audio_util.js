@@ -87,7 +87,6 @@ const AudioUtil = {
                 // push only once for chords
                 const strNum = AudioUtil.getViolinStringFromNote(note)
                 const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-                // queue video event
                 VideoUtil.queueMoveBow(player, vsched, duration, bowdir, strNum, fingerNum)
                 bowdir = !bowdir
               }
@@ -224,7 +223,6 @@ const AudioUtil = {
     console.log("sceneSpec: ", VideoUtil.sceneSpec)
     VideoUtil.layoutScene()
     AudioUtil.createScoreFromTracks(AudioUtil.tracks)
-    
   },
 
   getSceneSpecFromTracks: (tracks) => {
@@ -237,7 +235,7 @@ const AudioUtil = {
           "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
       ]
     }
-    const instrumentCount = { violin: 0, cello: 0}
+    const instrumentCount = { violin: 0, cello: 0, piano: 0 }
     if (Object.keys(tracks).length > 0) {
       for (let vname in tracks) {
         const track = tracks[vname]
@@ -245,7 +243,7 @@ const AudioUtil = {
         if (track.instrument in instrumentCount && 
             instrumentCount[track.instrument] < placement[track.instrument].length) {
           const player = placement[track.instrument][instrumentCount[track.instrument]]
-          player.instrument = track.instrument
+          player.instrumentType = track.instrument
           sceneSpec.players.push(player)
           instrumentCount[track.instrument]++
         }
@@ -259,7 +257,7 @@ const AudioUtil = {
     const dest = AudioUtil.startRecorder()
 
     // Play a score with multiple parts
-    AudioUtil.trackPlayerMap = { violin: [], viola: [], cello: []} // actor_id's
+    AudioUtil.trackPlayerMap = { violin: [], viola: [], cello: [], piano: []} // actor_id's
     AudioUtil.score = []
     const instruments = {}
     if (Object.keys(tracks).length > 0) {
@@ -274,17 +272,17 @@ const AudioUtil = {
         synth.connect(dest) // connect synth to AudioUtil.recorder as well
         synth.volume.value = -6
 
-        //---- Start Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
+        //---- Start Populate trackPlayerMap ---//
         if (instruments[track.instrument]) instruments[track.instrument] += 1
         else instruments[track.instrument] = 1
         let player = null
-        if (['violin', 'viola', 'cello'].indexOf(track.instrument) >= 0) {
-          player   = AudioUtil.assignAvailablePlayer(track)
+        if (['violin', 'viola', 'cello', 'piano'].indexOf(track.instrument) >= 0) {
+          player = AudioUtil.assignAvailablePlayer(track)
           if (!player) {
             console.log("Unassigned: ", track.instrument)
           }
         }
-        //---- End Populate trackPlayerMap - hardcode for now (2 violins, 1 piano) ---//
+        //----  End Populate trackPlayerMap ---//
         AudioUtil.score.push({ synth: synth, track: track, player: player })
       }
       console.log("INSTRUMENTS:", instruments)
@@ -297,7 +295,7 @@ const AudioUtil = {
     for (let actor_id in VideoUtil.players) {
       if (! assigned) {
         const testplayer = VideoUtil.players[actor_id]
-        if (testplayer.instrument == track.instrument) {
+        if (testplayer.instrumentType == track.instrument) {
           if (AudioUtil.trackPlayerMap[track.instrument].indexOf(actor_id) < 0) {
             AudioUtil.trackPlayerMap[track.instrument].push(actor_id)
             player = testplayer

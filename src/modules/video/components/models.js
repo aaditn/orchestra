@@ -89,18 +89,17 @@ export class Piano extends THREE.Group {
     this.keys = []
     this.keyMap = {}
     this.position.set(pos.x, pos.y, pos.z)
-    this.rotation.x = rad(rot.x);
-    this.rotation.y = rad(rot.y);
-    this.rotation.z = rad(rot.z);
+    this.rotation.x = rot.x
+    this.rotation.y = rot.y
+    this.rotation.z = rot.z
 
     const BASELEN = 50
-    const pianoMaterial = new THREE.MeshLambertMaterial({ color: 0xf4c4a4 })
+    const pianoMaterial = new THREE.MeshLambertMaterial({ color: 0xa48444 })
     let base = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 1, 6), pianoMaterial)
     base.position.set(0, -9, 0); base.castShadow = true
 
     let back = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 30, 1), pianoMaterial)
-    back.position.set(0, -6, -4); base.add(back)
-
+    back.position.set(0, -12, -4); base.add(back)
 
     // 84 keys on the keyboard: C1 .. B7
     let keyCount  = 0
