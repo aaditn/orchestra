@@ -54,7 +54,6 @@ const VideoUtil = {
   sceneSpec: {},
   players: {},
   all_events: {},
-  piano: null,
 
   mixer: null,
   facecap_mesh: null,
@@ -121,7 +120,10 @@ const VideoUtil = {
         {position: {x: 50, y: 3, z: -50}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
       ],
       piano: [
+        // {position: {x: 0, y: -10, z: -100}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
+        {position: {x: 0, y: -10, z: 30}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
         {position: {x: 75, y: -10, z: -75}, rotation: {x: 0, y: -1.25 * Math.PI, z: 0}},
+
       ]
     }
   },
@@ -180,13 +182,32 @@ const VideoUtil = {
               posture: [
                 {torso: [{bend: [0,0]}]},
                 {l_leg: [{raise: [0,90]}]}, {l_knee: [{bend: [0,100]}]},
-                {r_leg: [{raise: [0,90]}]}, {r_knee: [{"bend": [0,100]}]}
+                {r_leg: [{raise: [0,90]}]}, {r_knee: [{"bend": [0,100]}]},
+                {l_arm: [{straddle: [0,0]}]},
+                {l_elbow: [{bend: [0,90]}, {turn: [0,0]}]},
+                {l_wrist: [{tilt: [0,0]}, {turn: [0,90]}]},
+                {r_arm: [{straddle: [0,0]}]},
+                {r_elbow: [{bend: [0,90]}, {turn: [0,0]}]},
+                {r_wrist: [{tilt: [0,0]}, {turn: [0,90]}]}
               ]
             })
             VideoUtil.all_events[VideoUtil.evtCount++] = evt
+            /*
+            {l_arm: [{straddle: [0,0]}]}, // paramt = 1 (middle of keyboard)
+            {l_elbow: [{bend: [0,90]}, {turn: [0,0]}]},
+            {l_wrist: [{tilt: [0,10]}, {turn: [0,90]}]}
+
+            {l_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
+            {l_elbow: [{bend: [0,45]}]},
+            {l_wrist: [{tilt: [0,-40]}, {turn: [0,150]}]}
+            */
+
             const p = player.position; const r = player.rotation
+            const ctheta = p.x/Math.sqrt(p.x * p.x + p.z * p.z)
+            const stheta = p.z/Math.sqrt(p.x * p.x + p.z * p.z) * (p.z > 0 ? -1 : 1)
+
             const piano = new Piano(
-              {x: p.x + 10, y: p.y + 13, z: p.z - 10},
+              {x: p.x + 12 * ctheta, y: p.y + 13, z: p.z + 12 * stheta},
               {x: r.x, y: r.y + Math.PI, z: r.z}
             )
             player.instrument = piano
@@ -214,13 +235,6 @@ const VideoUtil = {
         }
       })
     }
-
-    /*
-    VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
-    VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
-    VideoUtil.scene.add(VideoUtil.piano)
-    */
-
   },
 
   initScene: (doneCallback = null, doneVal) => {
@@ -241,14 +255,6 @@ const VideoUtil = {
             angle: 0.35, castShadow: true
           }
         },
-        {instrument: "violin", position: {x: -70, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
-        {instrument: "violin", position: {x: -100, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
-        {instrument: "violin", position: {x: -130, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
-        {instrument: "violin", position: {x: -160, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0}},
-        {instrument: "violin", position: {x: -50, y: 3, z: -50}, rotation: {x: 0, y: 0.75, z: 0}},
-        {instrument: "cello", position: {x: -25, y: 3, z: -25}, rotation: {x: 0, y: 0.75, z: 0}},
-        {instrument: "cello", position: {x: 25, y: 3, z: -25}, rotation: {x: 0, y: -0.75, z: 0}},
-        {instrument: "cello", position: {x: 40, y: 3, z: 0}, rotation: {x: 0, y: -1.571, z: 0}},
       ],
       lights: [
         {type: "AmbientLight", color: "white", intensity: 0.5},
@@ -256,7 +262,6 @@ const VideoUtil = {
           "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
       ]
     }
-
     VideoUtil.layoutScene()
     VideoUtil.loadAssets(doneCallback, doneVal)
 
@@ -282,8 +287,6 @@ const VideoUtil = {
       VideoUtil.loadAssets(doneCallback, doneVal)
 
       VideoUtil.scene.add(new Chair(25, 180), new Chair(-25, 0))
-      VideoUtil.piano = new Piano({x: 0, y:0, z: 30}, {x: 0, y: 0, z: 0})
-      VideoUtil.scene.add(VideoUtil.piano)
 
       // handle lights
       const lights = VideoUtil.movie.lights
@@ -556,6 +559,44 @@ const VideoUtil = {
       if (keyIdx == 0) {
         console.log("ALERT: ", note)
       }
+      // total of 84 keys, 0 - 41 on left, 42 - 83 on right
+      let paramt = null
+      if (keyIdx < 42) {
+        paramt = keyIdx / 42.0
+        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+          action: "posture", run_once: true,
+          posture: [
+            {l_arm: [{straddle: [0,50-50*paramt]}]}, 
+            {l_elbow: [{bend: [0,45+45*paramt]}, {turn: [0,0]}]},
+            {l_wrist: [{tilt: [0,-40+50*paramt]}, {turn: [0,150-60*paramt]}]}
+          ]
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      } else {
+        paramt = (keyIdx - 42) / 42.0
+        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+          action: "posture", run_once: true,
+          posture: [
+            {r_arm: [{straddle: [0,0+50*paramt]}]}, 
+            {r_elbow: [{bend: [0,90-45*paramt]}]},
+            {r_wrist: [{tilt: [0,10+40*paramt]}, {turn: [0,90+60*paramt]}]}
+          ]
+            /*
+            {l_arm: [{straddle: [0,0]}]}, // paramt = 1 (middle of keyboard)
+            {l_elbow: [{bend: [0,90]}]},
+            {l_wrist: [{tilt: [0,10]}, {turn: [0,90]}]}
+
+            {l_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
+            {l_elbow: [{bend: [0,45]}]},
+            {l_wrist: [{tilt: [0,-40]}, {turn: [0,150]}]}
+
+            {r_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
+            {r_elbow: [{bend: [0,45]}]},
+            {r_wrist: [{tilt: [0,50]}, {turn: [0,150]}]}
+            */
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      }
       const playedKey = piano.keys[keyIdx]
       let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
         action: "move", run_once: true,
@@ -581,16 +622,6 @@ const VideoUtil = {
     if (VideoUtil.gameCounter % 10 == 0) {
       // keep for debugging
     }
-    /*
-    const player = VideoUtil.players[0]
-    if (VideoUtil.gameCounter % 100 < 50) {
-      player.l_finger1.bend = 30
-      player.l_finger2.bend = 30
-    } else {
-      player.l_finger1.bend = 90
-      player.l_finger2.bend = 90
-    }
-    */
 
     // cycle through events and process as needed
     for (let evtId in VideoUtil.all_events) {
