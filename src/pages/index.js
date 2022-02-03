@@ -32,6 +32,8 @@ export default function Home() {
     {url: "/data/music/let_it_be.mid", name: "Beatles - Let It Be", type: "midi"},
     {url: "/data/music/ode_to_joy.mid", name: "Ode to Joy", type: "midi"},
     {url: "/data/music/brandenburg_3.mid", name: "Brandenburg Number 3", type: "midi"},
+    {url: "/data/music/moto_perpetuo.mid", name: "Moto Perpetuo", type: "midi"},
+    {url: "/data/music/paganini_caprice_24.mid", name: "Paganini Caprice 24", type: "midi"},
   ]
 
   useEffect(() => {
