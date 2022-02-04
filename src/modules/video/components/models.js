@@ -32,20 +32,20 @@ export class Violin extends THREE.Group {
 
     let head = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
-    head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(0, 4, 0);
+    head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(2, 4, 0);
     head.castShadow = true;
 
-    let fboard = new THREE.Mesh(new THREE.BoxGeometry(7, 1, 1),
+    let fboard = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 1),
       new THREE.MeshLambertMaterial({ color: 0x000000 }));
     fboard.scale.set(1, 0.25, 1); fboard.position.set(-4, 4, 0);
     fboard.castShadow = true;
 
-    let body1 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 4, 32),
+    let body1 = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 4, 24),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
     body1.scale.set(1, 0.25, 1); body1.position.set(-7, 3, 0);
     body1.castShadow = true;
 
-    let body2 = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32),
+    let body2 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 4, 32),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
     body2.scale.set(1, 0.25, 1); body2.position.set(-12, 3, 0);
     body2.castShadow = true;
@@ -54,13 +54,13 @@ export class Violin extends THREE.Group {
       new THREE.MeshLambertMaterial({ color: 0x0f0f0f }));
     chinrest.scale.set(1, 0.25, 1); chinrest.position.set(-15, 3.5, -1);
 
-    let string1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
+    let string1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 32),
       new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-    string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-8, 4.3, 0.2);
+    string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-6, 4.3, 0.2);
 
-    let string2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 55, 32),
+    let string2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 32),
       new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-    string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-8, 4.3, -0.2);
+    string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-6, 4.3, -0.2);
 
     this.add(head, fboard, body1, body2, chinrest, string1, string2);
   }

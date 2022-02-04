@@ -122,8 +122,8 @@ const VideoUtil = {
       piano: [
         // {position: {x: 0, y: -10, z: -80}, rotation: {x: 0, y: -1/6 * Math.PI, z: 0}},
         // {position: {x: 75, y: -10, z: -75}, rotation: {x: 0, y: -1.25 * Math.PI, z: 0}},
-        {position: {x: 30, y: -10, z: 50}, rotation: {x: 0, y: -0.9 * Math.PI, z: 0}},
-        {position: {x: -30, y: -10, z: 50}, rotation: {x: 0, y: -1.1 * Math.PI, z: 0}},
+        {position: {x: 30, y: -10, z: 50}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
+        {position: {x: -30, y: -10, z: 50}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
 
       ]
     }
@@ -163,13 +163,13 @@ const VideoUtil = {
             evt = new Event( VideoUtil.evtCount, 0, 0, player, {
               action: "posture", run_once: true,
               posture: [
-                {l_arm: [{raise: [0,40]}, {straddle: [0,10]}, {turn: [0,-10]}]},
+                {l_arm: [{raise: [0,45]}, {straddle: [0,0]}, {turn: [0,-5]}]},
                 {l_elbow: [{bend: [0,75]}, {turn: [0,0]}]},
-                {l_wrist: [{tilt: [0,-30]}, {bend: [0,0]}, {turn: [0,120]}]},
+                {l_wrist: [{tilt: [0,-60]}, {bend: [0,-10]}, {turn: [0,170]}]},
               ]
             })
             VideoUtil.all_events[VideoUtil.evtCount++] = evt
-            const violin = new Violin({ x: 17, y: -8, z: -5 }, { x: 0, y: 20, z: -10 })
+            const violin = new Violin({ x: 17, y: -7, z: -5 }, { x: 0, y: 10, z: -5 })
             player.neck.attach(violin)
             bow = new Bow()
             player.r_finger1.attach(bow)
@@ -206,7 +206,6 @@ const VideoUtil = {
             const p = player.position; const r = player.rotation
             const piano = new Piano(
               {x: p.x + 12 * Math.sin(r.y), y: p.y + 13, z: p.z + 12 * Math.cos(r.y)},
-              // {x: p.x, y: p.y + 13, z: p.z},
               {x: r.x, y: r.y + 1 * Math.PI, z: r.z}
             )
             player.instrument = piano
@@ -513,14 +512,14 @@ const VideoUtil = {
     for (let i = 1; i <= 4; i++) { // finger numbers
       if (i == fingerNum) {
         let pos = {}
-        pos['l_finger' + i] = [{bend: [90, 90]}]
+        pos['l_finger' + i] = [{bend: [60, 60]}]
         let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
         VideoUtil.all_events[VideoUtil.evtCount++] = evt
       } else {
         let pos = {}
-        pos['l_finger' + i] = [{bend: [30, 30]}]
+        pos['l_finger' + i] = [{bend: [40, 40]}]
         let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
