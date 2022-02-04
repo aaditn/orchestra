@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { Mannequin, Male, rad, sin } from './mannequin'
+import { Mannequin, Male, rad} from './mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
@@ -120,9 +120,10 @@ const VideoUtil = {
         {position: {x: 50, y: 3, z: -50}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
       ],
       piano: [
-        // {position: {x: 0, y: -10, z: -100}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
-        {position: {x: 0, y: -10, z: 30}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
-        {position: {x: 75, y: -10, z: -75}, rotation: {x: 0, y: -1.25 * Math.PI, z: 0}},
+        // {position: {x: 0, y: -10, z: -80}, rotation: {x: 0, y: -1/6 * Math.PI, z: 0}},
+        // {position: {x: 75, y: -10, z: -75}, rotation: {x: 0, y: -1.25 * Math.PI, z: 0}},
+        {position: {x: 30, y: -10, z: 50}, rotation: {x: 0, y: -0.9 * Math.PI, z: 0}},
+        {position: {x: -30, y: -10, z: 50}, rotation: {x: 0, y: -1.1 * Math.PI, z: 0}},
 
       ]
     }
@@ -203,12 +204,10 @@ const VideoUtil = {
             */
 
             const p = player.position; const r = player.rotation
-            const ctheta = p.x/Math.sqrt(p.x * p.x + p.z * p.z)
-            const stheta = p.z/Math.sqrt(p.x * p.x + p.z * p.z) * (p.z > 0 ? -1 : 1)
-
             const piano = new Piano(
-              {x: p.x + 12 * ctheta, y: p.y + 13, z: p.z + 12 * stheta},
-              {x: r.x, y: r.y + Math.PI, z: r.z}
+              {x: p.x + 12 * Math.sin(r.y), y: p.y + 13, z: p.z + 12 * Math.cos(r.y)},
+              // {x: p.x, y: p.y + 13, z: p.z},
+              {x: r.x, y: r.y + 1 * Math.PI, z: r.z}
             )
             player.instrument = piano
             VideoUtil.scene.add(piano)
@@ -540,13 +539,19 @@ const VideoUtil = {
     if (upbow) { // Execute up bow
       let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
             action: "posture",
-            posture: [{r_elbow: [{bend: [75, 135]}]}, {r_wrist: [{tilt: [20, -20]}]}]
+            posture: [
+              {r_elbow: [{bend: [75, 135]}]},
+              {r_wrist: [{tilt: [30, -30]}, {turn: [0,-5]}]}
+            ]
       })
       VideoUtil.all_events[VideoUtil.evtCount++] = evt
     } else { // Execute down bow
       let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
             action: "posture",
-            posture: [{r_elbow: [{bend: [135, 75]}]}, {r_wrist: [{tilt: [-20, 20]}]}]
+            posture: [
+              {r_elbow: [{bend: [135, 75]}]},
+              {r_wrist: [{tilt: [-30, 30]},  {turn: [-5,0]}]
+            }]
       })
       VideoUtil.all_events[VideoUtil.evtCount++] = evt
     }
