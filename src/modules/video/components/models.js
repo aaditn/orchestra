@@ -1,3 +1,4 @@
+import { Thermostat } from '@mui/icons-material';
 import * as THREE from 'three'
 import { Mannequin, LimbShape, rad } from './mannequin'
 
@@ -30,7 +31,7 @@ export class Violin extends THREE.Group {
     this.rotation.y = rad(rot.y);
     this.rotation.z = rad(rot.z);
 
-    let head = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
+    let head = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 5, 8),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
     head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(2, 4, 0);
     head.castShadow = true;
@@ -45,24 +46,74 @@ export class Violin extends THREE.Group {
     body1.scale.set(1, 0.25, 1); body1.position.set(-7, 3, 0);
     body1.castShadow = true;
 
-    let body2 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 4, 32),
+    let body2 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 4, 24),
       new THREE.MeshLambertMaterial({ color: 0xfb8e00 }));
     body2.scale.set(1, 0.25, 1); body2.position.set(-12, 3, 0);
     body2.castShadow = true;
+
+    /*
+    let chinrest = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.25, 1, 32),
+      new THREE.MeshLambertMaterial({ color: 0x0f0f0f }));
+    chinrest.scale.set(1, 0.25, 1); chinrest.position.set(-15, 3.5, -1);
+    */
+
+    let string1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 4),
+      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+    string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-6, 4.3, 0.2);
+
+    let string2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 4),
+      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+    string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-6, 4.3, -0.2);
+
+    this.add(head, fboard, body1, body2, string1, string2) // chinrest)
+  }
+}
+
+
+export class Cello extends Violin {
+  constructor(pos, rot) {
+    super(pos, rot)
+    this.scale.set(2.5, 2.5, 2.5)
+    /*
+    this.position.set(pos.x, pos.y, pos.z)
+    this.rotation.x = rad(rot.x)
+    this.rotation.y = rad(rot.y)
+    this.rotation.z = rad(rot.z)
+
+    let head = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 5, 32),
+      new THREE.MeshLambertMaterial({ color: 0xfb8e00 }))
+    head.scale.set(1, 0.25, 1); head.rotation.z = rad(90); head.position.set(2, 4, 0);
+    head.castShadow = true
+
+    let fboard = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 1),
+      new THREE.MeshLambertMaterial({ color: 0x000000 }))
+    fboard.scale.set(1, 0.25, 1); fboard.position.set(-4, 4, 0);
+    fboard.castShadow = true
+
+    let body1 = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 4, 24),
+      new THREE.MeshLambertMaterial({ color: 0xfb8e00 }))
+    body1.scale.set(1, 0.25, 1); body1.position.set(-7, 3, 0);
+    body1.castShadow = true
+
+    let body2 = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 4, 32),
+      new THREE.MeshLambertMaterial({ color: 0xfb8e00 }))
+    body2.scale.set(1, 0.25, 1); body2.position.set(-12, 3, 0);
+    body2.castShadow = true
 
     let chinrest = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.25, 1, 32),
       new THREE.MeshLambertMaterial({ color: 0x0f0f0f }));
     chinrest.scale.set(1, 0.25, 1); chinrest.position.set(-15, 3.5, -1);
 
     let string1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 32),
-      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-    string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-6, 4.3, 0.2);
+      new THREE.MeshLambertMaterial({ color: 0xaaaaaa }))
+    string1.scale.set(1, 0.25, 1); string1.rotation.z = rad(90); string1.position.set(-6, 4.3, 0.2)
 
     let string2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70, 32),
       new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
     string2.scale.set(1, 0.25, 1); string2.rotation.z = rad(90); string2.position.set(-6, 4.3, -0.2);
 
-    this.add(head, fboard, body1, body2, chinrest, string1, string2);
+    this.add(head, fboard, body1, body2, chinrest, string1, string2)
+    */
   }
 }
 

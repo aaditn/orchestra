@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
-import { Chair, Violin, Bow, Piano } from "./models"
+import { Chair, Violin, Cello, Bow, Piano } from "./models"
 import { DoorBack } from '@mui/icons-material'
 
 export class Clock {
@@ -114,10 +114,10 @@ const VideoUtil = {
         {position: {x: -100, y: 3, z: -100}, rotation: {x: 0, y: Math.PI/4, z: 0}},
       ],
       cello: [
-        {position: {x: 40, y: 3, z: 0}, rotation: {x: 0, y: -Math.PI/2, z: 0}},
-        {position: {x: 25, y: 3, z: -25}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
-        {position: {x: 70, y: 3, z: 0}, rotation: {x: 0, y: -Math.PI/2, z: 0}},
-        {position: {x: 50, y: 3, z: -50}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
+        {position: {x: 40, y: -11, z: 0}, rotation: {x: 0, y: -Math.PI/2, z: 0}},
+        {position: {x: 25, y: -11, z: -25}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
+        {position: {x: 70, y: -11, z: 0}, rotation: {x: 0, y: -Math.PI/2, z: 0}},
+        {position: {x: 50, y: 11, z: -50}, rotation: {x: 0, y: -Math.PI/4, z: 0}},
       ],
       piano: [
         // {position: {x: 0, y: -10, z: -80}, rotation: {x: 0, y: -1/6 * Math.PI, z: 0}},
@@ -159,7 +159,7 @@ const VideoUtil = {
         VideoUtil.players[player.ID] = player
         switch (playerSpec.instrumentType) {
           case "violin":
-          case "cello":
+          case "viola":
             evt = new Event( VideoUtil.evtCount, 0, 0, player, {
               action: "posture", run_once: true,
               posture: [
@@ -175,7 +175,24 @@ const VideoUtil = {
             player.r_finger1.attach(bow)
             player.instrument = violin
             break;
-          case "viola":
+          case "cello":
+
+            evt = new Event( VideoUtil.evtCount, 0, 0, player, {
+              action: "posture", run_once: true,
+              posture: [
+                {l_leg: [{raise: [0,90]}, {straddle: [0, 45]}]}, {l_knee: [{bend: [0,100]}]},
+                {r_leg: [{raise: [0,90]}, {straddle: [0, 45]}]}, {r_knee: [{bend: [0,100]}]},
+                {l_arm: [{raise: [0,45]}, {straddle: [0,10]}, {turn: [0,-25]}]},
+                {l_elbow: [{bend: [0,110]}, {turn: [0,10]}]},
+                {l_wrist: [{tilt: [0,40]}, {bend: [0,-10]}, {turn: [0,0]}]},
+              ]
+            })
+            VideoUtil.all_events[VideoUtil.evtCount++] = evt
+            const cello = new Cello({ x: 3, y: 0, z: 0 }, { x: 0, y: 180, z: 80 })
+            player.neck.attach(cello)
+            bow = new Bow()
+            player.r_finger1.attach(bow)
+            player.instrument = cello
             break
           case "piano":
             evt = new Event( VideoUtil.evtCount, 0, 0, player, {
@@ -507,20 +524,22 @@ const VideoUtil = {
     }) // end of Promise.all
   },
 
-  queueMoveBow: (player, sched, duration, upbow, strNum, fingerNum) => {
+  // instrumentType in ['violin', 'cello']
+  queueMoveBow: (player, instrumentType, sched, duration, upbow, strNum, fingerNum) => {
+    let evt
     // left-hand fingers
     for (let i = 1; i <= 4; i++) { // finger numbers
       if (i == fingerNum) {
         let pos = {}
         pos['l_finger' + i] = [{bend: [60, 60]}]
-        let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
         VideoUtil.all_events[VideoUtil.evtCount++] = evt
       } else {
         let pos = {}
         pos['l_finger' + i] = [{bend: [40, 40]}]
-        let evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
         VideoUtil.all_events[VideoUtil.evtCount++] = evt
@@ -528,32 +547,68 @@ const VideoUtil = {
     }
 
     // right arm for the right string
-    let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-          action: "posture", run_once: true,
-          posture: [{r_arm: [{straddle: [65 + strNum * 5, 65 + strNum * 5]}]}]
-    })
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    switch (instrumentType) {
+      case "violin":
+        evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+              action: "posture", run_once: true,
+              posture: [{r_arm: [{straddle: [65 + strNum * 5, 65 + strNum * 5]}]}]
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
 
-    // up-bow or down-bow
-    if (upbow) { // Execute up bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-            action: "posture",
-            posture: [
-              {r_elbow: [{bend: [75, 135]}]},
-              {r_wrist: [{tilt: [30, -30]}, {turn: [0,-5]}]}
-            ]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    } else { // Execute down bow
-      let evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
-            action: "posture",
-            posture: [
-              {r_elbow: [{bend: [135, 75]}]},
-              {r_wrist: [{tilt: [-30, 30]},  {turn: [-5,0]}]
-            }]
-      })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-    }
+        // up-bow or down-bow
+        if (upbow) { // Execute up bow
+          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+                action: "posture",
+                posture: [
+                  {r_elbow: [{bend: [75, 135]}]},
+                  {r_wrist: [{tilt: [30, -30]}, {turn: [0,-5]}]}
+                ]
+          })
+          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        } else { // Execute down bow
+          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+                action: "posture",
+                posture: [
+                  {r_elbow: [{bend: [135, 75]}]},
+                  {r_wrist: [{tilt: [-30, 30]},  {turn: [-5,0]}]
+                }]
+          })
+          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        }
+        break
+      case "cello":
+        evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          action: "posture", run_once: true,
+          posture: [{r_arm: [
+            {straddle: [50 + strNum * 0, 50 + strNum * 0]},
+            {raise: [40, 40]},
+            {bend: [50, 50]}
+          ]}]
+        })
+        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+
+        // up-bow or down-bow
+        if (upbow) { // Execute up bow
+          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+                action: "posture",
+                posture: [
+                  {r_elbow: [{bend: [-10, 50]}]},
+                  {r_wrist: [{tilt: [25, -25]}, {turn: [-50,-50]}, {bend: [40, 60]}]}
+                ]
+          })
+          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        } else { // Execute down bow
+          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+                action: "posture",
+                posture: [
+                  {r_elbow: [{bend: [50, -10]}]},
+                  {r_wrist: [{tilt: [-25, 25]},  {turn: [-50,-50]}, {bend: [60, 40]}]
+                }]
+          })
+          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        }
+        break;
+      }
   },
 
   queuePianoKey: (player, sched, duration, note) => {

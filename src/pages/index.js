@@ -124,8 +124,8 @@ export default function Home() {
             {videoButtonText}
           </Button>
           <span id="audio_container"></span>
-            <audio controls></audio>
-          <MusicPlayerSlider duration={duration} position={5}/>
+          <audio controls></audio>
+          {/* <MusicPlayerSlider duration={duration} position={5}/> */}
           <div id="three-scene"></div>
         </div>
       </main>

@@ -82,12 +82,20 @@ const AudioUtil = {
           AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity)
           switch (instrument) {
             case "violin":
-            case "cello":
               if (j == 3) {
                 // push only once for chords
                 const strNum = AudioUtil.getViolinStringFromNote(note)
                 const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-                VideoUtil.queueMoveBow(player, vsched, duration, bowdir, strNum, fingerNum)
+                VideoUtil.queueMoveBow(player, "violin", vsched, duration, bowdir, strNum, fingerNum)
+                bowdir = !bowdir
+              }
+              break;
+            case "cello":
+              if (j == 3) {
+                // push only once for chords
+                const strNum = AudioUtil.getViolinStringFromNote(note) // need cello equivalent
+                const fingerNum = AudioUtil.getViolinFingerFromNote(note) // need cello equivalent
+                VideoUtil.queueMoveBow(player, "cello", vsched, duration, bowdir, strNum, fingerNum)
                 bowdir = !bowdir
               }
               break;
