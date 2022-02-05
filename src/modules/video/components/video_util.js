@@ -82,19 +82,30 @@ const VideoUtil = {
     window.addEventListener('resize', onWindowResize, false)
     onWindowResize()
 
-    const texture = new THREE.TextureLoader().load("/textures/wood_floor.jpg")
+    const floorTexture = new THREE.TextureLoader().load("/textures/wood_floor.jpg")
     const ground = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(1000, 1000),
-      new THREE.MeshPhongMaterial({
-        color: 'antiquewhite',
-        shininess: 1,
-        map: texture
-      })
-    );
-    ground.receiveShadow = true;
-    ground.position.y = -29.5;
-    ground.rotation.x = -Math.PI / 2;
-    VideoUtil.scene.add(ground);
+      new THREE.MeshPhongMaterial({ color: 'antiquewhite', shininess: 1, map: floorTexture })
+    )
+    ground.receiveShadow = true
+    ground.position.y = -29.5
+    ground.rotation.x = -Math.PI/2
+    VideoUtil.scene.add(ground)
+
+    // Dome
+    const points = []
+    for ( let i = 0; i < 20; i ++ ) {
+	    points.push( new THREE.Vector2( Math.cos( i/20 * Math.PI/2 ) * 10 , i * 0.5 ))
+    }
+    const wallTexture = new THREE.TextureLoader().load("/textures/wall.jpg")
+    const dome = new THREE.Mesh(
+      new THREE.LatheGeometry( points, 12, 0.375 * Math.PI, 1.25 * Math.PI ),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: wallTexture })
+    )
+    dome.receiveShadow = true
+    dome.scale.set(30, 30, 30)
+    dome.position.y = ground.position.y
+    VideoUtil.scene.add(dome)
 
     VideoUtil.scene.rotation.x = rad(10)
     VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
