@@ -109,7 +109,7 @@ const AudioUtil = {
   },
 
   // synth, notes, startTime - returns duration on this synth
-  playNotes: (synth, instrument, notes, startTime, vstartTime, speed, trackIdx) => {
+  playNotes: (synth, instrument, player, notes, startTime, speed) => {
     let bowdir = true
     let curr = startTime // audio clock (Tone.now())
     notes.forEach((noteArr, i) => {
@@ -118,25 +118,23 @@ const AudioUtil = {
         if (j == 0) {
           duration = el * speed
         } else {
+          const velocity = 0.5
           const note = el
-          const vsched = vstartTime + (curr - startTime)
+          const vsched = curr // startTime + (curr - startTime)
           if (note != "R") { // "R" is a rest
-            AudioUtil.queuePlayNote(synth, note, vsched, duration)
+            AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity)
             switch (instrument) {
               case "violin":
                 if (j == 1) {
                   // push only once for chords
                   const strNum = AudioUtil.getViolinStringFromNote(note)
                   const fingerNum = AudioUtil.getViolinFingerFromNote(note)
-                  // queue video event
-                  if (trackIdx < 2) { // TODO - fix this hack - 2 players needs generalization
-                    VideoUtil.queueMoveBow(trackIdx, vsched, duration, bowdir, strNum, fingerNum)
-                  }
+                  VideoUtil.queueMoveBow(player, "violin", vsched, duration, bowdir, strNum, fingerNum)
                   bowdir = !bowdir
                 }
                 break;
               case "piano":
-                VideoUtil.queuePianoKey(trackIdx, vsched, duration, note)
+                VideoUtil.queuePianoKey(player, vsched, duration, note)
                 break;
             }
           }
@@ -331,13 +329,12 @@ const AudioUtil = {
           if (fileType == "json") {
             const dur =
               AudioUtil.playNotes(
-                blob.synth, blob.track.instrument, blob.track.data,
-                now, vnow, blob.track.speed, blobIdx
-              )
+                blob.synth, blob.track.instrument, blob.player, blob.track.data, now, blob.track.speed )
             if (dur > maxDur) maxDur = dur
           } else if (fileType == "midi") {
             const dur =
-              AudioUtil.playMIDINotes( blob.synth, blob.track.instrument, blob.player, blob.track.data, now )
+              AudioUtil.playMIDINotes(
+                blob.synth, blob.track.instrument, blob.player, blob.track.data, now )
             if (dur > maxDur) maxDur = dur
           }
         }
