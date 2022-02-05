@@ -7,7 +7,6 @@ import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
 import { Chair, Violin, Cello, Bow, Piano } from "./models"
-import { DoorBack } from '@mui/icons-material'
 
 export class Clock {
   constructor() {
@@ -85,7 +84,9 @@ const VideoUtil = {
     const floorTexture = new THREE.TextureLoader().load("/textures/wood_floor.jpg")
     const ground = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(1000, 1000),
-      new THREE.MeshPhongMaterial({ color: 'antiquewhite', shininess: 1, map: floorTexture })
+      new THREE.MeshPhongMaterial({
+        color: 'antiquewhite', side: THREE.DoubleSide,
+        shininess: 1, map: floorTexture })
     )
     ground.receiveShadow = true
     ground.position.y = -29.5
@@ -99,13 +100,14 @@ const VideoUtil = {
     }
     const wallTexture = new THREE.TextureLoader().load("/textures/wall.jpg")
     const dome = new THREE.Mesh(
-      new THREE.LatheGeometry( points, 12, 0.375 * Math.PI, 1.25 * Math.PI ),
+      new THREE.LatheGeometry( points, 12, 0.0 * Math.PI, 2 * Math.PI ),
       new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: wallTexture })
     )
     dome.receiveShadow = true
-    dome.scale.set(30, 30, 30)
+    dome.scale.set(40, 40, 40)
     dome.position.y = ground.position.y
     VideoUtil.scene.add(dome)
+
 
     VideoUtil.scene.rotation.x = rad(10)
     VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
@@ -133,8 +135,8 @@ const VideoUtil = {
       piano: [
         // {position: {x: 0, y: -10, z: -80}, rotation: {x: 0, y: -1/6 * Math.PI, z: 0}},
         // {position: {x: 75, y: -10, z: -75}, rotation: {x: 0, y: -1.25 * Math.PI, z: 0}},
-        {position: {x: 30, y: -10, z: 50}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
-        {position: {x: -30, y: -10, z: 50}, rotation: {x: 0, y: -1 * Math.PI, z: 0}},
+        {position: {x: -30, y: -10, z: 50}, rotation: {x: 0, y: -1.125 * Math.PI, z: 0}},
+        {position: {x: 30, y: -10, z: 50}, rotation: {x: 0, y: -0.875 * Math.PI, z: 0}},
 
       ]
     }
@@ -269,25 +271,7 @@ const VideoUtil = {
     Mannequin.texLimb = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAAQMAAACQp+OdAAAABlBMVEX////Ly8vsgL9iAAAAHElEQVQoz2OgEPyHAjgDjxoKGWTaRRkYDR/8AAAU9d8hJ6+ZxgAAAABJRU5ErkJggg==");
 
     VideoUtil.players = {}
-
-    VideoUtil.sceneSpec = {
-      players: [
-        {
-          position: {x: -40, y: 3, z: 0}, rotation: {x: 0, y: 1.571, z: 0},
-          instrument: "violin", 
-          light: {
-            type: "SpotLight", color: "white", intensity: 0.2,
-            position: {x: -40, y: 40, z: 0}, "mapSize.width": 1024, "mapSize.height": 1024,
-            angle: 0.35, castShadow: true
-          }
-        },
-      ],
-      lights: [
-        {type: "AmbientLight", color: "white", intensity: 0.5},
-        {type: "PointLight", color: "white", intensity: 0.5, position: {x: 0, y: 100, z: 0},
-          "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
-      ]
-    }
+    VideoUtil.sceneSpec = { players: [], lights: [] }
     VideoUtil.layoutScene()
     VideoUtil.loadAssets(doneCallback, doneVal)
 

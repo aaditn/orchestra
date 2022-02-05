@@ -255,6 +255,11 @@ const AudioUtil = {
         }
       }
     }
+    sceneSpec.lights = [
+      {type: "AmbientLight", color: "white", intensity: 0.8},
+      {type: "PointLight", color: "white", intensity: 0.4, position: {x: 0, y: 100, z: 0},
+        "mapSize.width": 1024, "mapSize.height": 1024, "castShadow": true },
+    ]
     return sceneSpec
   },
 
