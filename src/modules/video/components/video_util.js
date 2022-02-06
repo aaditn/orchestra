@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as Tone from 'tone'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, rad} from './mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
@@ -7,6 +8,7 @@ import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { VideoActions } from './video_actions'
 import { Chair, Violin, Cello, Bow, Piano } from "./models"
+import { ThirtyFpsSharp } from '@mui/icons-material'
 
 export class Clock {
   constructor() {
@@ -29,8 +31,8 @@ export class Clock {
 // if start >= end, event is instant i.e. triggers once at start, goes from ready -> done
 // for events with duration, event transition from ready -> active -> done
 export class Event {
-  constructor(id, start, end, actor, data) {
-    this.ID = id
+  constructor(evtStream, start, end, actor, data) {
+    this.ID = evtStream.evtCount
     this.start = start   // duration start
     this.end = end     // duration end
     this.actor = actor
@@ -41,6 +43,26 @@ export class Event {
   }
 }
 
+export class EventStream {
+  constructor() {
+    this.all_events = {}
+    this.sorted_event_ids = []
+    this.evt_count = 1
+  }
+
+  get allEvents() { return this.all_events }
+  set allEvents(eventHash) { this.all_events = eventHash }
+  get evtCount() { return this.evt_count }
+  set evtCount(count) { this.evt_count = count }
+
+  incrEvtCount() { this.evt_count++ }
+  addEvent(evt) {
+    this.all_events[this.evt_count] = evt
+    this.evt_count++
+  }
+  deleteEvent(evtId) { delete this.all_events[evtId] }
+}
+
 //-------- START VideoUtil --------//
 const VideoUtil = {
   scene: null,
@@ -48,17 +70,15 @@ const VideoUtil = {
   renderer: null,
   lights: [],
   clock: null,
-  controls: null,
   movie: {},
   sceneSpec: {},
   players: {},
-  all_events: {},
+  eventStream: null,
+  posAudio: null,
 
-  mixer: null,
   facecap_mesh: null,
   facecap_action: null,
   gameCounter: 0,
-  evtCount: 1,
 
   // overridden from mannequin.js
   createScene: () => {
@@ -72,6 +92,10 @@ const VideoUtil = {
 
     VideoUtil.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
     VideoUtil.camera.position.set(0, 0, 300)
+    // const listener = new THREE.AudioListener()
+    // VideoUtil.camera.add( listener )
+    // const posAudio = new THREE.PositionalAudio( listener )
+
 
     const onWindowResize = (event) => {
       VideoUtil.camera.aspect = window.innerWidth / window.innerHeight
@@ -110,7 +134,7 @@ const VideoUtil = {
 
 
     VideoUtil.scene.rotation.x = rad(10)
-    VideoUtil.controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
+    const controls = new OrbitControls(VideoUtil.camera, VideoUtil.renderer.domElement);
     VideoUtil.clock = new Clock()
   },
 
@@ -159,6 +183,7 @@ const VideoUtil = {
   // layout scene triggered by choice of song, done dynamically
   // sceneSpec specifies how many players (position) and what type
   layoutScene: () => {
+    VideoUtil.eventStream = new EventStream()
     VideoUtil.players = {}
     VideoUtil.lights  = []
 
@@ -173,7 +198,7 @@ const VideoUtil = {
         switch (playerSpec.instrumentType) {
           case "violin":
           case "viola":
-            evt = new Event( VideoUtil.evtCount, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream, 0, 0, player, {
               action: "posture", run_once: true,
               posture: [
                 {l_arm: [{raise: [0,45]}, {straddle: [0,0]}, {turn: [0,-5]}]},
@@ -181,7 +206,7 @@ const VideoUtil = {
                 {l_wrist: [{tilt: [0,-60]}, {bend: [0,-10]}, {turn: [0,170]}]},
               ]
             })
-            VideoUtil.all_events[VideoUtil.evtCount++] = evt
+            VideoUtil.eventStream.addEvent(evt)
             const violin = new Violin({ x: 17, y: -7, z: -5 }, { x: 0, y: 10, z: -5 })
             player.neck.attach(violin)
             bow = new Bow()
@@ -190,7 +215,7 @@ const VideoUtil = {
             break;
           case "cello":
 
-            evt = new Event( VideoUtil.evtCount, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream, 0, 0, player, {
               action: "posture", run_once: true,
               posture: [
                 {l_leg: [{raise: [0,90]}, {straddle: [0, 45]}]}, {l_knee: [{bend: [0,100]}]},
@@ -200,7 +225,7 @@ const VideoUtil = {
                 {l_wrist: [{tilt: [0,40]}, {bend: [0,-10]}, {turn: [0,0]}]},
               ]
             })
-            VideoUtil.all_events[VideoUtil.evtCount++] = evt
+            VideoUtil.eventStream.addEvent(evt)
             const cello = new Cello({ x: 3, y: 0, z: 0 }, { x: 0, y: 180, z: 80 })
             player.neck.attach(cello)
             bow = new Bow()
@@ -208,7 +233,7 @@ const VideoUtil = {
             player.instrument = cello
             break
           case "piano":
-            evt = new Event( VideoUtil.evtCount, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream.evtCount, 0, 0, player, {
               action: "posture", run_once: true,
               posture: [
                 {torso: [{bend: [0,0]}]},
@@ -222,7 +247,7 @@ const VideoUtil = {
                 {r_wrist: [{tilt: [0,0]}, {turn: [0,90]}]}
               ]
             })
-            VideoUtil.all_events[VideoUtil.evtCount++] = evt
+            VideoUtil.eventStream.addEvent(evt)
             /*
             {l_arm: [{straddle: [0,0]}]}, // paramt = 1 (middle of keyboard)
             {l_elbow: [{bend: [0,90]}, {turn: [0,0]}]},
@@ -416,9 +441,9 @@ const VideoUtil = {
             break
         }
         if (actor && !e.inactive) {
-          VideoUtil.all_events[VideoUtil.evtCount] =
-            new Event(VideoUtil.evtCount, e.start, e.end, actor, e.data)
-          VideoUtil.evtCount++
+          VideoUtil.eventStream.addEvent(
+            new Event(VideoUtil.eventStream, e.start, e.end, actor, e.data)
+          )
         }
       })
     }
@@ -436,7 +461,7 @@ const VideoUtil = {
   },
 
   clearEvents: () => {
-    VideoUtil.all_events = {}
+    VideoUtil.eventStream.allEvents = {}
   },
 
   loadMovieScript: async function (fileUrl) {
@@ -501,7 +526,7 @@ const VideoUtil = {
           VideoUtil.facecap_mesh.scale.set(37, 37, 37)
 
           VideoUtil.scene.add(VideoUtil.facecap_mesh);
-          VideoUtil.mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
+          const mixer = new THREE.AnimationMixer(VideoUtil.facecap_mesh)
           VideoUtil.players[2].head.attach(VideoUtil.facecap_mesh)
           */
 
@@ -527,52 +552,52 @@ const VideoUtil = {
       if (i == fingerNum) {
         let pos = {}
         pos['l_finger' + i] = [{bend: [60, 60]}]
-        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
       } else {
         let pos = {}
         pos['l_finger' + i] = [{bend: [40, 40]}]
-        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched, player, {
           action: "posture", run_once: true, posture: [pos]
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
       }
     }
 
     // right arm for the right string
     switch (instrumentType) {
       case "violin":
-        evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
               action: "posture", run_once: true,
               posture: [{r_arm: [{straddle: [65 + strNum * 5, 65 + strNum * 5]}]}]
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
 
         // up-bow or down-bow
         if (upbow) { // Execute up bow
-          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
                 action: "posture",
                 posture: [
                   {r_elbow: [{bend: [75, 135]}]},
                   {r_wrist: [{tilt: [30, -30]}, {turn: [0,-5]}]}
                 ]
           })
-          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+          VideoUtil.eventStream.addEvent(evt)
         } else { // Execute down bow
-          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
                 action: "posture",
                 posture: [
                   {r_elbow: [{bend: [135, 75]}]},
                   {r_wrist: [{tilt: [-30, 30]},  {turn: [-5,0]}]
                 }]
           })
-          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+          VideoUtil.eventStream.addEvent(evt)
         }
         break
       case "cello":
-        evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
           action: "posture", run_once: true,
           posture: [{r_arm: [
             {straddle: [50 + strNum * 0, 50 + strNum * 0]},
@@ -580,27 +605,27 @@ const VideoUtil = {
             {bend: [50, 50]}
           ]}]
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
 
         // up-bow or down-bow
         if (upbow) { // Execute up bow
-          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
                 action: "posture",
                 posture: [
                   {r_elbow: [{bend: [-10, 50]}]},
                   {r_wrist: [{tilt: [25, -25]}, {turn: [-50,-50]}, {bend: [40, 60]}]}
                 ]
           })
-          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+          VideoUtil.eventStream.addEvent(evt)
         } else { // Execute down bow
-          evt = new Event( VideoUtil.evtCount, sched, sched + duration, player, {
+          evt = new Event( VideoUtil.eventStream, sched, sched + duration, player, {
                 action: "posture",
                 posture: [
                   {r_elbow: [{bend: [50, -10]}]},
                   {r_wrist: [{tilt: [-25, 25]},  {turn: [-50,-50]}, {bend: [60, 40]}]
                 }]
           })
-          VideoUtil.all_events[VideoUtil.evtCount++] = evt
+          VideoUtil.eventStream.addEvent(evt)
         }
         break;
       }
@@ -617,7 +642,7 @@ const VideoUtil = {
       let paramt = null
       if (keyIdx < 42) {
         paramt = keyIdx / 42.0
-        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched, player, {
           action: "posture", run_once: true,
           posture: [
             {l_arm: [{straddle: [0,50-50*paramt]}]}, 
@@ -625,10 +650,10 @@ const VideoUtil = {
             {l_wrist: [{tilt: [0,-40+50*paramt]}, {turn: [0,150-60*paramt]}]}
           ]
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
       } else {
         paramt = (keyIdx - 42) / 42.0
-        evt = new Event( VideoUtil.evtCount, sched, sched, player, {
+        evt = new Event( VideoUtil.eventStream, sched, sched, player, {
           action: "posture", run_once: true,
           posture: [
             {r_arm: [{straddle: [0,0+50*paramt]}]}, 
@@ -649,19 +674,19 @@ const VideoUtil = {
             {r_wrist: [{tilt: [0,50]}, {turn: [0,150]}]}
             */
         })
-        VideoUtil.all_events[VideoUtil.evtCount++] = evt
+        VideoUtil.eventStream.addEvent(evt)
       }
       const playedKey = piano.keys[keyIdx]
-      let evt = new Event( VideoUtil.evtCount, sched, sched, playedKey, {
+      let evt = new Event( VideoUtil.eventStream, sched, sched, playedKey, {
         action: "move", run_once: true,
         endPos: {x: playedKey.position.x, y: playedKey.position.y - 0.5, z: playedKey.position.z}
       })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
-      evt = new Event( VideoUtil.evtCount, sched + duration * 0.75, sched + duration * 0.75, playedKey, {
+      VideoUtil.eventStream.addEvent(evt)
+      evt = new Event( VideoUtil.eventStream, sched + duration * 0.75, sched + duration * 0.75, playedKey, {
         action: "move", run_once: true,
         endPos: {x: playedKey.position.x, y: playedKey.position.y, z: playedKey.position.z}
       })
-      VideoUtil.all_events[VideoUtil.evtCount++] = evt
+      VideoUtil.eventStream.addEvent(evt)
     }
   },
 
@@ -675,11 +700,12 @@ const VideoUtil = {
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0
     if (VideoUtil.gameCounter % 10 == 0) {
       // keep for debugging
+      console.log("NUM_EVENTS =", Object.keys(VideoUtil.eventStream.allEvents).length)
     }
 
     // cycle through events and process as needed
-    for (let evtId in VideoUtil.all_events) {
-      const evt = VideoUtil.all_events[evtId]
+    for (let evtId in VideoUtil.eventStream.allEvents) {
+      const evt = VideoUtil.eventStream.allEvents[evtId]
       const start = evt.start
       const end = evt.end
       switch (evt.status) {
@@ -704,8 +730,8 @@ const VideoUtil = {
           }
           break
         case 'done':
-          // do nothing
-          delete VideoUtil.all_events[evtId]
+          // delete VideoUtil.allEvents[evtId]
+          VideoUtil.eventStream.deleteEvent(evtId)
           break
         default:
           break

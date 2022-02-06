@@ -62,10 +62,11 @@ const AudioUtil = {
   queuePlayNote: (synth, note, when, duration, velocity) => {
     const player = null
     const vel    = velocity || 0.5
-    let evt = new Event(VideoUtil.evtCount, when, when + duration, player, {
+    let evt = new Event(VideoUtil.eventStream, when, when + duration, player, {
       action: "playNote", synth: synth, note: note, run_once: true, velocity: vel
     })
-    VideoUtil.all_events[VideoUtil.evtCount++] = evt
+    VideoUtil.eventStream.addEvent(evt)
+    // VideoUtil.allEvents[VideoUtil.evtCount++] = evt
   },
 
   // synth, notes, startTime - returns duration on this synth
@@ -80,6 +81,19 @@ const AudioUtil = {
         const note = noteArr[j]
         if (note != "R") { // "R" is a rest
           AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity)
+          /*
+          let multiNote = false
+          if (i > 0) {
+            const prevNote = notes[i-1]
+            if (Math.abs(noteArr[0]- prevNote[0]) < 0.001 && Math.abs(noteArr[1]- prevNote[1]) < 0.001) {
+              multiNote = true // use to prevent multiple bows for double stops for cello/violin
+            }
+            if (!multiNote && prevNote[0] + prevNote[1] > noteArr[0]) {
+              // console.log("OVERLAP: ", prevNote[0], prevNote[1].toFixed(5), noteArr[0], noteArr[1].toFixed(5))
+              multiNote = true
+            }
+          }
+          */
           switch (instrument) {
             case "violin":
               if (j == 3) {
@@ -146,7 +160,7 @@ const AudioUtil = {
 
   startRecorder: () => {
     const audioElem = document.querySelector('audio')
-    const actx = Tone.context;
+    const actx = Tone.context
     const dest = actx.createMediaStreamDestination()
     AudioUtil.chunks = [] // initialize audio chunks
     AudioUtil.recorder = new MediaRecorder(dest.stream)
@@ -274,14 +288,6 @@ const AudioUtil = {
     if (Object.keys(tracks).length > 0) {
       for (let vname in tracks) {
         const track = tracks[vname]
-        const synth = SampleLibrary.load({ instruments: track.instrument })
-        // const distortion = new Tone.Distortion(0.5);
-        // const filter = new Tone.AutoFilter(4).start();
-        // const panner3d = new Tone.Panner3D({pannerX: 200, pannerY: -17, pannerZ: -1})
-        // synth.chain(panner3d, Tone.Destination)
-        synth.toDestination()
-        synth.connect(dest) // connect synth to AudioUtil.recorder as well
-        synth.volume.value = -6
 
         //---- Start Populate trackPlayerMap ---//
         if (instruments[track.instrument]) instruments[track.instrument] += 1
@@ -294,6 +300,23 @@ const AudioUtil = {
           }
         }
         //----  End Populate trackPlayerMap ---//
+
+        const synth = SampleLibrary.load({ instruments: track.instrument })
+        const reverb = new Tone.Reverb(1)
+        // const distortion = new Tone.Distortion(0.5);
+        // const filter = new Tone.AutoFilter(4).start();
+        const pos = player ? player.position : {x: 0, y: 0, z: 0}
+        const panner3d = new Tone.Panner3D({
+          positionX: pos.x, positionY: pos.y, positionZ: pos.z,
+          refDistance: 10, panningModel: "HRTF"
+        })
+        // synth.chain(panner3d, Tone.Destination)
+        synth.chain(reverb, panner3d, Tone.Destination)
+        synth.toDestination()
+        synth.connect(dest) // connect synth to AudioUtil.recorder as well
+        synth.volume.value = -6
+
+
         AudioUtil.score.push({ synth: synth, track: track, player: player })
       }
       console.log("INSTRUMENTS:", instruments)

@@ -147,7 +147,7 @@ export class Piano extends THREE.Group {
     const BASELEN = 50
     const pianoMaterial = new THREE.MeshLambertMaterial({ color: 0xa48444 })
     let base = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 1, 6), pianoMaterial)
-    base.position.set(0, -9, 0); base.castShadow = true
+    base.position.set(0, -9, 0); // base.castShadow = true
 
     let back = new THREE.Mesh(new THREE.BoxGeometry(BASELEN, 30, 1), pianoMaterial)
     back.position.set(0, -12, -4); base.add(back)
@@ -180,7 +180,7 @@ export class Piano extends THREE.Group {
       }
     }
     this.keys.forEach(key => {
-      base.add(key)
+      base.add(key) // ; key.castShadow = true
     })
 
     this.add(base)
