@@ -1,7 +1,8 @@
 import * as Tone from 'tone'
 import { Midi } from '@tonejs/midi'
 import { SampleLibrary } from './Tonejs-Instruments'
-import { VideoUtil, Event } from '../../video/components/video_util'
+import { VideoUtil } from '../../video/components/video_util'
+import { Event } from "../../event/event_util"
 import { ElectricCar } from '@mui/icons-material'
 
 const AudioUtil = {
