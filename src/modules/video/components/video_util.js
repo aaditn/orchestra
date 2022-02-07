@@ -46,21 +46,78 @@ export class Event {
 export class EventStream {
   constructor() {
     this.all_events = {}
+    this.active_events = {}
     this.sorted_event_ids = []
-    this.evt_count = 1
+    this.evt_count  = 0
+    this.curr_ptr   = 0
   }
 
-  get allEvents() { return this.all_events }
-  set allEvents(eventHash) { this.all_events = eventHash }
+  get all() { return this.all_events }
+  set all(eventHash) { this.all_events = eventHash }
+  get active() { return this.active_events }
+  set active(eventHash) { this.active_events = eventHash }
   get evtCount() { return this.evt_count }
   set evtCount(count) { this.evt_count = count }
+  get sortedEvents() { return this.sorted_event_ids }
+  set sortedEvents(sortedEventIds) { this.sorted_event_ids = sortedEventIds }
+  get currPtr() { return this.curr_ptr }
+  set currPtr(ptr) { this.curr_ptr = ptr }
 
-  incrEvtCount() { this.evt_count++ }
+  setSortedEvents() { // call after all events loaded
+    let eventIds = Object.keys(this.all_events)
+    this.sorted_event_ids = eventIds.sort((evtId1, evtId2) => {
+      return this.all_events[evtId1].start - this.all_events[evtId2].start
+    })
+  }
   addEvent(evt) {
     this.all_events[this.evt_count] = evt
     this.evt_count++
   }
   deleteEvent(evtId) { delete this.all_events[evtId] }
+  deleteActiveEvent(evtId) { delete this.active_events[evtId] }
+  computeCurrPtr(t) { // Approximate only - not an exact curr_ptr
+    // search forward
+    for (let i = 0; i < this.sorted_event_ids.length; i++) {
+      const evt = this.all_events[this.sorted_event_ids[i]]
+      if (evt) {
+        if (Math.abs(evt.start - t) < 0.1) {
+          this.curr_ptr = i
+          break;
+        }
+      }
+    }
+  }
+  cacheActive(bts, fts) { // backward, forward timestamps to cache
+    // start from curr_ptr and move backward, forward
+    let done = false
+    let ptr  = this.curr_ptr
+    while (ptr >= 0 && !done) { // look backward
+      const evt = this.all_events[this.sorted_event_ids[ptr]]
+      if (!evt || evt.start <= bts) {
+        done = true
+      } else {
+        if (evt.status != 'done' && evt.start >= bts && !(evt.ID in this.active_events)) {
+          this.active_events[evt.ID] = evt
+        }
+      }
+      ptr--
+    }
+    done = false
+    ptr  = this.curr_ptr
+    let len = this.sorted_event_ids.length
+    while (ptr < len && !done) { // look backward
+      const evt = this.all_events[this.sorted_event_ids[ptr]]
+      if (!evt || evt.start >= fts) {
+        done = true
+      } else {
+        if (evt.status != 'done' && evt.start <= fts && !(evt.ID in this.active_events)) {
+          this.active_events[evt.ID] = evt
+        }
+      }
+      ptr++
+    }
+    // console.log("CACHELEN = ", Object.keys(this.active_events).length)
+  }
 }
 
 //-------- START VideoUtil --------//
@@ -192,13 +249,14 @@ const VideoUtil = {
     if (playerArr) {
       playerArr.forEach((playerSpec) => {
         let bow, evt
+        const now = Tone.now()
         const player = VideoUtil.processPlayerSpec(playerSpec)
         player.instrumentType = playerSpec.instrumentType
         VideoUtil.players[player.ID] = player
         switch (playerSpec.instrumentType) {
           case "violin":
           case "viola":
-            evt = new Event( VideoUtil.eventStream, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream, now, now, player, {
               action: "posture", run_once: true,
               posture: [
                 {l_arm: [{raise: [0,45]}, {straddle: [0,0]}, {turn: [0,-5]}]},
@@ -215,7 +273,7 @@ const VideoUtil = {
             break;
           case "cello":
 
-            evt = new Event( VideoUtil.eventStream, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream, now, now, player, {
               action: "posture", run_once: true,
               posture: [
                 {l_leg: [{raise: [0,90]}, {straddle: [0, 45]}]}, {l_knee: [{bend: [0,100]}]},
@@ -233,7 +291,7 @@ const VideoUtil = {
             player.instrument = cello
             break
           case "piano":
-            evt = new Event( VideoUtil.eventStream.evtCount, 0, 0, player, {
+            evt = new Event( VideoUtil.eventStream, now, now, player, {
               action: "posture", run_once: true,
               posture: [
                 {torso: [{bend: [0,0]}]},
@@ -275,8 +333,14 @@ const VideoUtil = {
             VideoUtil.lights.push(light)
           }
         }
-      })
-    }
+      }) // forEach((playerSpec)
+      // cache these one-off events and playback in event loop
+      const now = VideoUtil.clock.getElapsedTime()
+      VideoUtil.eventStream.setSortedEvents()
+      VideoUtil.eventStream.computeCurrPtr(now)
+      VideoUtil.eventStream.cacheActive(0, now + 5)
+    } // if (playerArr)
+
     // handle independent lights (not tied to actors)
     const lightsArr = VideoUtil.sceneSpec.lights
     if (lightsArr) {
@@ -461,7 +525,8 @@ const VideoUtil = {
   },
 
   clearEvents: () => {
-    VideoUtil.eventStream.allEvents = {}
+    VideoUtil.eventStream.all = {}
+    VideoUtil.eventStream.active = {}
   },
 
   loadMovieScript: async function (fileUrl) {
@@ -660,19 +725,19 @@ const VideoUtil = {
             {r_elbow: [{bend: [0,90-45*paramt]}]},
             {r_wrist: [{tilt: [0,10+40*paramt]}, {turn: [0,90+60*paramt]}]}
           ]
-            /*
-            {l_arm: [{straddle: [0,0]}]}, // paramt = 1 (middle of keyboard)
-            {l_elbow: [{bend: [0,90]}]},
-            {l_wrist: [{tilt: [0,10]}, {turn: [0,90]}]}
+          /*
+          {l_arm: [{straddle: [0,0]}]}, // paramt = 1 (middle of keyboard)
+          {l_elbow: [{bend: [0,90]}]},
+          {l_wrist: [{tilt: [0,10]}, {turn: [0,90]}]}
 
-            {l_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
-            {l_elbow: [{bend: [0,45]}]},
-            {l_wrist: [{tilt: [0,-40]}, {turn: [0,150]}]}
+          {l_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
+          {l_elbow: [{bend: [0,45]}]},
+          {l_wrist: [{tilt: [0,-40]}, {turn: [0,150]}]}
 
-            {r_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
-            {r_elbow: [{bend: [0,45]}]},
-            {r_wrist: [{tilt: [0,50]}, {turn: [0,150]}]}
-            */
+          {r_arm: [{straddle: [0,50]}]}, // paramt = 0 (lowest note)
+          {r_elbow: [{bend: [0,45]}]},
+          {r_wrist: [{tilt: [0,50]}, {turn: [0,150]}]}
+          */
         })
         VideoUtil.eventStream.addEvent(evt)
       }
@@ -696,26 +761,29 @@ const VideoUtil = {
   },
 
   animate: (t) => {
+    const evtStream = VideoUtil.eventStream
+    if (VideoUtil.gameCounter % 100 == 0) {
+      evtStream.computeCurrPtr(t)
+      evtStream.cacheActive(t - 2, t + 5)
+      console.log("Animate heartbeat: gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
+    }
     VideoUtil.gameCounter++
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0
-    if (VideoUtil.gameCounter % 10 == 0) {
-      // keep for debugging
-      console.log("NUM_EVENTS =", Object.keys(VideoUtil.eventStream.allEvents).length)
-    }
 
-    // cycle through events and process as needed
-    for (let evtId in VideoUtil.eventStream.allEvents) {
-      const evt = VideoUtil.eventStream.allEvents[evtId]
+    for (let evtId in evtStream.active) {
+      const evt = evtStream.active[evtId]
       const start = evt.start
       const end = evt.end
       switch (evt.status) {
         case 'ready':
           if (evt.data.run_once) { // no duration event, only start time needed
             if (t >= start) {
+              // console.log("Started once:", t, evt.ID, evt.data.action)
               evt.status = 'done' // bypass active state for run_once
               VideoUtil.processEvent(t, evt)
             }
           } else if (t >= start) { // default event has duration
+            // console.log("Started:", t, evt.ID, evt.data.action)
             evt.status = 'active'
             evt.data.t0 = t
             VideoUtil.processEvent(t, evt) // first time
@@ -730,8 +798,9 @@ const VideoUtil = {
           }
           break
         case 'done':
-          // delete VideoUtil.allEvents[evtId]
-          VideoUtil.eventStream.deleteEvent(evtId)
+          // console.log("Deleted:", t, evt.ID, evt.data.action)
+          // evtStream.deleteEvent(evtId)
+          evtStream.deleteActiveEvent(evtId)
           break
         default:
           break

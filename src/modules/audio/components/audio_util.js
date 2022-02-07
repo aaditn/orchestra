@@ -2,6 +2,7 @@ import * as Tone from 'tone'
 import { Midi } from '@tonejs/midi'
 import { SampleLibrary } from './Tonejs-Instruments'
 import { VideoUtil, Event } from '../../video/components/video_util'
+import { ElectricCar } from '@mui/icons-material'
 
 const AudioUtil = {
 
@@ -59,14 +60,13 @@ const AudioUtil = {
     }
   },
 
-  queuePlayNote: (synth, note, when, duration, velocity) => {
+  queuePlayNote: (synth, note, when, duration, velocity, instrument) => {
     const player = null
     const vel    = velocity || 0.5
     let evt = new Event(VideoUtil.eventStream, when, when + duration, player, {
-      action: "playNote", synth: synth, note: note, run_once: true, velocity: vel
+      action: "playNote", synth: synth, note: note, run_once: true, velocity: vel, instrument: instrument
     })
     VideoUtil.eventStream.addEvent(evt)
-    // VideoUtil.allEvents[VideoUtil.evtCount++] = evt
   },
 
   // synth, notes, startTime - returns duration on this synth
@@ -136,7 +136,7 @@ const AudioUtil = {
           const note = el
           const vsched = curr // startTime + (curr - startTime)
           if (note != "R") { // "R" is a rest
-            AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity)
+            AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity, instrument)
             switch (instrument) {
               case "violin":
                 if (j == 1) {
@@ -343,10 +343,8 @@ const AudioUtil = {
 
   // Assumes AudioUtil.tracks is populated
   handleStartAudio: function (fileType, durationCallback) {
-
     Tone.loaded().then(() => {
       const now = Tone.now()
-      const vnow = VideoUtil.clock.getElapsedTime() // video startTime
       console.log("Audio start at:", now)
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
@@ -367,6 +365,7 @@ const AudioUtil = {
           }
         }
       })
+      VideoUtil.eventStream.setSortedEvents() // sorted array of eventIds - optimizing event loop
       durationCallback(maxDur)
     })
   },
