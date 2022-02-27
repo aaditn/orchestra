@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import Head from 'next/head'
+import PubSub from 'pubsub-js'
 import { AudioUtil } from '../modules/audio/components/audio_util'
 import { VideoUtil } from '../modules/video/components/video_util'
 import MusicPlayerSlider from '../modules/video/components/PlayerSlider'
@@ -12,12 +13,10 @@ export default function Home() {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false)
   const [duration, setDuration] = useState(0)
-  const [position, setPosition] = useState(0)
   const [audioRunning, setAudioRunning] = useState(false)
   const [audioButtonText, setAudioButtonText] = useState("Start Audio")
-  const [videoRunning, setVideoRunning] = useState(false)
-  const [videoButtonText, setVideoButtonText] = useState("Start Video")
   const [pieceSelected, setPieceSelected] = useState(0)
+
   const pieces = [
     {url: "/data/music/flight_of_the_bumble_bee.json", name: "Bumble Bee", type: "json"},
     {url: "/data/music/fugue_sonata1_bach.json", name: "Bach Fugue", type: "json"},
@@ -45,8 +44,6 @@ export default function Home() {
     console.log("Assetsloaded = ", assetsLoaded)
     if (assetsLoaded) {
       VideoUtil.attachRendererToDOM()
-      setVideoRunning(true)
-      setVideoButtonText("Pause Video")
       const piece = pieces[0]
       AudioUtil.loadAudioFile(piece.url, piece.type)
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
@@ -63,36 +60,16 @@ export default function Home() {
       setAudioButtonText("Start Audio")
     } else { // start video
       const piece = pieces[pieceSelected]
-      AudioUtil.handleStartAudio(piece.type, setDuration)
+      AudioUtil.handleStartAudio(piece.type)
       setAudioRunning(true)
       setAudioButtonText("Stop Audio")
-    }
-  }
-
-  const toggleVideo = () => {
-    if (videoRunning) { // stop video
-      setVideoRunning(false)
-      setVideoButtonText("Start Video")
-      // document.getElementById("three-scene").innerHTML = ""
-      VideoUtil.renderer.setAnimationLoop(null)
-      let now = performance.now() / 1000.0
-      VideoUtil.clock.stopTime = now
-      VideoUtil.clock.activeTime += VideoUtil.clock.stopTime - VideoUtil.clock.startTime
-    } else { // start video
-      setVideoRunning(true)
-      // document.getElementById("three-scene").appendChild(VideoUtil.renderer.domElement)
-      setVideoButtonText("Stop Video")
-      VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
-      let now = performance.now() / 1000.0
-      VideoUtil.clock.startTime = now
-      VideoUtil.clock.inactiveTime += VideoUtil.clock.startTime - VideoUtil.clock.stopTime
     }
   }
 
   const changePieceSelected = (evt) => {
     setPieceSelected(evt.target.value)
     const piece = pieces[evt.target.value]
-    AudioUtil.loadAudioFile(piece.url, piece.type)
+    AudioUtil.loadAudioFile(piece.url, piece.type, setDuration)
   }
 
   return (
@@ -120,12 +97,9 @@ export default function Home() {
             {audioButtonText}
           </Button>
           &nbsp; &nbsp;
-          <Button onClick={toggleVideo} variant="contained">
-            {videoButtonText}
-          </Button>
           <span id="audio_container"></span>
           <audio controls></audio>
-          {/* <MusicPlayerSlider duration={duration} position={5}/> */}
+          <MusicPlayerSlider/>
           <div id="three-scene"></div>
         </div>
       </main>

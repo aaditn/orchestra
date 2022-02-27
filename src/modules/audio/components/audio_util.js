@@ -1,4 +1,5 @@
 import * as Tone from 'tone'
+import PubSub from 'pubsub-js'
 import { Midi } from '@tonejs/midi'
 import { SampleLibrary } from './Tonejs-Instruments'
 import { VideoUtil } from '../../video/components/video_util'
@@ -9,9 +10,15 @@ const AudioUtil = {
 
   score: [],
   tracks: {},
+  startTime: 0,
   recorder: null,
   chunks: [],
   trackPlayerMap: {},
+  //--- Set up pubsub for global events ---//
+  mySubscriber: (msg, data) => {
+    console.log( "PUBSUB AUDIO: ", msg, data )
+  },
+  token: null, // for pubsub events
   setTracks: (trks) => { AudioUtil.tracks = trks },
 
   getInstrumentSampleMap: () => {
@@ -220,6 +227,19 @@ const AudioUtil = {
     return modJson
   },
 
+  getDuration: (tracks) => {
+    let maxDur = 0
+    for (let vname in tracks) {
+      const track = tracks[vname]
+      if (track && track.data) {
+        const lastNoteArr = track.data[track.data.length-1]
+        const thisMaxDur  = lastNoteArr[0] + lastNoteArr[1]
+        if (thisMaxDur > maxDur) maxDur = thisMaxDur
+      }
+    }
+    return maxDur
+  },
+
   loadAudioFile: async function (fileUrl, fileType) {
     if (fileType == "json") { // handle JSON file
       const response = await fetch(fileUrl, {
@@ -231,10 +251,12 @@ const AudioUtil = {
       const responseJson = await response.json()
       console.log(responseJson)
       AudioUtil.setTracks(responseJson)
+      PubSub.publish('MAX', {max:AudioUtil.getDuration(AudioUtil.tracks)})
     } else { // handle MIDI file
       const midi = await Midi.fromUrl(fileUrl)
       const modResponseJson = AudioUtil.postProcessMIDI(midi)
       AudioUtil.setTracks(modResponseJson)
+      PubSub.publish('MAX', {max:AudioUtil.getDuration(AudioUtil.tracks)})
     }
 
     // Create new scene based on tracks
@@ -317,7 +339,6 @@ const AudioUtil = {
         synth.connect(dest) // connect synth to AudioUtil.recorder as well
         synth.volume.value = -6
 
-
         AudioUtil.score.push({ synth: synth, track: track, player: player })
       }
       console.log("INSTRUMENTS:", instruments)
@@ -343,10 +364,10 @@ const AudioUtil = {
   },
 
   // Assumes AudioUtil.tracks is populated
-  handleStartAudio: function (fileType, durationCallback) {
+  handleStartAudio: function (fileType) {
     Tone.loaded().then(() => {
-      const now = Tone.now()
-      console.log("Audio start at:", now)
+      VideoUtil.startTime = Tone.now()
+      console.log("Audio start at:", VideoUtil.startTime)
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
         if (blob.player) {
@@ -356,18 +377,21 @@ const AudioUtil = {
           if (fileType == "json") {
             const dur =
               AudioUtil.playNotes(
-                blob.synth, blob.track.instrument, blob.player, blob.track.data, now, blob.track.speed )
+                blob.synth, blob.track.instrument, blob.player, blob.track.data,
+                VideoUtil.startTime, blob.track.speed
+              )
             if (dur > maxDur) maxDur = dur
           } else if (fileType == "midi") {
             const dur =
               AudioUtil.playMIDINotes(
-                blob.synth, blob.track.instrument, blob.player, blob.track.data, now )
+                blob.synth, blob.track.instrument, blob.player,
+                blob.track.data, VideoUtil.startTime
+              )
             if (dur > maxDur) maxDur = dur
           }
         }
       })
       VideoUtil.eventStream.setSortedEvents() // sorted array of eventIds - optimizing event loop
-      durationCallback(maxDur)
     })
   },
 

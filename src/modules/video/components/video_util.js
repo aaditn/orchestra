@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import * as Tone from 'tone'
+import PubSub from 'pubsub-js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Mannequin, Male, rad} from './mannequin'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
@@ -23,6 +24,7 @@ const VideoUtil = {
   players: {},
   eventStream: null,
   posAudio: null,
+  startTime: 0,
 
   facecap_mesh: null,
   facecap_action: null,
@@ -43,7 +45,6 @@ const VideoUtil = {
     // const listener = new THREE.AudioListener()
     // VideoUtil.camera.add( listener )
     // const posAudio = new THREE.PositionalAudio( listener )
-
 
     const onWindowResize = (event) => {
       VideoUtil.camera.aspect = window.innerWidth / window.innerHeight
@@ -656,7 +657,10 @@ const VideoUtil = {
     if (VideoUtil.gameCounter % 100 == 0) {
       evtStream.computeCurrPtr(t)
       evtStream.cacheActive(t - 2, t + 5)
-      console.log("Animate heartbeat: gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
+      // console.log("Animate heartbeat: t =", t.toFixed(3), " gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
+    }
+    if (VideoUtil.gameCounter % 50 == 0) { // approx once/sec
+      PubSub.publish('POSITION', {position: t - VideoUtil.startTime})
     }
     VideoUtil.gameCounter++
     if (VideoUtil.gameCounter >= 1000000) VideoUtil.gameCounter = 0

@@ -1,11 +1,13 @@
-import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Slider from '@mui/material/Slider';
-import IconButton from '@mui/material/IconButton';
-import PauseRounded from '@mui/icons-material/PauseRounded';
-import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded';
+import { useEffect, useState } from 'react'
+import PubSub from 'pubsub-js'
+import { styled, useTheme } from '@mui/material/styles'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Slider from '@mui/material/Slider'
+import IconButton from '@mui/material/IconButton'
+import PauseRounded from '@mui/icons-material/PauseRounded'
+import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded'
+import { VideoUtil } from './video_util'
 
 const TinyText = styled(Typography)({
   fontSize: '0.75rem',
@@ -15,16 +17,50 @@ const TinyText = styled(Typography)({
 });
 
 export default function MusicPlayerSlider(props) {
-  const theme = useTheme();
-  const duration = props.duration; // seconds
-  const [position, setPosition] = React.useState(props.position);
-  const [paused, setPaused] = React.useState(false);
-  function formatDuration(value) {
-    const minute = Math.floor(value / 60);
-    const secondLeft = value - minute * 60;
-    return `${minute}:${secondLeft < 9 ? `0${secondLeft}` : secondLeft}`;
+  const theme = useTheme()
+  const [max, setMax] = useState(0) // seconds
+  const [position, setPosition] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  const mySubscriber = (msg, data) => {
+    if (msg == 'POSITION') {
+      // console.log( "PUBSUB SLIDER: ", msg, data.position)
+      setPosition(Math.floor(data.position))
+    } else if (msg == "MAX") {
+      // console.log( "PUBSUB MAX: ", msg, data.max)
+      setMax(data.max)
+    }
   }
-  const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
+
+  useEffect(() => {
+    //--- Set up pubsub for global events ---//
+    const token1 = PubSub.subscribe('POSITION', mySubscriber) // tokens needed to cancel sub
+    const token2 = PubSub.subscribe('MAX', mySubscriber)
+  }, [])
+
+  const togglePlay = () => {
+    if (!paused) { // !paused, so stop video
+      setPaused(!paused)
+      VideoUtil.renderer.setAnimationLoop(null)
+      const now = performance.now() / 1000.0
+      VideoUtil.clock.stopTime = now
+      VideoUtil.clock.activeTime += VideoUtil.clock.stopTime - VideoUtil.clock.startTime
+    } else { // paused, so start video
+      setPaused(!paused)
+      VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
+      const now = performance.now() / 1000.0
+      VideoUtil.clock.startTime = now
+      VideoUtil.clock.inactiveTime += VideoUtil.clock.startTime - VideoUtil.clock.stopTime
+    }
+  }
+
+  const formatDuration = (value) => {
+    const minute = Math.floor(value / 60)
+    const secondLeft = value - minute * 60
+    return `${minute}:${secondLeft < 9 ? `0${secondLeft}` : secondLeft}`
+  }
+  const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
+
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
       <Slider
@@ -32,8 +68,8 @@ export default function MusicPlayerSlider(props) {
         size="small"
         value={position}
         min={0}
-        step={1}
-        max={duration}
+        step={0.01}
+        max={max}
         onChange={(_, value) => setPosition(value)}
         sx={{
           color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
@@ -82,13 +118,10 @@ export default function MusicPlayerSlider(props) {
       >
         <IconButton
           aria-label={paused ? 'play' : 'pause'}
-          onClick={() => setPaused(!paused)}
+          onClick={() => togglePlay()}
         >
           {paused ? (
-            <PlayArrowRounded
-              sx={{ fontSize: '3rem' }}
-              htmlColor={mainIconColor}
-            />
+            <PlayArrowRounded sx={{ fontSize: '3rem' }} htmlColor={mainIconColor} />
           ) : (
             <PauseRounded sx={{ fontSize: '3rem' }} htmlColor={mainIconColor} />
           )}
