@@ -657,7 +657,7 @@ const VideoUtil = {
     if (VideoUtil.gameCounter % 100 == 0) {
       evtStream.computeCurrPtr(t)
       evtStream.cacheActive(t - 2, t + 5)
-      // console.log("Animate heartbeat: t =", t.toFixed(3), " gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
+      console.log("Animate heartbeat: t =", t.toFixed(3), " gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
     }
     if (VideoUtil.gameCounter % 50 == 0) { // approx once/sec
       PubSub.publish('POSITION', {position: t - VideoUtil.startTime})

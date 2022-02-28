@@ -12,7 +12,6 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false)
-  const [duration, setDuration] = useState(0)
   const [audioRunning, setAudioRunning] = useState(false)
   const [audioButtonText, setAudioButtonText] = useState("Start Audio")
   const [pieceSelected, setPieceSelected] = useState(0)
@@ -37,6 +36,7 @@ export default function Home() {
 
   useEffect(() => {
     VideoUtil.initScene(setAssetsLoaded, true)
+    const token = PubSub.subscribe('RUNNING', mySubscriber)
   }, [])
 
   // start load scene into DOM and start video loop only when assets loaded
@@ -51,6 +51,17 @@ export default function Home() {
       document.getElementById("three-scene").innerHTML = ""
     }
   }, [assetsLoaded])
+
+  const mySubscriber = (msg, data) => {
+    if (msg == 'RUNNING') {
+      console.log("INDEX PUBSUB: ", msg, data)
+      if (data) { // start running
+
+      } else { // stop running
+
+      }
+    }
+  }
 
   const toggleAudio = () => {
     if (audioRunning) { // stop video
@@ -69,7 +80,7 @@ export default function Home() {
   const changePieceSelected = (evt) => {
     setPieceSelected(evt.target.value)
     const piece = pieces[evt.target.value]
-    AudioUtil.loadAudioFile(piece.url, piece.type, setDuration)
+    AudioUtil.loadAudioFile(piece.url, piece.type)
   }
 
   return (
@@ -99,7 +110,7 @@ export default function Home() {
           &nbsp; &nbsp;
           <span id="audio_container"></span>
           <audio controls></audio>
-          <MusicPlayerSlider/>
+          <MusicPlayerSlider />
           <div id="three-scene"></div>
         </div>
       </main>

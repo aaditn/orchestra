@@ -70,7 +70,7 @@ export class EventStream {
       if (evt) {
         if (Math.abs(evt.start - t) < 0.1) {
           this.curr_ptr = i
-          break;
+          break
         }
       }
     }

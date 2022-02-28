@@ -7,7 +7,8 @@ import Slider from '@mui/material/Slider'
 import IconButton from '@mui/material/IconButton'
 import PauseRounded from '@mui/icons-material/PauseRounded'
 import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded'
-import { VideoUtil } from './video_util'
+import { AudioUtil } from '../../audio/components/audio_util'
+import { VideoUtil } from '../../video/components/video_util'
 
 const TinyText = styled(Typography)({
   fontSize: '0.75rem',
@@ -17,17 +18,15 @@ const TinyText = styled(Typography)({
 });
 
 export default function MusicPlayerSlider(props) {
-  const theme = useTheme()
+  const theme  = useTheme()
   const [max, setMax] = useState(0) // seconds
   const [position, setPosition] = useState(0)
   const [paused, setPaused] = useState(false)
 
   const mySubscriber = (msg, data) => {
     if (msg == 'POSITION') {
-      // console.log( "PUBSUB SLIDER: ", msg, data.position)
       setPosition(Math.floor(data.position))
     } else if (msg == "MAX") {
-      // console.log( "PUBSUB MAX: ", msg, data.max)
       setMax(data.max)
     }
   }
@@ -36,6 +35,7 @@ export default function MusicPlayerSlider(props) {
     //--- Set up pubsub for global events ---//
     const token1 = PubSub.subscribe('POSITION', mySubscriber) // tokens needed to cancel sub
     const token2 = PubSub.subscribe('MAX', mySubscriber)
+    const token3 = PubSub.subscribe('RUNNING', mySubscriber)
   }, [])
 
   const togglePlay = () => {
@@ -45,13 +45,32 @@ export default function MusicPlayerSlider(props) {
       const now = performance.now() / 1000.0
       VideoUtil.clock.stopTime = now
       VideoUtil.clock.activeTime += VideoUtil.clock.stopTime - VideoUtil.clock.startTime
+      // PubSub.publish('RUNNING', {isRunning: false})
     } else { // paused, so start video
       setPaused(!paused)
       VideoUtil.renderer.setAnimationLoop(VideoUtil.drawFrame)
       const now = performance.now() / 1000.0
       VideoUtil.clock.startTime = now
       VideoUtil.clock.inactiveTime += VideoUtil.clock.startTime - VideoUtil.clock.stopTime
+      // PubSub.publish('RUNNING', {isRunning: true})
     }
+  }
+
+  const debounce = (func, timeout = 300) => {
+    let timer
+    return (...args) => {
+      clearTimeout(timer)
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    }
+  }
+  const debouncedJumpToPosition = debounce((value) => jumpToPosition(value), 250)
+  const jumpToPosition = (value) => {
+    setPosition(value)
+    console.log("JUMPING TO:", value)
+    const now = value // VideoUtil.clock.getElapsedTime()
+    // VideoUtil.eventStream.setSortedEvents()
+    VideoUtil.eventStream.computeCurrPtr(now)
+    VideoUtil.eventStream.cacheActive(Math.max(0, now -2), now + 5)
   }
 
   const formatDuration = (value) => {
@@ -70,7 +89,7 @@ export default function MusicPlayerSlider(props) {
         min={0}
         step={0.01}
         max={max}
-        onChange={(_, value) => setPosition(value)}
+        onChange={(_, value) => debouncedJumpToPosition(value)}
         sx={{
           color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
           height: 4,
