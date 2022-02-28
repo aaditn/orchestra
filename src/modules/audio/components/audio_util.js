@@ -183,7 +183,7 @@ const AudioUtil = {
 
   stopRecorder: () => {
     // triggers callback recorder.onstop
-    if (AudioUtil.recorder) {
+    if (AudioUtil.recorder && AudioUtil.recorder.state != "inactive") {
       AudioUtil.recorder.stop()
     }
   },
