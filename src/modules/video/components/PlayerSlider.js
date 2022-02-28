@@ -28,6 +28,8 @@ export default function MusicPlayerSlider(props) {
       setPosition(Math.floor(data.position))
     } else if (msg == "MAX") {
       setMax(data.max)
+    } else if (msg == "RUNNING") {
+      VideoUtil.running = data
     }
   }
 

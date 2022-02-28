@@ -25,6 +25,7 @@ const VideoUtil = {
   eventStream: null,
   posAudio: null,
   startTime: 0,
+  running: false,
 
   facecap_mesh: null,
   facecap_action: null,
@@ -659,7 +660,7 @@ const VideoUtil = {
       evtStream.cacheActive(t - 2, t + 5)
       console.log("Animate heartbeat: t =", t.toFixed(3), " gameCounter =", VideoUtil.gameCounter, " currPtr =", evtStream.currPtr," active =", Object.keys(evtStream.active).length)
     }
-    if (VideoUtil.gameCounter % 50 == 0) { // approx once/sec
+    if (VideoUtil.running && VideoUtil.gameCounter % 50 == 0) { // approx once/sec
       PubSub.publish('POSITION', {position: t - VideoUtil.startTime})
     }
     VideoUtil.gameCounter++

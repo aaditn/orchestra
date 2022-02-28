@@ -36,7 +36,6 @@ export default function Home() {
 
   useEffect(() => {
     VideoUtil.initScene(setAssetsLoaded, true)
-    const token = PubSub.subscribe('RUNNING', mySubscriber)
   }, [])
 
   // start load scene into DOM and start video loop only when assets loaded
@@ -52,28 +51,19 @@ export default function Home() {
     }
   }, [assetsLoaded])
 
-  const mySubscriber = (msg, data) => {
-    if (msg == 'RUNNING') {
-      console.log("INDEX PUBSUB: ", msg, data)
-      if (data) { // start running
-
-      } else { // stop running
-
-      }
-    }
-  }
-
   const toggleAudio = () => {
     if (audioRunning) { // stop video
       AudioUtil.handleStopAudio()
       VideoUtil.clearEvents()
       setAudioRunning(false)
       setAudioButtonText("Start Audio")
+      VideoUtil.running = false
     } else { // start video
       const piece = pieces[pieceSelected]
       AudioUtil.handleStartAudio(piece.type)
       setAudioRunning(true)
       setAudioButtonText("Stop Audio")
+      VideoUtil.running = true
     }
   }
 
