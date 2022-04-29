@@ -68,11 +68,11 @@ export default function MusicPlayerSlider(props) {
   const debouncedJumpToPosition = debounce((value) => jumpToPosition(value), 250)
   const jumpToPosition = (value) => {
     setPosition(value)
-    console.log("JUMPING TO:", value)
+    console.log("JUMPING TO:", value, " t=", VideoUtil.clock.getElapsedTime(), " startTime: ", VideoUtil.startTime)
     const now = value // VideoUtil.clock.getElapsedTime()
     // VideoUtil.eventStream.setSortedEvents()
     VideoUtil.eventStream.computeCurrPtr(now)
-    VideoUtil.eventStream.cacheActive(Math.max(0, now -2), now + 5)
+    VideoUtil.eventStream.cacheActive(Math.max(0, now - 2), now + 5)
   }
 
   const formatDuration = (value) => {
