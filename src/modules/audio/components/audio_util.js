@@ -366,8 +366,9 @@ const AudioUtil = {
   // Assumes AudioUtil.tracks is populated
   handleStartAudio: function (fileType) {
     Tone.loaded().then(() => {
-      VideoUtil.startTime = Tone.now()
-      console.log("Audio start at:", VideoUtil.startTime)
+      // VideoUtil.startTime = Tone.now()
+      VideoUtil.startTime = VideoUtil.clock.getElapsedTime()
+      console.log("Audio start at:", VideoUtil.startTime, " clock: ", VideoUtil.clock.getElapsedTime())
       let maxDur = 0
       AudioUtil.score.forEach((blob, blobIdx) => {
         if (blob.player) {
