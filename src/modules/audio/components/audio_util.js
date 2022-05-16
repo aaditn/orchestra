@@ -11,8 +11,11 @@ const AudioUtil = {
   score: [],
   tracks: {},
   startTime: 0,
-  recorder: null,
-  chunks: [],
+  audioRecorder: null,
+  audioChunks: [],
+  videoRecorder: null,
+  videoChunks: [],
+  videoHtmlElem: null,
   trackPlayerMap: {},
   //--- Set up pubsub for global events ---//
   mySubscriber: (msg, data) => {
@@ -166,35 +169,102 @@ const AudioUtil = {
     })
   },
 
-  startRecorder: () => {
+  startAudioRecorder: () => {
     const audioElem = document.querySelector('audio')
     const actx = Tone.context
     const dest = actx.createMediaStreamDestination()
-    AudioUtil.chunks = [] // initialize audio chunks
-    AudioUtil.recorder = new MediaRecorder(dest.stream)
-    AudioUtil.recorder.start()
-    AudioUtil.recorder.ondataavailable = e => { AudioUtil.chunks.push(e.data) }
-    AudioUtil.recorder.onstop = e => {
-      const blob = new Blob(AudioUtil.chunks.flat(), { type: 'audio/ogg; codecs=opus' })
+    AudioUtil.audioChunks = [] // initialize audioChunks
+    AudioUtil.audioRecorder = new MediaRecorder(dest.stream)
+    AudioUtil.audioRecorder.start()
+    AudioUtil.audioRecorder.ondataavailable = e => { AudioUtil.audioChunks.push(e.data) }
+    AudioUtil.audioRecorder.onstop = e => {
+      const blob = new Blob(AudioUtil.audioChunks.flat(), { type: 'audio/ogg; codecs=opus' })
       audioElem.src = URL.createObjectURL(blob)
     }
     return dest
   },
 
-  stopRecorder: () => {
+  stopAudioRecorder: () => {
     // triggers callback recorder.onstop
-    if (AudioUtil.recorder && AudioUtil.recorder.state != "inactive") {
-      AudioUtil.recorder.stop()
+    if (AudioUtil.audioRecorder && AudioUtil.audioRecorder.state != "inactive") {
+      AudioUtil.audioRecorder.stop()
     }
   },
 
   handleStopAudio: () => {
-    AudioUtil.stopRecorder()
+    AudioUtil.stopAudioRecorder()
     AudioUtil.score.forEach((trackBlob) => {
       trackBlob.synth.dispose()
     })
     AudioUtil.score = []
   },
+
+
+  //---------------- VIDEO RECORDING START ----------------//
+  playVideo: () => {
+    AudioUtil.videoHtmlElem.play()
+  },
+
+  stopVideoRecorder: () => {
+    AudioUtil.videoRecorder.stop()
+    console.log('Recorded Video Chunks: ', AudioUtil.videoChunks)
+    AudioUtil.videoHtmlElem.controls = true
+  },
+
+  handleStopVideo: (event) => {
+    console.log('VideoRecorder STOPPED!!!!!: ', event)
+    const superBuffer = new Blob(AudioUtil.videoChunks, {type: 'video/webm'})
+    AudioUtil.videoHtmlElem.src = window.URL.createObjectURL(superBuffer)
+  },
+
+  handleVideoDataAvailable: (event) => {
+    if (event.data && event.data.size > 0) {
+      // console.log("VIDEO DATA AVAILABLE: ", event)
+      AudioUtil.videoChunks.push(event.data)
+    }
+  },
+
+  startVideoRecorder: () => {
+    const canvas = VideoUtil.renderer.domElement
+    const stream = canvas.captureStream(10); // frames per second
+    console.log('Started stream capture from canvas element: ', stream)
+    AudioUtil.videoHtmlElem = document.querySelector('video')
+    console.log("VIDEO: ", AudioUtil.videoHtmlElem )
+
+    let options = {mimeType: 'video/webm'}
+    AudioUtil.videoChunks = []
+    try {
+      AudioUtil.videoRecorder = new MediaRecorder(stream, options)
+    } catch (e0) {
+      console.log('Unable to create MediaRecorder with options Object: ', e0);
+      try {
+        options = {mimeType: 'video/webm,codecs=vp9'}
+        AudioUtil.videoRecorder = new MediaRecorder(stream, options)
+      } catch (e1) {
+        console.log('Unable to create MediaRecorder with options Object: ', e1);
+        try {
+          options = 'video/vp8'; // Chrome 47
+          AudioUtil.videoRecorder = new MediaRecorder(stream, options);
+        } catch (e2) {
+          alert('MediaRecorder is not supported by this browser.\n\n' +
+            'Try Firefox 29 or later, or Chrome 47 or later, ' +
+            'with Enable experimental Web Platform features enabled from chrome://flags.');
+          console.error('Exception while creating MediaRecorder:', e2);
+          return;
+        }
+      }
+    }
+    console.log('Created MediaRecorder', AudioUtil.videoRecorder, 'with options', options)
+    // recordButton.textContent = 'Stop Recording'
+    // playButton.disabled = true
+    // downloadButton.disabled = true
+    AudioUtil.videoRecorder.onstop = AudioUtil.handleStopVideo
+    AudioUtil.videoRecorder.ondataavailable = AudioUtil.handleVideoDataAvailable
+    AudioUtil.videoRecorder.start(100) // collect 100ms of data
+    console.log('MediaRecorder started', AudioUtil.videoRecorder)
+  },
+
+  //---------------- VIDEO RECORDING  END  ----------------//
 
   // json = {{ voice1: { instrument: "violin", muted: false, speed: 0.2, data: [}}, ...}
   postProcessMIDI: (midi) => {
@@ -301,8 +371,9 @@ const AudioUtil = {
   },
 
   createScoreFromTracks: (tracks) => {
-    // Turn recorder on by default
-    const dest = AudioUtil.startRecorder()
+    // Turn audioRecorder on by default
+    const dest = AudioUtil.startAudioRecorder()
+    AudioUtil.startVideoRecorder()
 
     // Play a score with multiple parts
     AudioUtil.trackPlayerMap = { violin: [], viola: [], cello: [], piano: []} // actor_id's
@@ -336,7 +407,7 @@ const AudioUtil = {
         // synth.chain(panner3d, Tone.Destination)
         synth.chain(reverb, panner3d, Tone.Destination)
         synth.toDestination()
-        synth.connect(dest) // connect synth to AudioUtil.recorder as well
+        synth.connect(dest) // connect synth to AudioUtil.audioRecorder as well
         synth.volume.value = -6
 
         AudioUtil.score.push({ synth: synth, track: track, player: player })

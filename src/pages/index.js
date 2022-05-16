@@ -4,6 +4,8 @@ import PubSub from 'pubsub-js'
 import { AudioUtil } from '../modules/audio/components/audio_util'
 import { VideoUtil } from '../modules/video/components/video_util'
 import MusicPlayerSlider from '../modules/video/components/PlayerSlider'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
@@ -54,6 +56,9 @@ export default function Home() {
   const toggleAudio = () => {
     if (audioRunning) { // stop video
       AudioUtil.handleStopAudio()
+
+      AudioUtil.handleStopVideo() // added this to see if video gets dumped on this event
+
       VideoUtil.clearEvents()
       setAudioRunning(false)
       setAudioButtonText("Start Audio")
@@ -74,37 +79,49 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
+    <Container maxWidth="lg">
       <Head>
         <title>Orchestra</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className={styles.main}>
-        <div className={styles.grid}>
-          <Select
-            variant="standard"
-            id="music"
-            value={pieceSelected}
-            label="Select Music"
-            onChange={changePieceSelected}
-          >
-            {pieces.map((piece, pieceIdx) => (
-              <MenuItem key={pieceIdx} value={pieceIdx}>{piece.name}</MenuItem>
-            ))}
-          </Select>
-          &nbsp; &nbsp;
-          <Button onClick={toggleAudio} variant="contained">
-            {audioButtonText}
-          </Button>
-          &nbsp; &nbsp;
-          <span id="audio_container"></span>
+      <Grid container spacing={1}>
+        <Grid item xs={3}>
+          <div>
+            <Select
+              variant="standard"
+              id="music"
+              value={pieceSelected}
+              label="Select Music"
+              onChange={changePieceSelected}
+            >
+              {pieces.map((piece, pieceIdx) => (
+                <MenuItem key={pieceIdx} value={pieceIdx}>{piece.name}</MenuItem>
+              ))}
+            </Select>
+          </div>
+        </Grid>
+        <Grid item xs={3}>
+          <div>
+            <Button onClick={toggleAudio} variant="contained">
+              {audioButtonText}
+            </Button>
+          </div>
+        </Grid>
+        <Grid item xs={6}>
           <audio controls></audio>
+        </Grid>
+        <Grid item xs={12}>
           <MusicPlayerSlider />
-          <div id="three-scene"></div>
-        </div>
-      </main>
-
-    </div>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <div id="three-scene" style={{border: "1px solid black"}}></div>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <div style={{border: "1px solid black"}}>
+            <video id="recorded_video" playsInline loop></video>
+          </div>
+        </Grid>
+      </Grid>
+    </Container>
   )
 }

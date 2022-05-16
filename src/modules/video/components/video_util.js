@@ -34,7 +34,7 @@ const VideoUtil = {
   // overridden from mannequin.js
   createScene: () => {
     VideoUtil.renderer = new THREE.WebGLRenderer({ antialias: true })
-    VideoUtil.renderer.setSize(1200, 750)
+    VideoUtil.renderer.setSize(0.45 * window.innerWidth, (750.0/1200) * 0.45 * window.innerWidth)
     VideoUtil.renderer.shadowMap.enabled = true
 
     VideoUtil.scene = new THREE.Scene()
@@ -50,7 +50,7 @@ const VideoUtil = {
     const onWindowResize = (event) => {
       VideoUtil.camera.aspect = window.innerWidth / window.innerHeight
       VideoUtil.camera.updateProjectionMatrix()
-      // VideoUtil.renderer.setSize(window.innerWidth, window.innerHeight, true)
+      VideoUtil.renderer.setSize(0.45 * window.innerWidth, (750.0/1200) * 0.45 * window.innerWidth, true)
     }
     window.addEventListener('resize', onWindowResize, false)
     onWindowResize()
