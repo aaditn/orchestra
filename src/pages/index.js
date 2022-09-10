@@ -55,9 +55,9 @@ export default function Home() {
 
   const toggleAudio = () => {
     if (audioRunning) { // stop video
-      AudioUtil.handleStopAudio()
+      // AudioUtil.handleStopAudio()
 
-      AudioUtil.handleStopVideo() // added this to see if video gets dumped on this event
+      // AudioUtil.handleStopVideo() // added this to see if video gets dumped on this event
 
       VideoUtil.clearEvents()
       setAudioRunning(false)
@@ -110,9 +110,15 @@ export default function Home() {
         <Grid item xs={6}>
           <audio controls></audio>
         </Grid>
+        {/*
         <Grid item xs={12}>
           <MusicPlayerSlider />
         </Grid>
+        */}
+        <Grid item xs={12}>
+          <div id="three-scene" style={{border: "1px solid black"}}></div>
+        </Grid>
+        {/*
         <Grid item xs={12} md={6}>
           <div id="three-scene" style={{border: "1px solid black"}}></div>
         </Grid>
@@ -121,6 +127,7 @@ export default function Home() {
             <video id="recorded_video" playsInline loop></video>
           </div>
         </Grid>
+        */}
       </Grid>
     </Container>
   )

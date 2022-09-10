@@ -50,7 +50,9 @@ const VideoUtil = {
     const onWindowResize = (event) => {
       VideoUtil.camera.aspect = window.innerWidth / window.innerHeight
       VideoUtil.camera.updateProjectionMatrix()
-      VideoUtil.renderer.setSize(0.45 * window.innerWidth, (750.0/1200) * 0.45 * window.innerWidth, true)
+      // video_recorded changes
+      // VideoUtil.renderer.setSize(0.45 * window.innerWidth, (750.0/1200) * 0.45 * window.innerWidth, true)
+      VideoUtil.renderer.setSize(0.9 * window.innerWidth, (750.0/1200) * 0.9 * window.innerWidth, true)
     }
     window.addEventListener('resize', onWindowResize, false)
     onWindowResize()

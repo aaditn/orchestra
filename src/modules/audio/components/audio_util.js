@@ -11,9 +11,9 @@ const AudioUtil = {
   score: [],
   tracks: {},
   startTime: 0,
-  audioRecorder: null,
+  // audioRecorder: null,
   audioChunks: [],
-  videoRecorder: null,
+  // videoRecorder: null,
   videoChunks: [],
   videoHtmlElem: null,
   trackPlayerMap: {},
@@ -169,6 +169,7 @@ const AudioUtil = {
     })
   },
 
+  /*
   startAudioRecorder: () => {
     const audioElem = document.querySelector('audio')
     const actx = Tone.context
@@ -198,9 +199,11 @@ const AudioUtil = {
     })
     AudioUtil.score = []
   },
+  */
 
 
   //---------------- VIDEO RECORDING START ----------------//
+  /*
   playVideo: () => {
     AudioUtil.videoHtmlElem.play()
   },
@@ -258,11 +261,13 @@ const AudioUtil = {
     // recordButton.textContent = 'Stop Recording'
     // playButton.disabled = true
     // downloadButton.disabled = true
-    AudioUtil.videoRecorder.onstop = AudioUtil.handleStopVideo
-    AudioUtil.videoRecorder.ondataavailable = AudioUtil.handleVideoDataAvailable
-    AudioUtil.videoRecorder.start(100) // collect 100ms of data
-    console.log('MediaRecorder started', AudioUtil.videoRecorder)
+    
+    // AudioUtil.videoRecorder.onstop = AudioUtil.handleStopVideo
+    // AudioUtil.videoRecorder.ondataavailable = AudioUtil.handleVideoDataAvailable
+    // AudioUtil.videoRecorder.start(100) // collect 100ms of data
+    // console.log('MediaRecorder started', AudioUtil.videoRecorder)
   },
+  */
 
   //---------------- VIDEO RECORDING  END  ----------------//
 
@@ -372,8 +377,8 @@ const AudioUtil = {
 
   createScoreFromTracks: (tracks) => {
     // Turn audioRecorder on by default
-    const dest = AudioUtil.startAudioRecorder()
-    AudioUtil.startVideoRecorder()
+    // const dest = AudioUtil.startAudioRecorder()
+    // AudioUtil.startVideoRecorder()
 
     // Play a score with multiple parts
     AudioUtil.trackPlayerMap = { violin: [], viola: [], cello: [], piano: []} // actor_id's
@@ -407,7 +412,7 @@ const AudioUtil = {
         // synth.chain(panner3d, Tone.Destination)
         synth.chain(reverb, panner3d, Tone.Destination)
         synth.toDestination()
-        synth.connect(dest) // connect synth to AudioUtil.audioRecorder as well
+        // synth.connect(dest) // connect synth to AudioUtil.audioRecorder as well
         synth.volume.value = -6
 
         AudioUtil.score.push({ synth: synth, track: track, player: player })
