@@ -136,7 +136,7 @@ const AudioUtil = {
   // synth, notes, startTime - returns duration on this synth
   playNotes: (synth, instrument, player, notes, startTime, speed) => {
     let bowdir = true
-    let curr = startTime // audio clock (Tone.now())
+    let curr = startTime + 0.5 // audio clock (Tone.now()), magic 0.5 - seems to need non-zero delay to sync
     notes.forEach((noteArr, i) => {
       let duration = 0
       noteArr.forEach((el, j) => {
@@ -146,6 +146,7 @@ const AudioUtil = {
           const velocity = 0.5
           const note = el
           const vsched = curr // startTime + (curr - startTime)
+          // console.log("note=", note, " vsched=", vsched)
           if (note != "R") { // "R" is a rest
             AudioUtil.queuePlayNote(synth, note, vsched, duration, velocity, instrument)
             switch (instrument) {
