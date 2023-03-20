@@ -110,11 +110,9 @@ export default function Home() {
         <Grid item xs={6}>
           <audio controls></audio>
         </Grid>
-        {/*
         <Grid item xs={12}>
           <MusicPlayerSlider />
         </Grid>
-        */}
         <Grid item xs={12}>
           <div id="three-scene" style={{border: "1px solid black"}}></div>
         </Grid>
